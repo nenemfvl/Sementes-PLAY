@@ -11,7 +11,7 @@
   
   body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #0A0A1A 0%, #1A1A2E 50%, #121220 100%);
+    background-color: #0A0A1A;
     color: #FFFFFF;
     min-height: 100vh;
   }
