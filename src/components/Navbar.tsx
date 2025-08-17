@@ -103,16 +103,7 @@ export default function Navbar() {
              >
                Ranking
              </Link>
-                         <Link 
-               href="/sobre" 
-               className={`transition-colors ${
-                 isActiveLink('/sobre') 
-                   ? 'text-sementes-primary font-semibold' 
-                   : 'text-gray-300 hover:text-sementes-primary'
-               }`}
-             >
-               Sobre
-             </Link>
+                         
           </nav>
 
           {/* User Menu */}
@@ -299,13 +290,7 @@ export default function Navbar() {
               >
                 Ranking
               </Link>
-              <Link 
-                href="/sobre" 
-                className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Sobre
-              </Link>
+              
             </nav>
           </motion.div>
         )}
