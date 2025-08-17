@@ -123,22 +123,6 @@ export default function DashboardPage() {
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="card p-6"
-          >
-            <div className="flex items-center">
-              <div className="p-2 bg-gray-600/20 rounded-lg">
-                <UserIcon className="w-6 h-6 text-gray-400" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-400">Tipo</p>
-                <p className="text-2xl font-bold text-white capitalize">{usuario?.tipo || 'Usuário'}</p>
-              </div>
-            </div>
-          </motion.div>
         </div>
 
         {/* Quick Actions */}
