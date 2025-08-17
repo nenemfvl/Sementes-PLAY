@@ -4,6 +4,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { EyeIcon, EyeSlashIcon, CheckIcon } from '@heroicons/react/24/outline'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function RegistroPage() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -18,8 +19,11 @@ export default function RegistroPage() {
   })
 
   const [errors, setErrors] = React.useState<Record<string, string>>({})
+  const [loading, setLoading] = React.useState(false)
+  
+  const { registro } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     // Validação básica
@@ -60,8 +64,15 @@ export default function RegistroPage() {
       return
     }
     
-    // Implementar lógica de registro
-    console.log('Registro:', formData)
+    setLoading(true)
+    
+    try {
+      await registro(formData.nome, formData.email, formData.username, formData.password)
+    } catch (err: any) {
+      setErrors({ geral: err.message || 'Erro ao criar conta' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

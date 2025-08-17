@@ -15,6 +15,7 @@ import {
   CogIcon,
   BellIcon,
 } from '@heroicons/react/24/outline'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function Navbar() {
   const router = useRouter()
@@ -22,9 +23,8 @@ export default function Navbar() {
   const [showProfileMenu, setShowProfileMenu] = React.useState(false)
   const [showMobileMenu, setShowMobileMenu] = React.useState(false)
 
-  // Estado do usuário (será gerenciado pelo sistema de auth real)
-  const [user, setUser] = React.useState<any>(null)
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false)
+  // Usar o contexto de autenticação
+  const { usuario, isAuthenticated, logout } = useAuth()
 
   const handleProfileClick = () => {
     setShowProfileMenu(!showProfileMenu)
@@ -37,8 +37,7 @@ export default function Navbar() {
   }
 
   const handleLogout = () => {
-    // Implementar logout real
-    console.log('Logout')
+    logout()
     setShowProfileMenu(false)
     setShowMobileMenu(false)
   }
@@ -126,15 +125,15 @@ export default function Navbar() {
 
             {/* User Profile */}
             <div className="relative">
-              {isAuthenticated && user ? (
+              {isAuthenticated && usuario ? (
                 <button
                   onClick={handleProfileClick}
                   className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-700 transition-colors"
                 >
-                  {user.avatarUrl ? (
+                  {usuario.avatarUrl ? (
                     <img 
-                      src={user.avatarUrl} 
-                      alt={user.nome} 
+                      src={usuario.avatarUrl} 
+                      alt={usuario.nome} 
                       className="w-8 h-8 rounded-full"
                     />
                   ) : (
@@ -142,7 +141,7 @@ export default function Navbar() {
                       <UserIcon className="w-5 h-5 text-white" />
                     </div>
                   )}
-                  <span className="text-gray-300 hidden sm:block">{user.nome}</span>
+                  <span className="text-gray-300 hidden sm:block">{usuario.nome}</span>
                   <ChevronDownIcon className="w-4 h-4 text-gray-400" />
                 </button>
               ) : (
@@ -163,7 +162,7 @@ export default function Navbar() {
               )}
 
               {/* Profile Dropdown */}
-              {showProfileMenu && isAuthenticated && user && (
+              {showProfileMenu && isAuthenticated && usuario && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -173,10 +172,10 @@ export default function Navbar() {
                   {/* User Info */}
                   <div className="px-4 py-3 border-b border-gray-700">
                     <div className="flex items-center space-x-3">
-                      {user.avatarUrl ? (
+                      {usuario.avatarUrl ? (
                         <img 
-                          src={user.avatarUrl} 
-                          alt={user.nome} 
+                          src={usuario.avatarUrl} 
+                          alt={usuario.nome} 
                           className="w-10 h-10 rounded-full"
                         />
                       ) : (
@@ -185,10 +184,10 @@ export default function Navbar() {
                         </div>
                       )}
                       <div>
-                        <div className="text-white font-medium">{user.nome}</div>
-                        <div className="text-sm text-gray-400">{user.email}</div>
+                        <div className="text-white font-medium">{usuario.nome}</div>
+                        <div className="text-sm text-gray-400">{usuario.email}</div>
                         <div className="text-sm text-sementes-accent">
-                          {user.sementes} Sementes
+                          {usuario.sementes} Sementes
                         </div>
                       </div>
                     </div>

@@ -4,6 +4,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -11,11 +12,23 @@ export default function LoginPage() {
     email: '',
     password: ''
   })
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState('')
+  
+  const { login } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Implementar lógica de login
-    console.log('Login:', formData)
+    setError('')
+    setLoading(true)
+    
+    try {
+      await login(formData.email, formData.password)
+    } catch (err: any) {
+      setError(err.message || 'Erro ao fazer login')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,12 +132,19 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {error && (
+            <div className="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
           <div>
             <button
               type="submit"
-              className="btn-primary w-full"
+              disabled={loading}
+              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Entrar
+              {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </div>
 
