@@ -26,6 +26,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// Função para salvar token nos cookies
+const setCookie = (name: string, value: string, days: number = 7) => {
+  const expires = new Date()
+  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000))
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`
+}
+
+// Função para remover cookie
+const removeCookie = (name: string) => {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -66,9 +78,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         // Token expirado
         localStorage.removeItem('auth-token')
+        removeCookie('auth-token')
       }
     } catch (error) {
       localStorage.removeItem('auth-token')
+      removeCookie('auth-token')
     } finally {
       setLoading(false)
     }
@@ -92,8 +106,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.error || 'Erro ao fazer login')
       }
 
-      // Salvar token
+      // Salvar token no localStorage e cookies
       localStorage.setItem('auth-token', data.token)
+      setCookie('auth-token', data.token)
       
       // Atualizar estado
       setUsuario(data.usuario)
@@ -139,6 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('auth-token')
+    removeCookie('auth-token')
     setUsuario(null)
     setIsAuthenticated(false)
     router.push('/')
