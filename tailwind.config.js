@@ -9,16 +9,16 @@ module.exports = {
     extend: {
       colors: {
         'sementes': {
-          'primary': '#FF6B6B', // Vermelho/rosa vibrante (cor principal)
-          'secondary': '#4A235A', // Roxo escuro
-          'accent': '#7B3F8D', // Roxo mais claro
+          'primary': '#FF0000', // Vermelho puro (cor principal)
+          'secondary': '#CC0000', // Vermelho escuro
+          'accent': '#FF3333', // Vermelho mais claro
           'dark': '#1A1A2E', // Azul índigo escuro (fundo principal)
           'light': '#ADD8E6', // Azul claro (ícones)
         },
         'sss': {
           'dark': '#0A0A1A', // Azul muito escuro (navbar)
           'light': '#FFFFFF', // Branco
-          'accent': '#FF6B6B', // Vermelho/rosa vibrante
+          'accent': '#FF0000', // Vermelho puro
           'white': '#FFFFFF', // Branco
           'gray': '#2C2C3A', // Cinza azulado (botões secundários)
           'darker': '#121220', // Azul escuro (seção inferior)
