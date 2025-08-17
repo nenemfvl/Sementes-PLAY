@@ -196,6 +196,14 @@ export default function Navbar() {
                   {/* Menu Items */}
                   <div className="py-2">
                     <button
+                      onClick={() => handleMenuItemClick('/dashboard')}
+                      className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
+                    >
+                      <ChartBarIcon className="w-5 h-5" />
+                      <span>Dashboard</span>
+                    </button>
+                    
+                    <button
                       onClick={() => handleMenuItemClick('/perfil')}
                       className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
                     >
