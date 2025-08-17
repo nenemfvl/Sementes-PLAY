@@ -12,8 +12,8 @@ module.exports = {
           'primary': '#FF0000', // Vermelho puro (cor principal)
           'secondary': '#CC0000', // Vermelho escuro
           'accent': '#FF3333', // Vermelho mais claro
-          'dark': '#1A1A2E', // Azul índigo escuro (fundo principal)
-          'light': '#ADD8E6', // Azul claro (ícones)
+          'dark': '#0A0A1A', // Azul muito escuro (fundo principal)
+          'light': '#FFD700', // Dourado (ícones de presente)
         },
         'sss': {
           'dark': '#0A0A1A', // Azul muito escuro (navbar)
@@ -22,6 +22,7 @@ module.exports = {
           'white': '#FFFFFF', // Branco
           'gray': '#2C2C3A', // Cinza azulado (botões secundários)
           'darker': '#121220', // Azul escuro (seção inferior)
+          'medium': '#1A1A2E', // Azul médio (seção central)
         }
       },
       fontFamily: {
