@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -20,7 +22,7 @@ export default function Navbar() {
   const [showMobileMenu, setShowMobileMenu] = React.useState(false)
 
   // Estado do usuário (será gerenciado pelo sistema de auth real)
-  const [user, setUser] = React.useState(null)
+  const [user, setUser] = React.useState<any>(null)
   const [isAuthenticated, setIsAuthenticated] = React.useState(false)
 
   const handleProfileClick = () => {

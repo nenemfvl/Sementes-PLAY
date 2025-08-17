@@ -9,6 +9,7 @@ export interface JWTPayload {
   email: string
   tipo: string
   nome: string
+  [key: string]: any
 }
 
 export async function createToken(payload: JWTPayload): Promise<string> {
