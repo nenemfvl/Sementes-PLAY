@@ -22,7 +22,7 @@ module.exports = {
           'white': '#FFFFFF', // Branco
           'gray': '#2C2C3A', // Cinza azulado (botões secundários)
           'darker': '#0A0A1A', // Mesmo azul escuro
-          'medium': '#0A0A1A', // Mesmo azul escuro
+          'medium': '#1A1A2E', // Azul médio (fundo por trás do cupom)
         }
       },
       fontFamily: {
