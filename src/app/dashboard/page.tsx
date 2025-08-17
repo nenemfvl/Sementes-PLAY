@@ -100,6 +100,23 @@ export default function DashboardPage() {
                 <ChartBarIcon className="w-6 h-6 text-sementes-secondary" />
               </div>
               <div className="ml-4">
+                <p className="text-sm font-medium text-gray-400">XP</p>
+                <p className="text-2xl font-bold text-white">{usuario?.xp || 0}</p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="card p-6"
+          >
+            <div className="flex items-center">
+              <div className="p-2 bg-sementes-accent/20 rounded-lg">
+                <HeartIcon className="w-6 h-6 text-sementes-accent" />
+              </div>
+              <div className="ml-4">
                 <p className="text-sm font-medium text-gray-400">Pontuação</p>
                 <p className="text-2xl font-bold text-white">{usuario?.pontuacao || 0}</p>
               </div>
@@ -109,7 +126,7 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.5 }}
             className="card p-6"
           >
             <div className="flex items-center">
@@ -128,7 +145,7 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.6 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           <div className="card p-6 hover:bg-gray-700/50 transition-colors cursor-pointer">

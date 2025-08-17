@@ -10,6 +10,8 @@ interface Usuario {
   tipo: string
   sementes: number
   nivel: string
+  xp: number
+  pontuacao: number
   avatarUrl?: string
 }
 
@@ -56,7 +58,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: payload.email,
           tipo: payload.tipo,
           sementes: 0,
-          nivel: 'comum'
+          nivel: 'comum',
+          xp: 0,
+          pontuacao: 0
         })
         setIsAuthenticated(true)
       } else {
