@@ -9,18 +9,19 @@ module.exports = {
     extend: {
       colors: {
         'sementes': {
-          'primary': '#10B981', // Verde principal
-          'secondary': '#059669', // Verde escuro
-          'accent': '#34D399', // Verde claro
-          'dark': '#064E3B', // Verde muito escuro
-          'light': '#D1FAE5', // Verde muito claro
+          'primary': '#FF6B6B', // Vermelho/rosa vibrante (cor principal)
+          'secondary': '#4A235A', // Roxo escuro
+          'accent': '#7B3F8D', // Roxo mais claro
+          'dark': '#1A1A2E', // Azul índigo escuro (fundo principal)
+          'light': '#ADD8E6', // Azul claro (ícones)
         },
         'sss': {
-          'dark': '#111827', // Fundo escuro
-          'light': '#F9FAFB', // Fundo claro
-          'accent': '#10B981', // Verde accent
+          'dark': '#0A0A1A', // Azul muito escuro (navbar)
+          'light': '#FFFFFF', // Branco
+          'accent': '#FF6B6B', // Vermelho/rosa vibrante
           'white': '#FFFFFF', // Branco
-          'gray': '#6B7280', // Cinza
+          'gray': '#2C2C3A', // Cinza azulado (botões secundários)
+          'darker': '#121220', // Azul escuro (seção inferior)
         }
       },
       fontFamily: {
