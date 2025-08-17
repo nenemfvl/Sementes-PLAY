@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #111827;
+    color: #F9FAFB;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-sementes-primary hover:bg-sementes-secondary text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sementes-accent focus:ring-opacity-50;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent border-2 border-sementes-primary text-sementes-primary hover:bg-sementes-primary hover:text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sementes-accent focus:ring-opacity-50;
+  }
+  
+  .btn-accent {
+    @apply bg-sementes-accent hover:bg-sementes-secondary text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sementes-accent focus:ring-opacity-50;
+  }
+  
+  .card {
+    @apply bg-sss-dark border border-gray-700 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 bg-sss-dark border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sementes-primary focus:border-transparent transition-all duration-200;
+  }
+  
+  .gradient-bg {
+    @apply bg-gradient-to-br from-sementes-dark via-sementes-secondary to-sementes-primary;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-sementes-primary to-sementes-accent bg-clip-text text-transparent;
+  }
+  
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
