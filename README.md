@@ -2,6 +2,8 @@
 
 Sistema de cashback e doações para o ecossistema FiveM. Conectamos jogadores, criadores de conteúdo e donos de cidades através de um sistema cíclico de recompensas.
 
+> **Status**: Projeto configurado e pronto para deploy no Vercel e Railway!
+
 ## 🚀 Funcionalidades
 
 - **Sistema de Cashback**: 10% de cashback em compras FiveM
