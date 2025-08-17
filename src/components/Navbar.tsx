@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   UserGroupIcon,
@@ -18,6 +18,7 @@ import {
 
 export default function Navbar() {
   const router = useRouter()
+  const pathname = usePathname()
   const [showProfileMenu, setShowProfileMenu] = React.useState(false)
   const [showMobileMenu, setShowMobileMenu] = React.useState(false)
 
@@ -42,6 +43,13 @@ export default function Navbar() {
     setShowMobileMenu(false)
   }
 
+  const isActiveLink = (path: string) => {
+    if (path === '/') {
+      return pathname === '/'
+    }
+    return pathname.startsWith(path)
+  }
+
   return (
     <header className="bg-black shadow-lg border-b border-gray-700 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,36 +64,56 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <Link 
-              href="/" 
-              className="text-gray-300 hover:text-sementes-primary transition-colors"
-            >
-              Início
-            </Link>
-            <Link 
-              href="/criadores" 
-              className="text-gray-300 hover:text-sementes-primary transition-colors"
-            >
-              Criadores
-            </Link>
-            <Link 
-              href="/parceiros" 
-              className="text-gray-300 hover:text-sementes-primary transition-colors"
-            >
-              Parceiros
-            </Link>
-            <Link 
-              href="/ranking" 
-              className="text-gray-300 hover:text-sementes-primary transition-colors"
-            >
-              Ranking
-            </Link>
-            <Link 
-              href="/sobre" 
-              className="text-gray-300 hover:text-sementes-primary transition-colors"
-            >
-              Sobre
-            </Link>
+                         <Link 
+               href="/" 
+               className={`transition-colors ${
+                 isActiveLink('/') 
+                   ? 'text-sementes-primary font-semibold' 
+                   : 'text-gray-300 hover:text-sementes-primary'
+               }`}
+             >
+               Início
+             </Link>
+                         <Link 
+               href="/criadores" 
+               className={`transition-colors ${
+                 isActiveLink('/criadores') 
+                   ? 'text-sementes-primary font-semibold' 
+                   : 'text-gray-300 hover:text-sementes-primary'
+               }`}
+             >
+               Criadores
+             </Link>
+                         <Link 
+               href="/parceiros" 
+               className={`transition-colors ${
+                 isActiveLink('/parceiros') 
+                   ? 'text-sementes-primary font-semibold' 
+                   : 'text-gray-300 hover:text-sementes-primary'
+               }`}
+             >
+               Parceiros
+             </Link>
+                         <Link 
+               href="/ranking" 
+               className={`transition-colors ${
+                 isActiveLink('/ranking') 
+                   ? 'text-sementes-primary font-semibold' 
+                   : 'text-gray-300 hover:text-sementes-primary'
+               }`}
+             >
+               Ranking
+             </Link>
+                         <Link 
+               href="/sobre" 
+               className={`transition-colors ${
+                 isActiveLink('/sobre') 
+                   ? 'text-sementes-primary font-semibold' 
+                   : 'text-gray-300 hover:text-sementes-primary'
+               }`}
+             >
+               Sobre
+             </Link>
           </nav>
 
           {/* User Menu */}
