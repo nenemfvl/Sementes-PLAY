@@ -15,7 +15,7 @@ import {
   CogIcon,
   BellIcon,
 } from '@heroicons/react/24/outline'
-import { useAuth } from '@/contexts/AuthContext'
+
 
 export default function Navbar() {
   const router = useRouter()
@@ -23,8 +23,36 @@ export default function Navbar() {
   const [showProfileMenu, setShowProfileMenu] = React.useState(false)
   const [showMobileMenu, setShowMobileMenu] = React.useState(false)
 
-  // Usar o contexto de autenticação
-  const { usuario, isAuthenticated, logout, loading } = useAuth()
+  // Verificação direta no localStorage como no site antigo
+  const [usuario, setUsuario] = React.useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
+
+  // Verificar autenticação ao carregar
+  React.useEffect(() => {
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          setUsuario(dadosUsuario)
+          setIsAuthenticated(true)
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          setUsuario(null)
+          setIsAuthenticated(false)
+        }
+      } else {
+        setUsuario(null)
+        setIsAuthenticated(false)
+      }
+      setLoading(false)
+    }
+    
+    verificarAutenticacao()
+  }, [])
 
   const handleProfileClick = () => {
     setShowProfileMenu(!showProfileMenu)
@@ -37,9 +65,14 @@ export default function Navbar() {
   }
 
   const handleLogout = () => {
-    logout()
+    // Logout direto como no site antigo
+    localStorage.removeItem('usuario-dados')
+    localStorage.removeItem('auth-token')
+    setUsuario(null)
+    setIsAuthenticated(false)
     setShowProfileMenu(false)
     setShowMobileMenu(false)
+    window.location.href = '/'
   }
 
   const isActiveLink = (path: string) => {
