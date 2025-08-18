@@ -502,7 +502,13 @@ export default function PainelParceiro() {
                             <button
                               onClick={() => {
                                 setEditandoConteudo(conteudo)
-                                setFormConteudo(conteudo)
+                                setFormConteudo({
+                                  titulo: conteudo.titulo,
+                                  tipo: conteudo.tipo,
+                                  categoria: conteudo.categoria,
+                                  url: conteudo.url,
+                                  cidade: '' // Valor padrão para cidade
+                                })
                                 setShowModalConteudo(true)
                               }}
                               className="p-1 bg-blue-500/20 text-blue-300 rounded hover:bg-blue-500/30"
