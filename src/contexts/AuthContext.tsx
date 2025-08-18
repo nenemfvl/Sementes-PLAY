@@ -46,13 +46,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Verificar se usuário está logado ao carregar
   useEffect(() => {
-    const token = localStorage.getItem('auth-token')
-    if (token) {
-      // Verificar se token ainda é válido
-      verificarToken(token)
-    } else {
+    const verificarAutenticacao = async () => {
+      const token = localStorage.getItem('auth-token')
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      
+      if (token && usuarioSalvo) {
+        try {
+          // Verificar se token ainda é válido
+          await verificarToken(token)
+        } catch (error) {
+          console.error('Erro ao verificar token:', error)
+          // Limpar dados inválidos
+          localStorage.removeItem('auth-token')
+          localStorage.removeItem('usuario-dados')
+          removeCookie('auth-token')
+          setUsuario(null)
+          setIsAuthenticated(false)
+        }
+      } else {
+        // Sem token ou dados, usuário não está logado
+        setUsuario(null)
+        setIsAuthenticated(false)
+      }
       setLoading(false)
     }
+    
+    verificarAutenticacao()
   }, [])
 
   // Não mostrar usuário enquanto está carregando
@@ -68,7 +87,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const dadosUsuario = JSON.parse(usuarioSalvo)
         setUsuario(dadosUsuario)
         setIsAuthenticated(true)
-        setLoading(false)
         return
       }
       
@@ -89,18 +107,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           pontuacao: payload.pontuacao || 0
         })
         setIsAuthenticated(true)
-        setLoading(false)
       } else {
         // Token expirado
-        localStorage.removeItem('auth-token')
-        removeCookie('auth-token')
-        setLoading(false)
+        throw new Error('Token expirado')
       }
     } catch (error) {
       console.error('Erro ao verificar token:', error)
-      localStorage.removeItem('auth-token')
-      removeCookie('auth-token')
-      setLoading(false)
+      throw error
     }
   }
 
