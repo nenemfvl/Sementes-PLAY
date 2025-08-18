@@ -17,12 +17,13 @@ export default function DashboardPage() {
   const { usuario, isAuthenticated, loading } = useAuth()
   const router = useRouter()
 
-  // Redirecionar se não estiver logado
+  // Redirecionar se não estiver logado - apenas após carregamento completo
   React.useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    // Só redirecionar se não estiver carregando E não estiver autenticado
+    if (!loading && !isAuthenticated && !usuario) {
       router.push('/login')
     }
-  }, [isAuthenticated, loading, router])
+  }, [isAuthenticated, loading, usuario, router])
 
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
@@ -36,8 +37,8 @@ export default function DashboardPage() {
     )
   }
 
-  // Aguardar autenticação ser definida
-  if (!isAuthenticated || !usuario) {
+  // Aguardar autenticação ser definida - apenas se não estiver carregando
+  if (!loading && (!isAuthenticated || !usuario)) {
     return (
       <div className="min-h-screen bg-sss-dark flex items-center justify-center">
         <div className="text-center">
