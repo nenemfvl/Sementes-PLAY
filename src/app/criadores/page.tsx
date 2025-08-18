@@ -331,20 +331,30 @@ export default function CriadoresPage() {
     <div className="min-h-screen bg-sss-dark">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
+          {/* Header Moderno */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-8"
+            className="text-center mb-12"
           >
-            <h1 className="text-4xl font-bold text-white mb-4">
-              <UserGroupIcon className="w-8 h-8 inline mr-2 text-sementes-primary" />
-              Criadores de Conteúdo
-            </h1>
-            <p className="text-gray-300">
-              Descubra e acompanhe os melhores criadores da nossa comunidade
-            </p>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-sementes-primary/20 via-sementes-accent/20 to-sementes-primary/20 rounded-3xl blur-3xl"></div>
+              <div className="relative bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-12">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-sementes-primary to-sementes-accent rounded-2xl flex items-center justify-center shadow-2xl">
+                    <UserGroupIcon className="w-10 h-10 text-white" />
+                  </div>
+                </div>
+                <h1 className="text-5xl md:text-6xl font-black text-white mb-6 bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                  Criadores de Conteúdo
+                </h1>
+                <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                  Descubra e acompanhe os melhores criadores da nossa comunidade. 
+                  Conecte-se, inspire-se e cresça junto conosco.
+                </p>
+              </div>
+            </div>
           </motion.div>
 
           {/* Contador de Sementes em circulação */}
@@ -428,107 +438,173 @@ export default function CriadoresPage() {
             </motion.div>
           )}
 
-          {/* Estatísticas */}
+          {/* Estatísticas Modernas */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
           >
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">👥</div>
-              <p className="text-gray-400 text-sm">Total de Criadores</p>
-              <p className="text-white font-bold text-lg">
-                {dadosCiclo ? dadosCiclo.estatisticas.totalCriadores : criadores.filter(c => c.status === 'ativo').length}
-              </p>
+            <div className="group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 hover:border-blue-500/50 transition-all duration-300 hover:scale-105">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-2xl">👥</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-sm font-medium mb-2">Total de Criadores</p>
+                <p className="text-3xl font-black text-white">
+                  {dadosCiclo ? dadosCiclo.estatisticas.totalCriadores : criadores.filter(c => c.status === 'ativo').length}
+                </p>
+                <div className="mt-4 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
+              </div>
             </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">🎬</div>
-              <p className="text-gray-400 text-sm">Total de Conteúdos</p>
-              <p className="text-white font-bold text-lg">{criadores.reduce((acc, c) => acc + c.totalConteudos, 0)}</p>
+
+            <div className="group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 hover:border-green-500/50 transition-all duration-300 hover:scale-105">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-2xl">🎬</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-sm font-medium mb-2">Total de Conteúdos</p>
+                <p className="text-3xl font-black text-white">{criadores.reduce((acc, c) => acc + c.totalConteudos, 0)}</p>
+                <div className="mt-4 h-1 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full"></div>
+              </div>
             </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">👁️</div>
-              <p className="text-gray-400 text-sm">Total de Visualizações</p>
-              <p className="text-white font-bold text-lg">{(criadores.reduce((acc, c) => acc + c.totalVisualizacoes, 0) / 1000).toFixed(0)}k</p>
+
+            <div className="group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-red-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 hover:border-orange-500/50 transition-all duration-300 hover:scale-105">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-2xl">👁️</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-sm font-medium mb-2">Total de Visualizações</p>
+                <p className="text-3xl font-black text-white">{(criadores.reduce((acc, c) => acc + c.totalVisualizacoes, 0) / 1000).toFixed(0)}k</p>
+                <div className="mt-4 h-1 bg-gradient-to-r from-orange-500 to-red-600 rounded-full"></div>
+              </div>
             </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">💝</div>
-              <p className="text-gray-400 text-sm">Total de Sementes</p>
-              <p className="text-white font-bold text-lg">
-                {dadosCiclo ? 
-                  (dadosCiclo.estatisticas.totalSementes / 1000).toFixed(0) + 'k' : 
-                  (criadores.reduce((acc, c) => acc + c.totalSementes, 0) / 1000).toFixed(0) + 'k'
-                }
-              </p>
+
+            <div className="group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-amber-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-4xl">🌱</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-sm font-medium mb-2">Total de Sementes</p>
+                <p className="text-3xl font-black text-white">
+                  {dadosCiclo ? 
+                    (dadosCiclo.estatisticas.totalSementes / 1000).toFixed(0) + 'k' : 
+                    (criadores.reduce((acc, c) => acc + c.totalSementes, 0) / 1000).toFixed(0) + 'k'
+                  }
+                </p>
+                <div className="mt-4 h-1 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-full"></div>
+              </div>
             </div>
           </motion.div>
 
-          {/* Filtros */}
+          {/* Filtros Modernos */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="card mb-8"
+            className="mb-12"
           >
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Buscar criadores por nome ou categoria..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-sementes-primary"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex gap-4">
-                <div className="flex items-center space-x-2">
-                  <FunnelIcon className="w-5 h-5 text-gray-400" />
-                  <select
-                    value={filterCategoria}
-                    onChange={(e) => setFilterCategoria(e.target.value)}
-                    className="bg-gray-700 border border-gray-600 rounded-lg px-3 py-3 text-white focus:outline-none focus:border-sementes-primary"
-                  >
-                    {categorias.map((categoria) => (
-                      <option key={categoria} value={categoria}>
-                        {categoria === 'todas' ? 'Todas as Categorias' : categoria}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <StarIcon className="w-5 h-5 text-gray-400" />
-                  <select
-                    value={filterNivel}
-                    onChange={(e) => setFilterNivel(e.target.value)}
-                    className="bg-gray-700 border border-gray-600 rounded-lg px-3 py-3 text-white focus:outline-none focus:border-sementes-primary"
-                  >
-                    {niveis.map((nivel) => (
-                      <option key={nivel} value={nivel}>
-                        {nivel === 'todos' ? 'Todos os Níveis' : getNivelLabel(nivel)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <MapPinIcon className="w-5 h-5 text-gray-400" />
-                  <select
-                    value={filterEstado}
-                    onChange={(e) => setFilterEstado(e.target.value)}
-                    className="bg-gray-700 border border-gray-600 rounded-lg px-3 py-3 text-white focus:outline-none focus:border-sementes-primary"
-                  >
-                    {estados.map((estado) => (
-                      <option key={estado} value={estado}>
-                        {estado === 'todos' ? 'Todos os Estados' : estado}
-                      </option>
-                    ))}
-                  </select>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-sementes-primary/10 to-sementes-accent/10 rounded-3xl blur-2xl"></div>
+              <div className="relative bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-8">
+                <div className="flex flex-col lg:flex-row gap-6">
+                  {/* Barra de Busca */}
+                  <div className="flex-1">
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-sementes-primary/20 to-sementes-accent/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                      <div className="relative">
+                        <MagnifyingGlassIcon className="w-6 h-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-sementes-primary" />
+                        <input
+                          type="text"
+                          placeholder="🔍 Buscar criadores por nome ou categoria..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full pl-14 pr-6 py-4 bg-gray-800/80 border border-gray-600/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-sementes-primary focus:ring-2 focus:ring-sementes-primary/20 transition-all duration-300 text-lg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Filtros */}
+                  <div className="flex flex-wrap gap-4">
+                    <div className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                      <div className="relative flex items-center space-x-3 bg-gray-800/80 border border-gray-600/50 rounded-2xl px-4 py-3 hover:border-blue-500/50 transition-all duration-300">
+                        <FunnelIcon className="w-5 h-5 text-blue-400" />
+                        <select
+                          value={filterCategoria}
+                          onChange={(e) => setFilterCategoria(e.target.value)}
+                          className="bg-transparent text-white focus:outline-none cursor-pointer"
+                        >
+                          {categorias.map((categoria) => (
+                            <option key={categoria} value={categoria}>
+                              {categoria === 'todas' ? '📂 Todas as Categorias' : categoria}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-amber-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                      <div className="relative flex items-center space-x-3 bg-gray-800/80 border border-gray-600/50 rounded-2xl px-4 py-3 hover:border-yellow-500/50 transition-all duration-300">
+                        <StarIcon className="w-5 h-5 text-yellow-400" />
+                        <select
+                          value={filterNivel}
+                          onChange={(e) => setFilterNivel(e.target.value)}
+                          className="bg-transparent text-white focus:outline-none cursor-pointer"
+                        >
+                          {niveis.map((nivel) => (
+                            <option key={nivel} value={nivel}>
+                              {nivel === 'todos' ? '⭐ Todos os Níveis' : getNivelLabel(nivel)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                      <div className="relative flex items-center space-x-3 bg-gray-800/80 border border-gray-600/50 rounded-2xl px-4 py-3 hover:border-green-500/50 transition-all duration-300">
+                        <MapPinIcon className="w-5 h-5 text-green-400" />
+                        <select
+                          value={filterEstado}
+                          onChange={(e) => setFilterEstado(e.target.value)}
+                          className="bg-transparent text-white focus:outline-none cursor-pointer"
+                        >
+                          {estados.map((estado) => (
+                            <option key={estado} value={estado}>
+                              {estado === 'todos' ? '🌍 Todos os Estados' : estado}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -642,82 +718,103 @@ export default function CriadoresPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className="card hover:bg-gray-700/50 transition-colors cursor-pointer group"
+                    className="group relative overflow-hidden cursor-pointer"
                     onClick={() => {
                       setSelectedCriador(criador)
                       setShowModal(true)
                     }}
                   >
-                    {/* Header do Card */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-sementes-primary/20 rounded-full flex items-center justify-center">
-                          <UserGroupIcon className="w-6 h-6 text-sementes-primary" />
+                    {/* Efeito de brilho no hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-sementes-primary/10 via-sementes-accent/10 to-sementes-primary/10 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-700 opacity-0 group-hover:opacity-100"></div>
+                    
+                    {/* Card principal */}
+                    <div className="relative bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-6 hover:border-sementes-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
+                      {/* Header do Card */}
+                      <div className="flex items-start justify-between mb-6">
+                        <div className="flex items-center space-x-4">
+                          <div className="relative">
+                            <div className="w-16 h-16 bg-gradient-to-br from-sementes-primary to-sementes-accent rounded-2xl flex items-center justify-center shadow-lg">
+                              {criador.avatarUrl ? (
+                                <img 
+                                  src={criador.avatarUrl} 
+                                  alt={criador.nome}
+                                  className="w-16 h-16 rounded-2xl object-cover"
+                                />
+                              ) : (
+                                <UserGroupIcon className="w-8 h-8 text-white" />
+                              )}
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-900"></div>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold text-white group-hover:text-sementes-primary transition-colors mb-1">
+                              {criador.nome}
+                            </h3>
+                            <p className="text-gray-400 font-medium">{criador.categoria}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-white font-semibold group-hover:text-sementes-primary transition-colors">
-                            {criador.nome}
-                          </h3>
-                          <p className="text-gray-400 text-sm">{criador.categoria}</p>
+                        
+                        <div className="text-right">
+                          <span className={`px-3 py-2 rounded-2xl text-sm font-bold border-2 ${getNivelColor(criador.nivel)}`}>
+                            {getNivelLabel(criador.nivel)}
+                          </span>
                         </div>
                       </div>
-                      
-                      <div className="text-right">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getNivelColor(criador.nivel)}`}>
-                          {getNivelLabel(criador.nivel)}
-                        </span>
-                      </div>
-                    </div>
 
-                    {/* Informações */}
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center space-x-2 text-gray-300">
-                        <MapPinIcon className="w-4 h-4 text-sementes-primary" />
-                        <span className="text-sm">{criador.cidade}, {criador.estado}</span>
+                      {/* Informações */}
+                      <div className="space-y-4 mb-6">
+                        <div className="flex items-center space-x-3 text-gray-300">
+                          <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <MapPinIcon className="w-4 h-4 text-blue-400" />
+                          </div>
+                          <span className="font-medium">{criador.cidade}, {criador.estado}</span>
+                        </div>
+                        
+                        <div className="flex items-center space-x-3 text-gray-300">
+                          <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <CalendarIcon className="w-4 h-4 text-purple-400" />
+                          </div>
+                          <span className="font-medium">Desde {new Date(criador.dataCadastro).toLocaleDateString('pt-BR')}</span>
+                        </div>
                       </div>
-                      
-                      <div className="flex items-center space-x-2 text-gray-300">
-                        <CalendarIcon className="w-4 h-4 text-sementes-primary" />
-                        <span className="text-sm">Desde {new Date(criador.dataCadastro).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                    </div>
 
-                    {/* Estatísticas */}
-                    <div className="grid grid-cols-3 gap-2 mb-4">
-                      <div className="text-center p-2 bg-gray-700/50 rounded-lg">
-                        <p className="text-gray-400 text-xs">Conteúdos</p>
-                        <p className="text-white font-bold">{criador.totalConteudos}</p>
+                      {/* Estatísticas */}
+                      <div className="grid grid-cols-3 gap-3 mb-6">
+                        <div className="text-center p-3 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-2xl border border-blue-500/30">
+                          <p className="text-blue-400 text-xs font-bold mb-1">Conteúdos</p>
+                          <p className="text-white font-black text-lg">{criador.totalConteudos}</p>
+                        </div>
+                        <div className="text-center p-3 bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-2xl border border-green-500/30">
+                          <p className="text-green-400 text-xs font-bold mb-1">Visualizações</p>
+                          <p className="text-white font-black text-lg">{(criador.totalVisualizacoes / 1000).toFixed(0)}k</p>
+                        </div>
+                        <div className="text-center p-3 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 rounded-2xl border border-yellow-500/30">
+                          <p className="text-yellow-400 text-xs font-bold mb-1">Sementes</p>
+                          <p className="text-white font-black text-lg">{(criador.totalSementes / 1000).toFixed(0)}k</p>
+                        </div>
                       </div>
-                      <div className="text-center p-2 bg-gray-700/50 rounded-lg">
-                        <p className="text-gray-400 text-xs">Visualizações</p>
-                        <p className="text-white font-bold">{(criador.totalVisualizacoes / 1000).toFixed(0)}k</p>
-                      </div>
-                      <div className="text-center p-2 bg-gray-700/50 rounded-lg">
-                        <p className="text-gray-400 text-xs">Sementes</p>
-                        <p className="text-white font-bold">{(criador.totalSementes / 1000).toFixed(0)}k</p>
-                      </div>
-                    </div>
 
-                    {/* Botões de Ação */}
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleFavorito(criador.id)
-                        }}
-                        className={`p-2 rounded-lg transition-colors ${
-                          favoritos.has(criador.id)
-                            ? 'text-red-500 bg-red-500/20'
-                            : 'text-gray-400 hover:text-red-500 hover:bg-red-500/20'
-                        }`}
-                      >
-                        <HeartIcon className="w-4 h-4" />
-                      </button>
-                      
-                      <button className="inline-flex items-center space-x-2 text-sementes-primary hover:text-sementes-accent transition-colors">
-                        <EyeIcon className="w-4 h-4" />
-                        <span className="text-sm font-medium">Ver Perfil</span>
-                      </button>
+                      {/* Botões de Ação */}
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleFavorito(criador.id)
+                          }}
+                          className={`p-3 rounded-2xl transition-all duration-300 ${
+                            favoritos.has(criador.id)
+                              ? 'text-red-500 bg-red-500/20 border-2 border-red-500/50'
+                              : 'text-gray-400 hover:text-red-500 hover:bg-red-500/20 border-2 border-transparent hover:border-red-500/50'
+                          }`}
+                        >
+                          <HeartIcon className="w-5 h-5" />
+                        </button>
+                        
+                        <button className="inline-flex items-center space-x-3 bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-6 py-3 rounded-2xl font-bold hover:shadow-lg hover:shadow-sementes-primary/25 transition-all duration-300 hover:scale-105">
+                          <EyeIcon className="w-5 h-5" />
+                          <span>Ver Perfil</span>
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
