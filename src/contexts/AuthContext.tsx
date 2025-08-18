@@ -60,8 +60,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const verificarToken = async (token: string) => {
     try {
-      // Aqui você pode fazer uma chamada para verificar o token
-      // Por enquanto, vamos apenas decodificar o JWT
+      // Verificar se temos dados do usuário salvos no localStorage
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      
+      if (usuarioSalvo) {
+        // Usar dados salvos para evitar fallbacks
+        const dadosUsuario = JSON.parse(usuarioSalvo)
+        setUsuario(dadosUsuario)
+        setIsAuthenticated(true)
+        setLoading(false)
+        return
+      }
+      
+      // Se não tiver dados salvos, verificar token
       const payload = JSON.parse(atob(token.split('.')[1]))
       const agora = Math.floor(Date.now() / 1000)
       
@@ -114,6 +125,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('auth-token', data.token)
       setCookie('auth-token', data.token)
       
+      // SALVAR DADOS COMPLETOS DO USUÁRIO para evitar fallbacks
+      localStorage.setItem('usuario-dados', JSON.stringify(data.usuario))
+      
       // Atualizar estado
       setUsuario(data.usuario)
       setIsAuthenticated(true)
@@ -158,6 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('auth-token')
+    localStorage.removeItem('usuario-dados')
     removeCookie('auth-token')
     setUsuario(null)
     setIsAuthenticated(false)
