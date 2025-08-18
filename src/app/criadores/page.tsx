@@ -12,6 +12,7 @@ import {
   MapPinIcon,
   CalendarIcon
 } from '@heroicons/react/24/outline'
+import { FaYoutube, FaTwitch, FaInstagram, FaTiktok } from 'react-icons/fa'
 import ConteudosCriadores from '@/components/ConteudosCriadores'
 
 interface Criador {
