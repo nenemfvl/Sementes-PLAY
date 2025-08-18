@@ -98,16 +98,7 @@ export default function Navbar() {
              >
                Parceiros
              </Link>
-                         <Link 
-               href="/cashback" 
-               className={`transition-colors ${
-                 isActiveLink('/cashback') 
-                   ? 'text-sementes-primary font-semibold' 
-                   : 'text-gray-300 hover:text-sementes-primary'
-               }`}
-             >
-               Cashback
-             </Link>
+
                          <Link 
                href="/ranking" 
                className={`transition-colors ${
@@ -276,6 +267,14 @@ export default function Navbar() {
                     </button>
                     
                     <button
+                      onClick={() => handleMenuItemClick('/cashback')}
+                      className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
+                    >
+                      <CurrencyDollarIcon className="w-5 h-5" />
+                      <span>Cashback</span>
+                    </button>
+                    
+                    <button
                       onClick={() => handleMenuItemClick('/configuracoes')}
                       className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
                     >
@@ -340,13 +339,7 @@ export default function Navbar() {
               >
                 Parceiros
               </Link>
-              <Link 
-                href="/cashback" 
-                className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Cashback
-              </Link>
+
               <Link 
                 href="/ranking" 
                 className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
