@@ -71,7 +71,7 @@ export default function RankingPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterTipo, setFilterTipo] = useState('todos')
   const [filterNivel, setFilterNivel] = useState('todos')
-  const [filterEstado, setFilterTipo] = useState('todos')
+  const [filterEstado, setFilterEstado] = useState('todos')
   const [selectedUsuario, setSelectedUsuario] = useState<Usuario | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [favoritos, setFavoritos] = useState<Set<string>>(new Set())
