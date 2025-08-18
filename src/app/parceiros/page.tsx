@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -36,11 +34,11 @@ interface Parceiro {
   descricao?: string
 }
 
-export default function Parceiros() {
-  const { usuario, isAuthenticated } = useAuth()
-  const router = useRouter()
-  const [parceiros, setParceiros] = useState<Parceiro[]>([])
+export default function ParceirosPage() {
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [parceiros, setParceiros] = useState<Parceiro[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCidade, setSelectedCidade] = useState('todas')
   const [selectedNivel, setSelectedNivel] = useState('todos')
@@ -48,13 +46,29 @@ export default function Parceiros() {
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          setUsuario(dadosUsuario)
+          setIsAuthenticated(true)
+          // Carregar dados após autenticação
+          carregarParceiros()
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          setUsuario(null)
+          setIsAuthenticated(false)
+        }
+      } else {
+        setUsuario(null)
+        setIsAuthenticated(false)
+      }
+      setLoading(false)
     }
-
-    carregarParceiros()
-  }, [usuario, isAuthenticated, router])
+    verificarAutenticacao()
+  }, [])
 
   const carregarParceiros = async () => {
     try {

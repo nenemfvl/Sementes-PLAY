@@ -1,9 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
 import {
   ArrowLeftIcon,
   CurrencyDollarIcon,
@@ -76,14 +74,14 @@ interface EstatisticasCashback {
   mediaPorResgate: number
 }
 
-export default function Cashback() {
-  const { usuario, isAuthenticated } = useAuth()
-  const router = useRouter()
+export default function CashbackPage() {
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [codigos, setCodigos] = useState<CodigoCashback[]>([])
   const [historico, setHistorico] = useState<HistoricoCashback[]>([])
   const [solicitacoesPendentes, setSolicitacoesPendentes] = useState<SolicitacaoPendente[]>([])
   const [estatisticas, setEstatisticas] = useState<EstatisticasCashback | null>(null)
-  const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('disponiveis')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategoria, setSelectedCategoria] = useState('todas')
@@ -92,15 +90,29 @@ export default function Cashback() {
   const [resgateLoading, setResgateLoading] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          setUsuario(dadosUsuario)
+          setIsAuthenticated(true)
+          // Carregar dados após autenticação
+          carregarDados()
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          setUsuario(null)
+          setIsAuthenticated(false)
+        }
+      } else {
+        setUsuario(null)
+        setIsAuthenticated(false)
+      }
+      setLoading(false)
     }
-
-    if (usuario?.id) {
-      carregarDados()
-    }
-  }, [usuario, isAuthenticated, router])
+    verificarAutenticacao()
+  }, [])
 
   const carregarDados = async () => {
     try {

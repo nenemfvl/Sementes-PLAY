@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
 import {
   ArrowLeftIcon,
   CurrencyDollarIcon,
@@ -28,9 +26,9 @@ interface Parceiro {
   dataCriacao: string
 }
 
-export default function RegistrarCompra() {
-  const { usuario, isAuthenticated } = useAuth()
-  const router = useRouter()
+export default function RegistrarCompraPage() {
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [parceiros, setParceiros] = useState<Parceiro[]>([])
   const [loading, setLoading] = useState(true)
   const [enviando, setEnviando] = useState(false)
@@ -44,13 +42,27 @@ export default function RegistrarCompra() {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          setUsuario(dadosUsuario)
+          setIsAuthenticated(true)
+          // Carregar dados após autenticação
+          carregarParceiros()
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          window.location.href = '/login'
+        }
+      } else {
+        window.location.href = '/login'
+      }
+      setLoading(false)
     }
-
-    carregarParceiros()
-  }, [usuario, isAuthenticated, router])
+    verificarAutenticacao()
+  }, [])
 
   const carregarParceiros = async () => {
     try {
@@ -100,7 +112,7 @@ export default function RegistrarCompra() {
     } catch (error) {
       console.error('Erro ao carregar parceiros:', error)
     } finally {
-      setLoading(false)
+      // setLoading(false) // This line was removed from the new_code, so it's removed here.
     }
   }
 
