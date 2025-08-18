@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   CurrencyDollarIcon,
@@ -13,10 +13,37 @@ import {
   GiftIcon,
   UsersIcon,
   FireIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 
 export default function Home() {
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          setUsuario(dadosUsuario)
+          setIsAuthenticated(true)
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          setUsuario(null)
+          setIsAuthenticated(false)
+        }
+      } else {
+        setUsuario(null)
+        setIsAuthenticated(false)
+      }
+      setLoading(false)
+    }
+    verificarAutenticacao()
+  }, [])
   const features = [
     {
       icon: CurrencyDollarIcon,
@@ -98,14 +125,31 @@ export default function Home() {
               Transforme suas compras em apoio aos seus criadores favoritos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/registrar-compra" className="btn-primary">
-                <PlayIcon className="w-5 h-5 mr-2" />
-                Solicitar Cashback
-              </Link>
-              <Link href="/criadores" className="btn-secondary">
-                <HeartIcon className="w-5 h-5 mr-2" />
-                Ver Criadores
-              </Link>
+              {!loading && (
+                isAuthenticated ? (
+                  <>
+                    <Link href="/registrar-compra" className="btn-primary">
+                      <PlayIcon className="w-5 h-5 mr-2" />
+                      Solicitar Cashback
+                    </Link>
+                    <Link href="/dashboard" className="btn-secondary">
+                      <UserGroupIcon className="w-5 h-5 mr-2" />
+                      Meu Dashboard
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/registro" className="btn-primary">
+                      <UsersIcon className="w-5 h-5 mr-2" />
+                      Criar Conta
+                    </Link>
+                    <Link href="/criadores" className="btn-secondary">
+                      <HeartIcon className="w-5 h-5 mr-2" />
+                      Ver Criadores
+                    </Link>
+                  </>
+                )
+              )}
             </div>
           </motion.div>
         </div>
@@ -297,14 +341,38 @@ export default function Home() {
               enquanto apoia seus criadores favoritos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/cadastro" className="btn-primary">
-                <UsersIcon className="w-5 h-5 mr-2" />
-                Criar Conta
-              </Link>
-              <Link href="/login" className="btn-secondary">
-                <FireIcon className="w-5 h-5 mr-2" />
-                Fazer Login
-              </Link>
+              {!loading && (
+                isAuthenticated ? (
+                  <>
+                    <Link href="/dashboard" className="btn-primary">
+                      <ArrowRightIcon className="w-5 h-5 mr-2" />
+                      Ir para Dashboard
+                    </Link>
+                    <button 
+                      onClick={() => {
+                        localStorage.removeItem('usuario-dados')
+                        localStorage.removeItem('auth-token')
+                        window.location.href = '/'
+                      }}
+                      className="btn-secondary"
+                    >
+                      <FireIcon className="w-5 h-5 mr-2" />
+                      Fazer Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/registro" className="btn-primary">
+                      <UsersIcon className="w-5 h-5 mr-2" />
+                      Criar Conta
+                    </Link>
+                    <Link href="/login" className="btn-secondary">
+                      <FireIcon className="w-5 h-5 mr-2" />
+                      Fazer Login
+                    </Link>
+                  </>
+                )
+              )}
             </div>
           </motion.div>
         </div>
