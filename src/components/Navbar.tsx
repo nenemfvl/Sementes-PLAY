@@ -104,6 +104,20 @@ export default function Navbar() {
                Ranking
              </Link>
                          
+                         {/* Admin Link - Apenas para usuários com nível 5+ */}
+                         {isAuthenticated && usuario && Number(usuario.nivel) >= 5 && (
+                           <Link 
+                             href="/admin" 
+                             className={`transition-colors ${
+                               isActiveLink('/admin') 
+                                 ? 'text-sementes-primary font-semibold' 
+                                 : 'text-gray-300 hover:text-sementes-primary'
+                             }`}
+                           >
+                             Admin
+                           </Link>
+                         )}
+                         
           </nav>
 
           {/* User Menu */}
@@ -290,6 +304,17 @@ export default function Navbar() {
               >
                 Ranking
               </Link>
+              
+              {/* Admin Link Mobile - Apenas para usuários com nível 5+ */}
+              {isAuthenticated && usuario && Number(usuario.nivel) >= 5 && (
+                <Link 
+                  href="/admin" 
+                  className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Admin
+                </Link>
+              )}
               
             </nav>
           </motion.div>
