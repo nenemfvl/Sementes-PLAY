@@ -45,6 +45,14 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Garantir que carteira não é null
+    if (!carteira) {
+      return NextResponse.json(
+        { error: 'Erro ao criar carteira' },
+        { status: 500 }
+      )
+    }
+
     const saldoAnterior = carteira.saldo
     let saldoPosterior = saldoAnterior
     let tipoMovimentacao = 'credito'
