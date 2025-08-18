@@ -38,6 +38,29 @@ interface Criador {
   }
 }
 
+interface DadosCiclo {
+  ciclo: number
+  season: number
+  dataInicioCiclo: string
+  dataInicioSeason: string
+  pausado: boolean
+  ranking: Array<{
+    id: string
+    pontuacao: number
+    posicao: number
+    usuario: {
+      id: string
+      nome: string
+      avatarUrl?: string
+      nivel: string
+    }
+  }>
+  estatisticas: {
+    totalCriadores: number
+    totalSementes: number
+  }
+}
+
 export default function CriadoresPage() {
   const [usuario, setUsuario] = useState<any>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -51,6 +74,7 @@ export default function CriadoresPage() {
   const [selectedCriador, setSelectedCriador] = useState<Criador | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [favoritos, setFavoritos] = useState<Set<string>>(new Set())
+  const [dadosCiclo, setDadosCiclo] = useState<DadosCiclo | null>(null)
 
   useEffect(() => {
     const verificarAutenticacao = () => {
@@ -63,6 +87,7 @@ export default function CriadoresPage() {
           // Carregar dados após autenticação
           carregarCriadores()
           carregarTotalSementes()
+          carregarDadosCiclo()
         } catch (error) {
           console.error('Erro ao ler dados do usuário:', error)
           localStorage.removeItem('usuario-dados')
@@ -75,6 +100,7 @@ export default function CriadoresPage() {
       }
       // Carregar contador independentemente da autenticação
       carregarTotalSementes()
+      carregarDadosCiclo()
       setLoading(false)
     }
     verificarAutenticacao()
@@ -95,6 +121,24 @@ export default function CriadoresPage() {
     } catch (error) {
       console.error('Erro ao carregar total de sementes:', error)
       setTotalSementes(0)
+    }
+  }
+
+  const carregarDadosCiclo = async () => {
+    try {
+      const response = await fetch('/api/ciclos')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setDadosCiclo(data.dados)
+          // Atualizar total de sementes com dados do ciclo
+          if (data.dados.estatisticas.totalSementes > 0) {
+            setTotalSementes(data.dados.estatisticas.totalSementes)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados do ciclo:', error)
     }
   }
 
@@ -323,6 +367,67 @@ export default function CriadoresPage() {
             </motion.div>
           )}
 
+          {/* Informações do Ciclo Atual */}
+          {dadosCiclo && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mb-8"
+            >
+              <div className="bg-gradient-to-r from-sementes-primary/20 to-sementes-accent/20 rounded-2xl border border-sementes-primary/30 p-6">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                  {/* Status do Ciclo */}
+                  <div className="flex items-center space-x-4">
+                    <div className="text-center">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-2xl">🔄</span>
+                        <span className="text-gray-400 text-sm">Ciclo Atual</span>
+                      </div>
+                      <div className="text-4xl font-bold text-sementes-primary">
+                        {dadosCiclo.ciclo}
+                      </div>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-2xl">🏆</span>
+                        <span className="text-gray-400 text-sm">Season</span>
+                      </div>
+                      <div className="text-4xl font-bold text-sementes-accent">
+                        {dadosCiclo.season}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status e Datas */}
+                  <div className="flex flex-col items-center lg:items-end space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <span className={`w-3 h-3 rounded-full ${dadosCiclo.pausado ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                      <span className="text-sm text-gray-300">
+                        {dadosCiclo.pausado ? 'Ciclo Pausado' : 'Ciclo Ativo'}
+                      </span>
+                    </div>
+                    
+                    <div className="text-center lg:text-right">
+                      <p className="text-gray-400 text-xs">Início do Ciclo</p>
+                      <p className="text-white text-sm">
+                        {new Date(dadosCiclo.dataInicioCiclo).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                    
+                    <div className="text-center lg:text-right">
+                      <p className="text-gray-400 text-xs">Início da Season</p>
+                      <p className="text-white text-sm">
+                        {new Date(dadosCiclo.dataInicioSeason).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Estatísticas */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -333,7 +438,9 @@ export default function CriadoresPage() {
             <div className="card p-4 text-center">
               <div className="text-2xl mb-2">👥</div>
               <p className="text-gray-400 text-sm">Total de Criadores</p>
-              <p className="text-white font-bold text-lg">{criadores.filter(c => c.status === 'ativo').length}</p>
+              <p className="text-white font-bold text-lg">
+                {dadosCiclo ? dadosCiclo.estatisticas.totalCriadores : criadores.filter(c => c.status === 'ativo').length}
+              </p>
             </div>
             <div className="card p-4 text-center">
               <div className="text-2xl mb-2">🎬</div>
@@ -348,7 +455,12 @@ export default function CriadoresPage() {
             <div className="card p-4 text-center">
               <div className="text-2xl mb-2">💝</div>
               <p className="text-gray-400 text-sm">Total de Sementes</p>
-              <p className="text-white font-bold text-lg">{(criadores.reduce((acc, c) => acc + c.totalSementes, 0) / 1000).toFixed(0)}k</p>
+              <p className="text-white font-bold text-lg">
+                {dadosCiclo ? 
+                  (dadosCiclo.estatisticas.totalSementes / 1000).toFixed(0) + 'k' : 
+                  (criadores.reduce((acc, c) => acc + c.totalSementes, 0) / 1000).toFixed(0) + 'k'
+                }
+              </p>
             </div>
           </motion.div>
 
@@ -421,6 +533,93 @@ export default function CriadoresPage() {
               </div>
             </div>
           </motion.div>
+
+          {/* Ranking do Ciclo Atual */}
+          {dadosCiclo && dadosCiclo.ranking.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mb-8"
+            >
+              <div className="card">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-white flex items-center">
+                    <span className="text-3xl mr-3">🏆</span>
+                    Ranking do Ciclo {dadosCiclo.ciclo}
+                  </h2>
+                  <div className="text-sm text-gray-400">
+                    Top {dadosCiclo.ranking.length} Criadores
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {dadosCiclo.ranking.map((ranking, index) => (
+                    <motion.div
+                      key={ranking.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      className="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700/70 transition-colors"
+                    >
+                      {/* Posição */}
+                      <div className="flex items-center space-x-4">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                          {index === 0 && (
+                            <span className="text-yellow-400">🥇</span>
+                          )}
+                          {index === 1 && (
+                            <span className="text-gray-300">🥈</span>
+                          )}
+                          {index === 2 && (
+                            <span className="text-amber-600">🥉</span>
+                          )}
+                          {index > 2 && (
+                            <span className="text-gray-400">#{index + 1}</span>
+                          )}
+                        </div>
+                        
+                        {/* Avatar e Nome */}
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-sementes-primary/20 rounded-full flex items-center justify-center">
+                            {ranking.usuario.avatarUrl ? (
+                              <img 
+                                src={ranking.usuario.avatarUrl} 
+                                alt={ranking.usuario.nome}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <UserGroupIcon className="w-5 h-5 text-sementes-primary" />
+                            )}
+                          </div>
+                          <div>
+                            <h3 className="text-white font-semibold">{ranking.usuario.nome}</h3>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getNivelColor(ranking.usuario.nivel)}`}>
+                              {getNivelLabel(ranking.usuario.nivel)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Pontuação */}
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-sementes-primary">
+                          {ranking.pontuacao.toLocaleString('pt-BR')}
+                        </div>
+                        <div className="text-gray-400 text-sm">pontos</div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-gray-600">
+                  <p className="text-center text-gray-400 text-sm">
+                    O ranking é atualizado a cada ciclo. Mantenha-se ativo para subir no ranking!
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Lista de Criadores */}
           <motion.div
@@ -524,6 +723,64 @@ export default function CriadoresPage() {
                 ))}
               </div>
             )}
+          </motion.div>
+
+          {/* Como Funciona o Sistema de Ciclos */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mb-8"
+          >
+            <div className="card">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">🔄 Como Funciona o Sistema de Ciclos</h2>
+                <p className="text-gray-400">Entenda como funciona nosso sistema de recompensas por ciclos</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center p-4">
+                  <div className="w-16 h-16 bg-sementes-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-3xl">📅</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Ciclos Mensais</h3>
+                  <p className="text-gray-400 text-sm">
+                    Cada ciclo dura aproximadamente um mês. Os criadores acumulam pontos baseados em suas atividades e engajamento.
+                  </p>
+                </div>
+
+                <div className="text-center p-4">
+                  <div className="w-16 h-16 bg-sementes-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-3xl">🏆</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Ranking e Recompensas</h3>
+                  <p className="text-gray-400 text-sm">
+                    Ao final de cada ciclo, os melhores criadores recebem recompensas em sementes e sobem no ranking da plataforma.
+                  </p>
+                </div>
+
+                <div className="text-center p-4">
+                  <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-3xl">🌱</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Sementes e Crescimento</h3>
+                  <p className="text-gray-400 text-sm">
+                    As sementes podem ser usadas para desbloquear recursos, participar de eventos especiais e crescer na comunidade.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-gray-700/50 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">📊 Como Ganhar Pontos:</h4>
+                <ul className="text-gray-300 text-sm space-y-1">
+                  <li>• Criar conteúdo de qualidade e engajante</li>
+                  <li>• Receber visualizações, curtidas e comentários</li>
+                  <li>• Participar ativamente da comunidade</li>
+                  <li>• Colaborar com outros criadores</li>
+                  <li>• Manter consistência na produção de conteúdo</li>
+                </ul>
+              </div>
+            </div>
           </motion.div>
 
           {/* Seção de Conteúdos */}
