@@ -189,22 +189,21 @@ export async function GET(request: NextRequest) {
         orderBy: { data: 'desc' },
         skip: offset,
         take: limite,
-        include: {
-          doador: {
-            select: {
-              id: true,
-              nome: true,
-              avatarUrl: true
-            }
-          },
-          criador: {
-            select: {
-              id: true,
-              nome: true,
-              avatarUrl: true
-            }
-          }
-        }
+                 include: {
+           doador: {
+             select: {
+               id: true,
+               nome: true,
+               avatarUrl: true
+             }
+           },
+           criador: {
+             select: {
+               id: true,
+               nome: true
+             }
+           }
+         }
       }),
       prisma.doacao.count({ where })
     ])
