@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+
 import {
   UsersIcon,
   UserGroupIcon,
@@ -35,7 +35,6 @@ export default function AdminPage() {
   const [usuario, setUsuario] = useState<any>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
   const [stats, setStats] = useState<AdminStats>({
     totalUsuarios: 0,
     totalCriadores: 0,
@@ -47,24 +46,33 @@ export default function AdminPage() {
 
   useEffect(() => {
     const verificarAutenticacao = () => {
+      console.log('🔍 [ADMIN] Verificando autenticação...')
       const usuarioSalvo = localStorage.getItem('usuario-dados')
+      console.log('📱 [ADMIN] Usuário no localStorage:', usuarioSalvo ? 'EXISTE' : 'NÃO EXISTE')
+      
       if (usuarioSalvo) {
         try {
           const dadosUsuario = JSON.parse(usuarioSalvo)
+          console.log('👤 [ADMIN] Dados do usuário:', dadosUsuario)
+          console.log('🔢 [ADMIN] Nível do usuário:', dadosUsuario.nivel, 'Tipo:', typeof dadosUsuario.nivel)
+          
           // Verificar se é admin (nivel >= 5)
-          if (dadosUsuario.nivel && dadosUsuario.nivel >= 5) {
+          if (dadosUsuario.nivel && Number(dadosUsuario.nivel) >= 5) {
+            console.log('✅ [ADMIN] Usuário é admin, definindo estado...')
             setUsuario(dadosUsuario)
             setIsAuthenticated(true)
           } else {
+            console.log('❌ [ADMIN] Usuário não é admin, redirecionando...')
             // Não é admin, redirecionar
             window.location.href = '/dashboard'
           }
         } catch (error) {
-          console.error('Erro ao ler dados do usuário:', error)
+          console.error('❌ [ADMIN] Erro ao parsear usuário:', error)
           localStorage.removeItem('usuario-dados')
           window.location.href = '/login'
         }
       } else {
+        console.log('❌ [ADMIN] Sem usuário no localStorage, redirecionando...')
         window.location.href = '/login'
       }
       setLoading(false)
@@ -73,18 +81,10 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    if (isAuthenticated && usuario) {
+      carregarEstatisticas()
     }
-
-    if (!usuario || Number(usuario.nivel) < 5) {
-      router.push('/')
-      return
-    }
-
-    carregarEstatisticas()
-  }, [usuario, isAuthenticated, router])
+  }, [isAuthenticated, usuario])
 
   const carregarEstatisticas = async () => {
     try {
@@ -327,7 +327,7 @@ export default function AdminPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
                 className="card p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                onClick={() => router.push(module.href)}
+                onClick={() => window.location.href = module.href}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className={`p-3 rounded-lg ${module.color} group-hover:scale-110 transition-transform duration-300`}>
