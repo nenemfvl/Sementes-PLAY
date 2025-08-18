@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   UsersIcon,
@@ -31,8 +31,10 @@ interface AdminStats {
   fundoAtual: number
 }
 
-export default function AdminDashboard() {
-  const { usuario, isAuthenticated } = useAuth()
+export default function AdminPage() {
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
   const [stats, setStats] = useState<AdminStats>({
     totalUsuarios: 0,
@@ -42,7 +44,33 @@ export default function AdminDashboard() {
     denunciasPendentes: 0,
     fundoAtual: 0
   })
-  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          // Verificar se é admin (nivel >= 5)
+          if (dadosUsuario.nivel && dadosUsuario.nivel >= 5) {
+            setUsuario(dadosUsuario)
+            setIsAuthenticated(true)
+          } else {
+            // Não é admin, redirecionar
+            window.location.href = '/dashboard'
+          }
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          window.location.href = '/login'
+        }
+      } else {
+        window.location.href = '/login'
+      }
+      setLoading(false)
+    }
+    verificarAutenticacao()
+  }, [])
 
   useEffect(() => {
     if (!isAuthenticated) {

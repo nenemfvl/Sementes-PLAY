@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import {
   BuildingOfficeIcon,
@@ -91,9 +90,11 @@ interface CodigoCashback {
   dataExpiracao?: string
 }
 
-export default function PainelParceiro() {
-  const { usuario, isAuthenticated } = useAuth()
+export default function PainelParceiroPage() {
   const router = useRouter()
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [transacoes, setTransacoes] = useState<Transacao[]>([])
   const [loadingTransacoes, setLoadingTransacoes] = useState(true)
   const [estatisticas, setEstatisticas] = useState<Estatisticas | null>(null)
@@ -127,21 +128,33 @@ export default function PainelParceiro() {
   const [editandoCodigo, setEditandoCodigo] = useState<CodigoCashback | null>(null)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          // Verificar se é um parceiro
+          if (dadosUsuario.nivel === 'parceiro') {
+            setUsuario(dadosUsuario)
+            setIsAuthenticated(true)
+            // Carregar dados após autenticação
+            carregarDados()
+          } else {
+            // Não é parceiro, redirecionar
+            window.location.href = '/dashboard'
+          }
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          window.location.href = '/login'
+        }
+      } else {
+        window.location.href = '/login'
+      }
+      setLoading(false)
     }
-
-    // Verificar se o usuário é um parceiro
-    if (usuario && usuario.nivel !== 'parceiro') {
-      router.push('/')
-      return
-    }
-
-    if (usuario?.id) {
-      carregarDados()
-    }
-  }, [usuario, isAuthenticated, router])
+    verificarAutenticacao()
+  }, [])
 
   const carregarDados = async () => {
     try {
@@ -335,7 +348,7 @@ export default function PainelParceiro() {
     setFormCodigo(prev => ({ ...prev, codigo }))
   }
 
-  if (loadingEstatisticas) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-sss-dark flex items-center justify-center">
         <div className="text-center">

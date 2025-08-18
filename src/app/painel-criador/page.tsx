@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import {
   ChartBarIcon,
@@ -85,14 +84,15 @@ interface Enquete {
 }
 
 export default function PainelCriador() {
-  const { usuario, isAuthenticated } = useAuth()
   const router = useRouter()
-  const [conteudos, setConteudos] = useState<Conteudo[]>([])
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ titulo: '', url: '', tipo: '', categoria: '' })
   const [saving, setSaving] = useState(false)
   const [editando, setEditando] = useState<Conteudo | null>(null)
+  const [conteudos, setConteudos] = useState<Conteudo[]>([])
   const [estatisticas, setEstatisticas] = useState({ totalDoacoes: 0, totalSementes: 0, totalFavoritos: 0 })
   const [loadingEstatisticas, setLoadingEstatisticas] = useState(true)
   const [doacoes, setDoacoes] = useState<Doacao[]>([])
@@ -116,21 +116,33 @@ export default function PainelCriador() {
   const [formEnquete, setFormEnquete] = useState({ pergunta: '', opcoes: ['', ''], dataFim: '' })
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          // Verificar se é um criador
+          if (dadosUsuario.nivel && ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo'].includes(dadosUsuario.nivel)) {
+            setUsuario(dadosUsuario)
+            setIsAuthenticated(true)
+            // Carregar dados após autenticação
+            carregarDados()
+          } else {
+            // Não é criador, redirecionar
+            window.location.href = '/dashboard'
+          }
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          window.location.href = '/login'
+        }
+      } else {
+        window.location.href = '/login'
+      }
+      setLoading(false)
     }
-
-    // Verificar se o usuário é um criador
-    if (usuario && !isCriador(usuario.nivel)) {
-      router.push('/')
-      return
-    }
-
-    if (usuario?.id) {
-      carregarDados()
-    }
-  }, [usuario, isAuthenticated, router])
+    verificarAutenticacao()
+  }, [])
 
   const isCriador = (nivel: string | number) => {
     const niveisCriador = ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
