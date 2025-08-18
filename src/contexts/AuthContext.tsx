@@ -66,30 +66,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const agora = Math.floor(Date.now() / 1000)
       
       if (payload.exp > agora) {
-        // Token válido
-        if (payload.nome) {
-          setUsuario({
-            id: payload.userId,
-            nome: payload.nome,
-            email: payload.email,
-            tipo: payload.tipo,
-            sementes: 0,
-            nivel: 'comum',
-            xp: 0,
-            pontuacao: 0
-          })
-          setIsAuthenticated(true)
-        } else {
-          // Token não tem nome válido, remover
-          localStorage.removeItem('auth-token')
-          removeCookie('auth-token')
-        }
+        // Token válido - usar dados disponíveis com fallbacks seguros
+        setUsuario({
+          id: payload.userId || payload.sub || 'unknown',
+          nome: payload.nome || payload.name || 'Usuário',
+          email: payload.email || '',
+          tipo: payload.tipo || 'comum',
+          sementes: payload.sementes || 0,
+          nivel: payload.nivel || 'comum',
+          xp: payload.xp || 0,
+          pontuacao: payload.pontuacao || 0
+        })
+        setIsAuthenticated(true)
       } else {
         // Token expirado
         localStorage.removeItem('auth-token')
         removeCookie('auth-token')
       }
     } catch (error) {
+      console.error('Erro ao verificar token:', error)
       localStorage.removeItem('auth-token')
       removeCookie('auth-token')
     } finally {
