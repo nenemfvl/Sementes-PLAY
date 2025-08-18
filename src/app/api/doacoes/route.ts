@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
 
     // Verificar se o doador tem saldo suficiente
     const carteiraDoador = await prisma.carteiraDigital.findUnique({
-      where: { usuarioId: doadorId }
+      where: { usuarioId: doadorId },
+      include: { usuario: true }
     })
 
     if (!carteiraDoador || carteiraDoador.saldo < quantidade) {
