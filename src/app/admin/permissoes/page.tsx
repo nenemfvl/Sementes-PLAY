@@ -1,9 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
 import {
   ShieldCheckIcon,
   ArrowLeftIcon,
@@ -50,11 +48,11 @@ interface NivelPermissao {
   cor: string
 }
 
-export default function AdminPermissoes() {
-  const { usuario, isAuthenticated } = useAuth()
-  const router = useRouter()
-  const [usuarios, setUsuarios] = useState<UsuarioPermissao[]>([])
+export default function AdminPermissoesPage() {
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [usuarios, setUsuarios] = useState<UsuarioPermissao[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [filterTipo, setFilterTipo] = useState('todos')
   const [filterNivel, setFilterNivel] = useState('todos')
@@ -102,18 +100,34 @@ export default function AdminPermissoes() {
   ]
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          // Verificar se é admin (nivel >= 5)
+          if (dadosUsuario.nivel && dadosUsuario.nivel >= 5) {
+            setUsuario(dadosUsuario)
+            setIsAuthenticated(true)
+            // Carregar dados após autenticação
+            carregarUsuarios()
+          } else {
+            // Não é admin, redirecionar
+            window.location.href = '/'
+          }
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          window.location.href = '/login'
+        }
+      } else {
+        // Não autenticado, redirecionar
+        window.location.href = '/login'
+      }
+      setLoading(false)
     }
-
-    if (!usuario || Number(usuario.nivel) < 5) {
-      router.push('/')
-      return
-    }
-
-    carregarUsuarios()
-  }, [usuario, isAuthenticated, router])
+    verificarAutenticacao()
+  }, [])
 
   const carregarUsuarios = async () => {
     try {
@@ -291,7 +305,7 @@ export default function AdminPermissoes() {
           >
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push('/admin')}
+                onClick={() => window.location.href = '/admin'}
                 className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
               >
                 <ArrowLeftIcon className="w-5 h-5 text-white" />
