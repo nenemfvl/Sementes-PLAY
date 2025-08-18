@@ -4,7 +4,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
-import { useAuth } from '@/contexts/AuthContext'
+
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -15,7 +15,33 @@ export default function LoginPage() {
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState('')
   
-  const { login } = useAuth()
+  // Função de login direta como no site antigo
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao fazer login')
+      }
+
+      // Salvar dados do usuário no localStorage
+      localStorage.setItem('usuario-dados', JSON.stringify(data.usuario))
+      localStorage.setItem('auth-token', data.token)
+      
+      // Redirecionar para dashboard
+      window.location.href = '/dashboard'
+    } catch (error) {
+      throw error
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -4,7 +4,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { EyeIcon, EyeSlashIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
-import { useAuth } from '@/contexts/AuthContext'
+
 
 export default function RegistroPage() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -21,7 +21,29 @@ export default function RegistroPage() {
   const [errors, setErrors] = React.useState<Record<string, string>>({})
   const [loading, setLoading] = React.useState(false)
   
-  const { registro } = useAuth()
+  // Função de registro direta como no site antigo
+  const registro = async (nome: string, email: string, username: string, password: string) => {
+    try {
+      const response = await fetch('/api/auth/registro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nome, email, username, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao criar conta')
+      }
+
+      // Redirecionar para login com mensagem de sucesso
+      window.location.href = '/login?message=Conta criada com sucesso!'
+    } catch (error) {
+      throw error
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
