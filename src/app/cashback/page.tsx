@@ -248,7 +248,7 @@ export default function CashbackPage() {
           >
             <div className="flex items-center justify-center mb-4">
               <button
-                onClick={() => router.push('/')}
+                onClick={() => window.location.href = '/'}
                 className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors mr-4"
               >
                 <ArrowLeftIcon className="w-5 h-5 text-white" />
