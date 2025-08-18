@@ -66,18 +66,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const agora = Math.floor(Date.now() / 1000)
       
       if (payload.exp > agora) {
-        // Token válido - usar dados disponíveis com fallbacks seguros
-        setUsuario({
-          id: payload.userId || payload.sub || 'unknown',
-          nome: payload.nome || payload.name || 'Usuário',
-          email: payload.email || '',
-          tipo: payload.tipo || 'comum',
-          sementes: payload.sementes || 0,
-          nivel: payload.nivel || 'comum',
-          xp: payload.xp || 0,
-          pontuacao: payload.pontuacao || 0
-        })
-        setIsAuthenticated(true)
+        // Token válido - só definir usuário se tiver nome
+        const nomeUsuario = payload.nome || payload.name
+        if (nomeUsuario) {
+          setUsuario({
+            id: payload.userId || payload.sub || 'unknown',
+            nome: nomeUsuario,
+            email: payload.email || '',
+            tipo: payload.tipo || 'comum',
+            sementes: payload.sementes || 0,
+            nivel: payload.nivel || 'comum',
+            xp: payload.xp || 0,
+            pontuacao: payload.pontuacao || 0
+          })
+          setIsAuthenticated(true)
+        } else {
+          // Token não tem nome válido, remover
+          localStorage.removeItem('auth-token')
+          removeCookie('auth-token')
+        }
       } else {
         // Token expirado
         localStorage.removeItem('auth-token')
