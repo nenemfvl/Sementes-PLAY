@@ -42,6 +42,7 @@ export default function CriadoresPage() {
   const [usuario, setUsuario] = useState<any>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [totalSementes, setTotalSementes] = useState<number | null>(null)
   const [criadores, setCriadores] = useState<Criador[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategoria, setFilterCategoria] = useState('todas')
@@ -61,6 +62,7 @@ export default function CriadoresPage() {
           setIsAuthenticated(true)
           // Carregar dados após autenticação
           carregarCriadores()
+          carregarTotalSementes()
         } catch (error) {
           console.error('Erro ao ler dados do usuário:', error)
           localStorage.removeItem('usuario-dados')
@@ -71,10 +73,30 @@ export default function CriadoresPage() {
         setUsuario(null)
         setIsAuthenticated(false)
       }
+      // Carregar contador independentemente da autenticação
+      carregarTotalSementes()
       setLoading(false)
     }
     verificarAutenticacao()
   }, [])
+
+  const carregarTotalSementes = async () => {
+    try {
+      const response = await fetch('/api/admin/stats')
+      if (response.ok) {
+        const data = await response.json()
+        if (typeof data.totalSementes === 'number') {
+          setTotalSementes(data.totalSementes)
+          return
+        }
+      }
+      // Fallback enquanto API não existir
+      setTotalSementes(0)
+    } catch (error) {
+      console.error('Erro ao carregar total de sementes:', error)
+      setTotalSementes(0)
+    }
+  }
 
   const carregarCriadores = async () => {
     try {
@@ -280,6 +302,26 @@ export default function CriadoresPage() {
               Descubra e acompanhe os melhores criadores da nossa comunidade
             </p>
           </motion.div>
+
+          {/* Contador de Sementes em circulação */}
+          {totalSementes !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="w-full mb-8"
+            >
+              <div className="flex flex-col items-center bg-[#1a223a]/90 rounded-2xl border border-gray-700 py-8">
+                <span className="text-gray-400 text-sm mb-2">Sementes em circulação</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-5xl md:text-6xl font-extrabold text-sss-accent">
+                    {totalSementes.toLocaleString('pt-BR')}
+                  </span>
+                  <span className="text-4xl">🌱</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Estatísticas */}
           <motion.div
