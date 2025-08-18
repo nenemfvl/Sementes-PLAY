@@ -39,7 +39,7 @@ export async function GET() {
         nivel: {
           in: ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
         },
-        status: 'ativo'
+        suspenso: false
       }
     })
 
@@ -48,7 +48,7 @@ export async function GET() {
         nivel: {
           in: ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
         },
-        status: 'ativo'
+        suspenso: false
       },
       _sum: {
         sementes: true
