@@ -10,6 +10,7 @@ import {
   EyeIcon,
   HeartIcon
 } from '@heroicons/react/24/outline'
+import Link from 'next/link'
 
 interface DadosCiclo {
   ciclo: number
@@ -196,6 +197,17 @@ export default function CriadoresPage() {
                 <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
                   Informações sobre ciclos, estatísticas e conteúdos dos parceiros
                 </p>
+                
+                {/* Botão Seja Criador */}
+                <div className="mt-8">
+                  <Link
+                    href="/candidatura-criador"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-sementes-primary to-sementes-accent text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-sementes-primary/25 transition-all duration-300 hover:scale-105 transform"
+                  >
+                    <UserGroupIcon className="w-6 h-6 mr-3" />
+                    Seja um Criador
+                  </Link>
+                </div>
               </div>
             </div>
           </motion.div>
