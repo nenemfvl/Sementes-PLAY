@@ -46,25 +46,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Verificar se usuário está logado ao carregar - simples como no site antigo
   useEffect(() => {
+    console.log('🔍 [AUTH] useEffect executado')
+    
     const verificarAutenticacao = () => {
+      console.log('🔍 [AUTH] Verificando autenticação...')
+      
       const usuarioSalvo = localStorage.getItem('usuario-dados')
+      console.log('📱 [AUTH] Usuário no localStorage:', usuarioSalvo ? 'EXISTE' : 'NÃO EXISTE')
       
       if (usuarioSalvo) {
         try {
+          console.log('✅ [AUTH] Usuário encontrado, parseando...')
           const dadosUsuario = JSON.parse(usuarioSalvo)
+          console.log('👤 [AUTH] Dados do usuário:', dadosUsuario)
+          
           setUsuario(dadosUsuario)
           setIsAuthenticated(true)
+          console.log('✅ [AUTH] Usuário definido, isAuthenticated = true')
         } catch (error) {
-          console.error('Erro ao ler dados do usuário:', error)
+          console.error('❌ [AUTH] Erro ao parsear usuário:', error)
           localStorage.removeItem('usuario-dados')
           setUsuario(null)
           setIsAuthenticated(false)
+          console.log('🧹 [AUTH] Dados inválidos removidos')
         }
       } else {
+        console.log('❌ [AUTH] Sem usuário no localStorage')
         setUsuario(null)
         setIsAuthenticated(false)
       }
+      
       setLoading(false)
+      console.log('🏁 [AUTH] Verificação concluída, loading = false')
     }
     
     verificarAutenticacao()

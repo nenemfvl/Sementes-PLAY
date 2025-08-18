@@ -17,20 +17,31 @@ export default function DashboardPage() {
 
   // Proteção de rota EXATAMENTE como no site antigo
   React.useEffect(() => {
+    console.log('🔍 [DASHBOARD] useEffect executado')
+    
     const verificarAutenticacao = () => {
+      console.log('🔍 [DASHBOARD] Verificando autenticação...')
+      
       const usuarioSalvo = localStorage.getItem('usuario-dados')
+      console.log('📱 [DASHBOARD] Usuário no localStorage:', usuarioSalvo ? 'EXISTE' : 'NÃO EXISTE')
       
       if (usuarioSalvo) {
         try {
+          console.log('✅ [DASHBOARD] Usuário encontrado, parseando...')
           const dadosUsuario = JSON.parse(usuarioSalvo)
+          console.log('👤 [DASHBOARD] Dados do usuário:', dadosUsuario)
+          
           setUsuario(dadosUsuario)
           setLoading(false)
+          console.log('✅ [DASHBOARD] Usuário definido, loading = false')
         } catch (error) {
-          console.error('Erro ao ler dados do usuário:', error)
+          console.error('❌ [DASHBOARD] Erro ao parsear usuário:', error)
           localStorage.removeItem('usuario-dados')
+          console.log('🧹 [DASHBOARD] Dados inválidos removidos, redirecionando...')
           window.location.href = '/login'
         }
       } else {
+        console.log('❌ [DASHBOARD] Sem usuário no localStorage, redirecionando...')
         // Sem usuário, redirecionar imediatamente
         window.location.href = '/login'
       }
