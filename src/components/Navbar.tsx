@@ -49,6 +49,11 @@ export default function Navbar() {
     return pathname.startsWith(path)
   }
 
+  const isCriador = (nivel: string | number) => {
+    const niveisCriador = ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
+    return niveisCriador.includes(String(nivel))
+  }
+
   return (
     <header className="bg-black shadow-lg border-b border-gray-700 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -113,6 +118,34 @@ export default function Navbar() {
              >
                Ranking
              </Link>
+                         
+                         {/* Painel Criador - Apenas para usuários com níveis de criador */}
+                         {isAuthenticated && usuario && isCriador(usuario.nivel) && (
+                           <Link 
+                             href="/painel-criador" 
+                             className={`transition-colors ${
+                               isActiveLink('/painel-criador') 
+                                 ? 'text-sementes-primary font-semibold' 
+                                 : 'text-gray-300 hover:text-sementes-primary'
+                             }`}
+                           >
+                             Painel Criador
+                           </Link>
+                         )}
+                         
+                         {/* Painel Parceiro - Apenas para usuários com nível parceiro */}
+                         {isAuthenticated && usuario && usuario.nivel === 'parceiro' && (
+                           <Link 
+                             href="/painel-parceiro" 
+                             className={`transition-colors ${
+                               isActiveLink('/painel-parceiro') 
+                                 ? 'text-sementes-primary font-semibold' 
+                                 : 'text-gray-300 hover:text-sementes-primary'
+                             }`}
+                           >
+                             Painel Parceiro
+                           </Link>
+                         )}
                          
                          {/* Admin Link - Apenas para usuários com nível 5+ */}
                          {isAuthenticated && usuario && Number(usuario.nivel) >= 5 && (
@@ -321,6 +354,28 @@ export default function Navbar() {
               >
                 Ranking
               </Link>
+              
+              {/* Painel Criador Mobile - Apenas para usuários com níveis de criador */}
+              {isAuthenticated && usuario && isCriador(usuario.nivel) && (
+                <Link 
+                  href="/painel-criador" 
+                  className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Painel Criador
+                </Link>
+              )}
+              
+              {/* Painel Parceiro Mobile - Apenas para usuários com nível parceiro */}
+              {isAuthenticated && usuario && usuario.nivel === 'parceiro' && (
+                <Link 
+                  href="/painel-parceiro" 
+                  className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Painel Parceiro
+                </Link>
+              )}
               
               {/* Admin Link Mobile - Apenas para usuários com nível 5+ */}
               {isAuthenticated && usuario && Number(usuario.nivel) >= 5 && (
