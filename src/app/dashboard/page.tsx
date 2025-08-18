@@ -1,8 +1,6 @@
 'use client'
 
 import React from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   UserIcon,
@@ -14,16 +12,32 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function DashboardPage() {
-  const { usuario, isAuthenticated, loading } = useAuth()
-  const router = useRouter()
+  const [usuario, setUsuario] = React.useState<any>(null)
+  const [loading, setLoading] = React.useState(true)
 
-  // Proteção de rota simples como no site antigo
+  // Proteção de rota EXATAMENTE como no site antigo
   React.useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      // Usar redirecionamento direto como no site antigo
-      window.location.href = '/login'
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          setUsuario(dadosUsuario)
+          setLoading(false)
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          window.location.href = '/login'
+        }
+      } else {
+        // Sem usuário, redirecionar imediatamente
+        window.location.href = '/login'
+      }
     }
-  }, [isAuthenticated, loading])
+    
+    verificarAutenticacao()
+  }, [])
 
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
@@ -35,11 +49,6 @@ export default function DashboardPage() {
         </div>
       </div>
     )
-  }
-
-  // Se não estiver autenticado, não mostrar nada (vai redirecionar)
-  if (!isAuthenticated) {
-    return null
   }
 
   return (
