@@ -220,7 +220,7 @@ export default function AdminDashboard() {
                 <h3 className="text-lg font-semibold text-white mb-3">Fluxo do Sistema</h3>
                                   <div className="space-y-2 text-sm text-gray-300">
                     <p>• Usuários compram em sites parceiros usando cupom <span className="font-bold text-sementes-primary">sementesplay20</span></p>
-                    <p>• Parceiros devem repassar 20% do valor ao SementesPLAY e enviar comprovante</p>
+                    <p>• Parceiros devem repassar 10% do valor ao SementesPLAY e enviar comprovante</p>
                     <p>• Sistema alimenta automaticamente o fundo de sementes</p>
                     <p>• Admin distribui o fundo a cada ciclo para criadores e usuários</p>
                     <p>• Dúvidas? Consulte o suporte ou documentação</p>
