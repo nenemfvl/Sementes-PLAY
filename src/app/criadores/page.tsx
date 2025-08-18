@@ -72,56 +72,8 @@ export default function CriadoresPage() {
         }
       }
 
-      // Carregar conteúdos dos parceiros (mockado por enquanto)
-      const mockConteudos: ConteudoParceiro[] = [
-        {
-          id: '1',
-          titulo: 'Como Criar Conteúdo de Qualidade',
-          descricao: 'Dicas essenciais para criar conteúdo que engaja e cresce sua audiência',
-          tipo: 'video',
-          plataforma: 'youtube',
-          url: 'https://youtube.com/watch?v=exemplo',
-          visualizacoes: 15000,
-          curtidas: 1200,
-          dataPublicacao: '2024-01-15',
-          parceiro: {
-            nome: 'Maria Santos',
-            nivel: 'parceiro'
-          }
-        },
-        {
-          id: '2',
-          titulo: 'Stream de Gaming: Dicas para Iniciantes',
-          descricao: 'Aprenda as melhores práticas para fazer streams de sucesso',
-          tipo: 'stream',
-          plataforma: 'twitch',
-          url: 'https://twitch.tv/exemplo',
-          visualizacoes: 8000,
-          curtidas: 650,
-          dataPublicacao: '2024-01-20',
-          parceiro: {
-            nome: 'João Silva',
-            nivel: 'parceiro'
-          }
-        },
-        {
-          id: '3',
-          titulo: 'Receita: Bolo de Chocolate Especial',
-          descricao: 'Receita exclusiva de bolo de chocolate com ingredientes especiais',
-          tipo: 'post',
-          plataforma: 'instagram',
-          url: 'https://instagram.com/p/exemplo',
-          visualizacoes: 25000,
-          curtidas: 2100,
-          dataPublicacao: '2024-01-25',
-          parceiro: {
-            nome: 'Ana Costa',
-            nivel: 'parceiro'
-          }
-        }
-      ]
-
-      setConteudosParceiros(mockConteudos)
+      // TODO: Implementar API para carregar conteúdos dos parceiros
+      setConteudosParceiros([])
       setLoading(false)
     } catch (error) {
       console.error('Erro ao carregar dados:', error)

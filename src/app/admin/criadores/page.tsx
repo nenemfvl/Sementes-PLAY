@@ -80,60 +80,7 @@ export default function AdminCriadores() {
   const carregarCriadores = async () => {
     try {
       // TODO: Implementar API para buscar criadores
-      // Por enquanto, usando dados mockados para desenvolvimento
-      setCriadores([
-        {
-          id: '1',
-          nome: 'Carlos Silva',
-          email: 'carlos@exemplo.com',
-          avatarUrl: 'https://exemplo.com/avatar1.jpg',
-          nivel: 3,
-          categoria: 'Veículos',
-          status: 'ativo',
-          dataCadastro: new Date('2023-06-15'),
-          ultimaAtividade: new Date('2024-01-20'),
-          totalConteudos: 45,
-          totalVisualizacoes: 12500,
-          totalGanhos: 1250.50,
-          biografia: 'Criador especializado em veículos personalizados para FiveM',
-          redesSociais: ['@carlossilva', '@veiculoscustom'],
-          especialidades: ['Veículos', 'Scripts', 'Mods']
-        },
-        {
-          id: '2',
-          nome: 'Ana Costa',
-          email: 'ana@exemplo.com',
-          avatarUrl: 'https://exemplo.com/avatar2.jpg',
-          nivel: 4,
-          categoria: 'Scripts',
-          status: 'ativo',
-          dataCadastro: new Date('2023-03-20'),
-          ultimaAtividade: new Date('2024-01-19'),
-          totalConteudos: 78,
-          totalVisualizacoes: 28900,
-          totalGanhos: 3200.75,
-          biografia: 'Desenvolvedora de scripts avançados para servidores FiveM',
-          redesSociais: ['@anacosta', '@scriptsfivem'],
-          especialidades: ['Scripts', 'Lua', 'JavaScript']
-        },
-        {
-          id: '3',
-          nome: 'Pedro Santos',
-          email: 'pedro@exemplo.com',
-          avatarUrl: 'https://exemplo.com/avatar3.jpg',
-          nivel: 2,
-          categoria: 'Maps',
-          status: 'suspenso',
-          dataCadastro: new Date('2023-09-10'),
-          ultimaAtividade: new Date('2024-01-15'),
-          totalConteudos: 23,
-          totalVisualizacoes: 5600,
-          totalGanhos: 450.25,
-          biografia: 'Criador de mapas e ambientes para roleplay',
-          redesSociais: ['@pedrosantos', '@mapsfivem'],
-          especialidades: ['Maps', 'Ambientes', 'Buildings']
-        }
-      ])
+      setCriadores([])
     } catch (error) {
       console.error('Erro ao carregar criadores:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao carregar criadores' })

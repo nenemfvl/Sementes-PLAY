@@ -67,48 +67,7 @@ export default function RegistrarCompraPage() {
   const carregarParceiros = async () => {
     try {
       // TODO: Implementar API para buscar parceiros
-      // Por enquanto, usando dados mockados
-      setParceiros([
-        {
-          id: '1',
-          nome: 'João Silva',
-          email: 'joao@exemplo.com',
-          nomeCidade: 'São Paulo',
-          avatar: '',
-          nivel: 'Ouro',
-          sementes: 15000,
-          comissaoMensal: 2500,
-          totalVendas: 125000,
-          posicao: 1,
-          dataCriacao: '2024-01-01'
-        },
-        {
-          id: '2',
-          nome: 'Maria Santos',
-          email: 'maria@exemplo.com',
-          nomeCidade: 'Rio de Janeiro',
-          avatar: '',
-          nivel: 'Prata',
-          sementes: 8500,
-          comissaoMensal: 1800,
-          totalVendas: 89000,
-          posicao: 2,
-          dataCriacao: '2024-01-15'
-        },
-        {
-          id: '3',
-          nome: 'Pedro Costa',
-          email: 'pedro@exemplo.com',
-          nomeCidade: 'Belo Horizonte',
-          avatar: '',
-          nivel: 'Bronze',
-          sementes: 5200,
-          comissaoMensal: 1200,
-          totalVendas: 65000,
-          posicao: 3,
-          dataCriacao: '2024-02-01'
-        }
-      ])
+      setParceiros([])
     } catch (error) {
       console.error('Erro ao carregar parceiros:', error)
     } finally {

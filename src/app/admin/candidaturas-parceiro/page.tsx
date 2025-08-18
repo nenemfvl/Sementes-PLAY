@@ -80,43 +80,7 @@ export default function AdminCandidaturasParceiroPage() {
   const carregarCandidaturas = async () => {
     try {
       // TODO: Implementar API para buscar candidaturas de parceiro
-      // Por enquanto, usando dados mockados para desenvolvimento
-      setCandidaturas([
-        {
-          id: '1',
-          nome: 'João Silva',
-          email: 'joao@exemplo.com',
-          telefone: '(11) 99999-9999',
-          nomeCidade: 'São Paulo',
-          estado: 'SP',
-          pais: 'Brasil',
-          descricao: 'Cidade de roleplay com foco em economia realista',
-          experiencia: '5 anos como dono de cidade FiveM',
-          redesSociais: ['@joaosilva', '@cidadesp'],
-          comprovantes: ['https://exemplo.com/comprovante1.jpg'],
-          status: 'pendente',
-          dataCandidatura: new Date('2024-01-15'),
-          dataRevisao: undefined,
-          observacoes: undefined
-        },
-        {
-          id: '2',
-          nome: 'Maria Santos',
-          email: 'maria@exemplo.com',
-          telefone: '(21) 88888-8888',
-          nomeCidade: 'Rio de Janeiro',
-          estado: 'RJ',
-          pais: 'Brasil',
-          descricao: 'Cidade com sistema de empregos e economia avançada',
-          experiencia: '3 anos como administradora de servidor',
-          redesSociais: ['@mariasantos', '@ciderj'],
-          comprovantes: ['https://exemplo.com/comprovante2.jpg'],
-          status: 'aprovada',
-          dataCandidatura: new Date('2024-01-10'),
-          dataRevisao: new Date('2024-01-12'),
-          observacoes: 'Candidatura aprovada após análise dos comprovantes'
-        }
-      ])
+      setCandidaturas([])
     } catch (error) {
       console.error('Erro ao carregar candidaturas:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao carregar candidaturas' })

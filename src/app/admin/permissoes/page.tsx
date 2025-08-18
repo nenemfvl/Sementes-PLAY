@@ -132,76 +132,7 @@ export default function AdminPermissoesPage() {
   const carregarUsuarios = async () => {
     try {
       // TODO: Implementar API para buscar usuários
-      // Por enquanto, usando dados mockados para desenvolvimento
-      setUsuarios([
-        {
-          id: '1',
-          nome: 'João Silva',
-          email: 'joao@exemplo.com',
-          avatarUrl: 'https://exemplo.com/avatar1.jpg',
-          tipo: 'usuario',
-          nivel: 2,
-          status: 'ativo',
-          dataCadastro: new Date('2023-06-15'),
-          ultimaAtividade: new Date('2024-01-20'),
-          permissoes: [
-            { id: '1', nome: 'visualizar_conteudo', descricao: 'Visualizar conteúdo', categoria: 'conteudo', ativa: true },
-            { id: '2', nome: 'solicitar_cashback', descricao: 'Solicitar cashback', categoria: 'financeiro', ativa: true },
-            { id: '3', nome: 'comentar', descricao: 'Comentar em conteúdo', categoria: 'conteudo', ativa: true },
-            { id: '4', nome: 'avaliar', descricao: 'Avaliar conteúdo', categoria: 'conteudo', ativa: true }
-          ]
-        },
-        {
-          id: '2',
-          nome: 'Maria Santos',
-          email: 'maria@exemplo.com',
-          avatarUrl: 'https://exemplo.com/avatar2.jpg',
-          tipo: 'criador',
-          nivel: 4,
-          status: 'ativo',
-          dataCadastro: new Date('2023-03-20'),
-          ultimaAtividade: new Date('2024-01-19'),
-          permissoes: [
-            { id: '1', nome: 'visualizar_conteudo', descricao: 'Visualizar conteúdo', categoria: 'conteudo', ativa: true },
-            { id: '2', nome: 'solicitar_cashback', descricao: 'Solicitar cashback', categoria: 'financeiro', ativa: true },
-            { id: '3', nome: 'criar_conteudo', descricao: 'Criar conteúdo', categoria: 'conteudo', ativa: true },
-            { id: '4', nome: 'editar_proprio_conteudo', descricao: 'Editar próprio conteúdo', categoria: 'conteudo', ativa: true },
-            { id: '5', nome: 'receber_pagamentos', descricao: 'Receber pagamentos', categoria: 'financeiro', ativa: true },
-            { id: '6', nome: 'gerenciar_perfil', descricao: 'Gerenciar perfil', categoria: 'usuarios', ativa: true }
-          ]
-        },
-        {
-          id: '3',
-          nome: 'Pedro Costa',
-          email: 'pedro@exemplo.com',
-          avatarUrl: 'https://exemplo.com/avatar3.jpg',
-          tipo: 'criador',
-          nivel: 3,
-          status: 'ativo',
-          dataCadastro: new Date('2023-09-10'),
-          ultimaAtividade: new Date('2024-01-15'),
-          permissoes: [
-            { id: '1', nome: 'visualizar_conteudo', descricao: 'Visualizar conteúdo', categoria: 'conteudo', ativa: true },
-            { id: '2', nome: 'solicitar_cashback', descricao: 'Solicitar cashback', categoria: 'financeiro', ativa: true },
-            { id: '3', nome: 'criar_conteudo', descricao: 'Criar conteúdo', categoria: 'conteudo', ativa: true },
-            { id: '4', nome: 'editar_proprio_conteudo', descricao: 'Editar próprio conteúdo', categoria: 'conteudo', ativa: true }
-          ]
-        },
-        {
-          id: '4',
-          nome: 'Ana Oliveira',
-          email: 'ana@exemplo.com',
-          avatarUrl: 'https://exemplo.com/avatar4.jpg',
-          tipo: 'admin',
-          nivel: 5,
-          status: 'ativo',
-          dataCadastro: new Date('2023-01-15'),
-          ultimaAtividade: new Date('2024-01-20'),
-          permissoes: [
-            { id: '1', nome: 'todas_permissoes', descricao: 'Todas as permissões', categoria: 'sistema', ativa: true }
-          ]
-        }
-      ])
+      setUsuarios([])
     } catch (error) {
       console.error('Erro ao carregar usuários:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao carregar usuários' })

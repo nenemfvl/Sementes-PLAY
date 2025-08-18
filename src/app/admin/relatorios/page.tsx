@@ -99,79 +99,21 @@ export default function AdminRelatorios() {
   const carregarRelatorio = async () => {
     try {
       // TODO: Implementar API para buscar relatórios
-      // Por enquanto, usando dados mockados para desenvolvimento
       setRelatorio({
         periodo: periodoSelecionado === '30dias' ? 'Últimos 30 dias' : 
                 periodoSelecionado === '90dias' ? 'Últimos 90 dias' : 'Último ano',
-        totalUsuarios: 1250,
-        totalCriadores: 45,
-        totalParceiros: 23,
-        totalRepasses: 156,
-        totalGanhos: 31200.50,
-        totalConteudos: 234,
-        totalVisualizacoes: 89000,
-        crescimentoUsuarios: 12.5,
-        crescimentoRepasses: 8.3,
-        topCriadores: [
-          {
-            id: '1',
-            nome: 'Carlos Silva',
-            categoria: 'Veículos',
-            totalConteudos: 45,
-            totalVisualizacoes: 12500,
-            totalGanhos: 1250.50
-          },
-          {
-            id: '2',
-            nome: 'Ana Costa',
-            categoria: 'Scripts',
-            totalConteudos: 78,
-            totalVisualizacoes: 28900,
-            totalGanhos: 3200.75
-          },
-          {
-            id: '3',
-            nome: 'Pedro Santos',
-            categoria: 'Maps',
-            totalConteudos: 23,
-            totalVisualizacoes: 5600,
-            totalGanhos: 450.25
-          }
-        ],
-        topParceiros: [
-          {
-            id: '1',
-            nome: 'João Silva',
-            cidade: 'São Paulo',
-            totalRepasses: 45,
-            totalGanhos: 8900.50,
-            totalUsuarios: 1250
-          },
-          {
-            id: '2',
-            nome: 'Maria Santos',
-            cidade: 'Rio de Janeiro',
-            totalRepasses: 32,
-            totalGanhos: 6400.75,
-            totalUsuarios: 980
-          },
-          {
-            id: '3',
-            nome: 'Pedro Costa',
-            cidade: 'Belo Horizonte',
-            totalRepasses: 18,
-            totalGanhos: 3600.25,
-            totalUsuarios: 650
-          }
-        ],
-        estatisticasMensais: [
-          { mes: 'Jan', usuarios: 1200, repasses: 45, ganhos: 8900, conteudos: 23 },
-          { mes: 'Fev', usuarios: 1250, repasses: 52, ganhos: 10200, conteudos: 28 },
-          { mes: 'Mar', usuarios: 1300, repasses: 48, ganhos: 9500, conteudos: 31 },
-          { mes: 'Abr', usuarios: 1280, repasses: 55, ganhos: 11000, conteudos: 29 },
-          { mes: 'Mai', usuarios: 1320, repasses: 58, ganhos: 11500, conteudos: 35 },
-          { mes: 'Jun', usuarios: 1350, repasses: 62, ganhos: 12200, conteudos: 38 }
-        ]
+        totalUsuarios: 0,
+        totalCriadores: 0,
+        totalParceiros: 0,
+        totalRepasses: 0,
+        totalGanhos: 0,
+        totalConteudos: 0,
+        totalVisualizacoes: 0,
+        crescimentoUsuarios: 0,
+        crescimentoRepasses: 0,
+        topCriadores: [],
+        topParceiros: [],
+        estatisticasMensais: []
       })
     } catch (error) {
       console.error('Erro ao carregar relatório:', error)

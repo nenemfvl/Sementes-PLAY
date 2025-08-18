@@ -117,56 +117,16 @@ export default function CashbackPage() {
   const carregarDados = async () => {
     try {
       // TODO: Implementar APIs reais
-      // Por enquanto, usando dados mockados
-      setCodigos([
-        {
-          id: '1',
-          codigo: 'sementesplay10',
-          descricao: 'Cupom principal para compras em parceiros',
-          valor: 10,
-          tipo: 'percentual',
-          valorMinimo: 50,
-          valorMaximo: 1000,
-          dataInicio: new Date('2024-01-01'),
-          dataFim: new Date('2024-12-31'),
-          status: 'ativo',
-          categoria: 'parceiro',
-          usos: 1250,
-          maxUsos: 10000,
-          icone: '🎯',
-          cor: 'green'
-        }
-      ])
-
-      setHistorico([
-        {
-          id: '1',
-          codigo: 'sementesplay10',
-          valor: 25.50,
-          dataResgate: new Date('2024-01-15'),
-          status: 'aprovado',
-          observacao: 'Compra aprovada - R$ 510,00'
-        }
-      ])
-
-      setSolicitacoesPendentes([
-        {
-          id: '1',
-          parceiroNome: 'João Silva - São Paulo',
-          valorCompra: 510.00,
-          valorCashback: 25.50,
-          dataCompra: new Date('2024-01-15'),
-          status: 'pendente'
-        }
-      ])
-
+      setCodigos([])
+      setHistorico([])
+      setSolicitacoesPendentes([])
       setEstatisticas({
-        totalResgatado: 1250.75,
-        totalPendente: 89.50,
-        codigosUsados: 45,
-        economiaTotal: 1340.25,
-        resgatesMes: 12,
-        mediaPorResgate: 28.50
+        totalResgatado: 0,
+        totalPendente: 0,
+        codigosUsados: 0,
+        economiaTotal: 0,
+        resgatesMes: 0,
+        mediaPorResgate: 0
       })
     } catch (error) {
       console.error('Erro ao carregar dados:', error)

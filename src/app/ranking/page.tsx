@@ -120,75 +120,7 @@ export default function RankingPage() {
   const carregarUsuarios = async () => {
     try {
       // TODO: Implementar API para buscar usuários
-      // Por enquanto, usando dados mockados
-      const mockUsuarios: Usuario[] = [
-        {
-          id: '1',
-          nome: 'João Silva',
-          email: 'joao@exemplo.com',
-          avatarUrl: '',
-          nivel: 'criador-supremo',
-          categoria: 'Tecnologia',
-          cidade: 'São Paulo',
-          estado: 'SP',
-          totalConteudos: 45,
-          totalVisualizacoes: 125000,
-          totalCurtidas: 8900,
-          totalSementes: 15000,
-          dataCadastro: '2024-01-01',
-          status: 'ativo',
-          tipo: 'criador',
-          redesSociais: {
-            youtube: 'https://youtube.com/@joaosilva',
-            twitch: 'https://twitch.tv/joaosilva',
-            instagram: 'https://instagram.com/joaosilva'
-          }
-        },
-        {
-          id: '2',
-          nome: 'Maria Santos',
-          email: 'maria@exemplo.com',
-          avatarUrl: '',
-          nivel: 'parceiro',
-          categoria: 'Culinária',
-          cidade: 'Rio de Janeiro',
-          estado: 'RJ',
-          totalConteudos: 32,
-          totalVisualizacoes: 89000,
-          totalCurtidas: 5600,
-          totalSementes: 12000,
-          dataCadastro: '2024-01-15',
-          status: 'ativo',
-          tipo: 'parceiro',
-          redesSociais: {
-            instagram: 'https://instagram.com/mariasantos',
-            tiktok: 'https://tiktok.com/@mariasantos'
-          }
-        },
-        {
-          id: '3',
-          nome: 'Pedro Costa',
-          email: 'pedro@exemplo.com',
-          avatarUrl: '',
-          nivel: 'usuario',
-          categoria: 'Gaming',
-          cidade: 'Belo Horizonte',
-          estado: 'MG',
-          totalConteudos: 28,
-          totalVisualizacoes: 67000,
-          totalCurtidas: 4200,
-          totalSementes: 8500,
-          dataCadastro: '2024-02-01',
-          status: 'ativo',
-          tipo: 'usuario',
-          redesSociais: {
-            twitch: 'https://twitch.tv/pedrocosta',
-            youtube: 'https://youtube.com/@pedrocosta'
-          }
-        }
-      ]
-
-      setUsuarios(mockUsuarios)
+      setUsuarios([])
     } catch (error) {
       console.error('Erro ao carregar usuários:', error)
     }

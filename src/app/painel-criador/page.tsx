@@ -152,94 +152,17 @@ export default function PainelCriador() {
   const carregarDados = async () => {
     try {
       // TODO: Implementar APIs reais
-      // Por enquanto, usando dados mockados
-      setConteudos([
-        {
-          id: '1',
-          titulo: 'Meu Primeiro Vídeo',
-          tipo: 'video',
-          categoria: 'gaming',
-          url: 'https://youtube.com/watch?v=exemplo',
-          dataPublicacao: '2024-01-15',
-          visualizacoes: 1250,
-          curtidas: 89,
-          dislikes: 2
-        },
-        {
-          id: '2',
-          titulo: 'Tutorial de Configuração',
-          tipo: 'tutorial',
-          categoria: 'tecnologia',
-          url: 'https://youtube.com/watch?v=tutorial',
-          dataPublicacao: '2024-01-10',
-          visualizacoes: 890,
-          curtidas: 45,
-          dislikes: 1
-        }
-      ])
-
+      setConteudos([])
       setEstatisticas({
-        totalDoacoes: 1250,
-        totalSementes: 8900,
-        totalFavoritos: 156
+        totalDoacoes: 0,
+        totalSementes: 0,
+        totalFavoritos: 0
       })
-
-      setDoacoes([
-        {
-          id: '1',
-          quantidade: 100,
-          data: '2024-01-15',
-          mensagem: 'Continue criando conteúdo incrível!',
-          doador: { nome: 'João Silva' }
-        },
-        {
-          id: '2',
-          quantidade: 50,
-          data: '2024-01-14',
-          mensagem: 'Adorei o vídeo!',
-          doador: { nome: 'Maria Santos' }
-        }
-      ])
-
-      setRanking([
-        { id: '1', nome: 'João Silva', total: 1000 },
-        { id: '2', nome: 'Maria Santos', total: 750 },
-        { id: '3', nome: 'Pedro Costa', total: 500 }
-      ])
-
-      setNotificacoes([
-        {
-          id: '1',
-          titulo: 'Nova Doação',
-          mensagem: 'Você recebeu 100 Sementes de João Silva',
-          data: '2024-01-15'
-        }
-      ])
-
-      setRecados([
-        {
-          id: '1',
-          usuarioNome: 'Ana Oliveira',
-          mensagem: 'Quando você vai fazer um vídeo sobre FiveM?',
-          data: '2024-01-15',
-          publico: true
-        }
-      ])
-
-      setEnquetes([
-        {
-          id: '1',
-          pergunta: 'Qual tipo de conteúdo você prefere?',
-          opcoes: [
-            { opcao: 'Gaming', votos: 45, porcentagem: 60 },
-            { opcao: 'Tutorial', votos: 30, porcentagem: 40 }
-          ],
-          criador: 'Eu',
-          totalVotos: 75,
-          dataCriacao: '2024-01-10',
-          ativa: true
-        }
-      ])
+      setDoacoes([])
+      setRanking([])
+      setNotificacoes([])
+      setRecados([])
+      setEnquetes([])
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     } finally {

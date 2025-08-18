@@ -159,89 +159,19 @@ export default function PainelParceiroPage() {
   const carregarDados = async () => {
     try {
       // TODO: Implementar APIs reais
-      // Por enquanto, usando dados mockados
       setEstatisticas({
-        totalVendas: 12500,
-        totalComissoes: 1250,
-        codigosAtivos: 8,
-        repassesRealizados: 15,
-        transacoesMes: 45,
-        usuariosAtivos: 89
+        totalVendas: 0,
+        totalComissoes: 0,
+        codigosAtivos: 0,
+        repassesRealizados: 0,
+        transacoesMes: 0,
+        usuariosAtivos: 0
       })
-
-      setTransacoes([
-        {
-          id: '1',
-          valor: 150.00,
-          codigoParceiro: 'PARCEIRO10',
-          status: 'aprovada',
-          data: '2024-01-15',
-          usuario: { nome: 'João Silva', email: 'joao@email.com' }
-        },
-        {
-          id: '2',
-          valor: 89.90,
-          codigoParceiro: 'PARCEIRO10',
-          status: 'pendente',
-          data: '2024-01-14',
-          usuario: { nome: 'Maria Santos', email: 'maria@email.com' }
-        }
-      ])
-
-      setRepasses([
-        {
-          id: '1',
-          valorCompra: 150.00,
-          valorRepasse: 15.00,
-          status: 'pendente',
-          dataCompra: '2024-01-15',
-          usuario: { nome: 'João Silva', email: 'joao@email.com' }
-        }
-      ])
-
-      setConteudos([
-        {
-          id: '1',
-          titulo: 'Promoção Especial FiveM',
-          tipo: 'promocao',
-          categoria: 'gaming',
-          url: 'https://exemplo.com/promocao',
-          dataPublicacao: '2024-01-15',
-          visualizacoes: 1250,
-          curtidas: 89,
-          dislikes: 2
-        }
-      ])
-
-      setCodigosCashback([
-        {
-          id: '1',
-          codigo: 'PARCEIRO10',
-          desconto: 10,
-          maxUsos: 100,
-          usosAtuais: 45,
-          ativo: true,
-          dataCriacao: '2024-01-01'
-        },
-        {
-          id: '2',
-          codigo: 'PARCEIRO20',
-          desconto: 20,
-          maxUsos: 50,
-          usosAtuais: 12,
-          ativo: true,
-          dataCriacao: '2024-01-10'
-        }
-      ])
-
-      setNotificacoes([
-        {
-          id: '1',
-          titulo: 'Nova Transação',
-          mensagem: 'João Silva usou seu código PARCEIRO10',
-          data: '2024-01-15'
-        }
-      ])
+      setTransacoes([])
+      setRepasses([])
+      setConteudos([])
+      setCodigosCashback([])
+      setNotificacoes([])
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     } finally {

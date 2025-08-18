@@ -92,76 +92,7 @@ export default function AdminSuporte() {
   const carregarTickets = async () => {
     try {
       // TODO: Implementar API para buscar tickets
-      // Por enquanto, usando dados mockados para desenvolvimento
-      setTickets([
-        {
-          id: '1',
-          usuario: {
-            id: '1',
-            nome: 'João Silva',
-            email: 'joao@exemplo.com',
-            telefone: '(11) 99999-9999'
-          },
-          assunto: 'Problema com solicitação de cashback',
-          mensagem: 'Olá, estou tentando solicitar o cashback da minha compra mas está dando erro. Pode me ajudar?',
-          categoria: 'financeiro',
-          prioridade: 'media',
-          status: 'aberto',
-          dataCriacao: new Date('2024-01-20 14:30:00'),
-          ultimaAtualizacao: new Date('2024-01-20 14:30:00'),
-          respostas: []
-        },
-        {
-          id: '2',
-          usuario: {
-            id: '2',
-            nome: 'Maria Santos',
-            email: 'maria@exemplo.com',
-            telefone: '(21) 88888-8888'
-          },
-          assunto: 'Dúvida sobre como se tornar criador',
-          mensagem: 'Gostaria de saber quais são os requisitos para se tornar um criador no SementesPLAY. Pode me explicar o processo?',
-          categoria: 'conta',
-          prioridade: 'baixa',
-          status: 'respondido',
-          dataCriacao: new Date('2024-01-19 10:15:00'),
-          ultimaAtualizacao: new Date('2024-01-20 09:45:00'),
-          respostas: [
-            {
-              id: '1',
-              autor: 'admin',
-              nomeAutor: 'Admin SementesPLAY',
-              mensagem: 'Olá Maria! Para se tornar criador, você precisa ter pelo menos 18 anos, ter experiência com FiveM e enviar uma candidatura através do nosso sistema. Vou te enviar um email com mais detalhes.',
-              data: new Date('2024-01-20 09:45:00')
-            }
-          ]
-        },
-        {
-          id: '3',
-          usuario: {
-            id: '3',
-            nome: 'Pedro Costa',
-            email: 'pedro@exemplo.com',
-            telefone: '(31) 77777-7777'
-          },
-          assunto: 'Erro no sistema - Página não carrega',
-          mensagem: 'Estou tentando acessar o dashboard mas a página fica carregando infinitamente. Já tentei em diferentes navegadores.',
-          categoria: 'tecnico',
-          prioridade: 'alta',
-          status: 'em_andamento',
-          dataCriacao: new Date('2024-01-20 16:20:00'),
-          ultimaAtualizacao: new Date('2024-01-20 17:00:00'),
-          respostas: [
-            {
-              id: '1',
-              autor: 'admin',
-              nomeAutor: 'Admin SementesPLAY',
-              mensagem: 'Olá Pedro! Estamos investigando o problema. Pode me dizer qual navegador e sistema operacional você está usando?',
-              data: new Date('2024-01-20 17:00:00')
-            }
-          ]
-        }
-      ])
+      setTickets([])
     } catch (error) {
       console.error('Erro ao carregar tickets:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao carregar tickets' })
