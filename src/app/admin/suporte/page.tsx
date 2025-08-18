@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
 import {
   ChatBubbleLeftRightIcon,
   ArrowLeftIcon,
@@ -48,10 +46,10 @@ interface RespostaTicket {
 }
 
 export default function AdminSuporte() {
-  const { usuario, isAuthenticated } = useAuth()
-  const router = useRouter()
-  const [tickets, setTickets] = useState<TicketSuporte[]>([])
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [tickets, setTickets] = useState<TicketSuporte[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('todos')
   const [filterPrioridade, setFilterPrioridade] = useState('todos')
@@ -62,18 +60,34 @@ export default function AdminSuporte() {
   const [notificacao, setNotificacao] = useState<{ tipo: 'sucesso' | 'erro' | 'info', mensagem: string } | null>(null)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          // Verificar se é admin (nivel >= 5)
+          if (dadosUsuario.nivel && dadosUsuario.nivel >= 5) {
+            setUsuario(dadosUsuario)
+            setIsAuthenticated(true)
+            // Carregar dados após autenticação
+            carregarTickets()
+          } else {
+            // Não é admin, redirecionar
+            window.location.href = '/'
+          }
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          window.location.href = '/login'
+        }
+      } else {
+        // Não autenticado, redirecionar
+        window.location.href = '/login'
+      }
+      setLoading(false)
     }
-
-    if (!usuario || Number(usuario.nivel) < 5) {
-      router.push('/')
-      return
-    }
-
-    carregarTickets()
-  }, [usuario, isAuthenticated, router])
+    verificarAutenticacao()
+  }, [])
 
   const carregarTickets = async () => {
     try {
@@ -286,7 +300,7 @@ export default function AdminSuporte() {
           >
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push('/admin')}
+                onClick={() => window.location.href = '/admin'}
                 className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
               >
                 <ArrowLeftIcon className="w-5 h-5 text-white" />
