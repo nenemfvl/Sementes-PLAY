@@ -89,16 +89,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           pontuacao: payload.pontuacao || 0
         })
         setIsAuthenticated(true)
+        setLoading(false)
       } else {
         // Token expirado
         localStorage.removeItem('auth-token')
         removeCookie('auth-token')
+        setLoading(false)
       }
     } catch (error) {
       console.error('Erro ao verificar token:', error)
       localStorage.removeItem('auth-token')
       removeCookie('auth-token')
-    } finally {
       setLoading(false)
     }
   }
