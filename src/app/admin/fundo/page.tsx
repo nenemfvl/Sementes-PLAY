@@ -43,6 +43,8 @@ interface DistribuicaoFundo {
 
 export default function AdminFundoPage() {
   const router = useRouter()
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [fundoAtual, setFundoAtual] = useState<FundoSementes | null>(null)
   const [distribuicoes, setDistribuicoes] = useState<DistribuicaoFundo[]>([])
   const [loading, setLoading] = useState(true)
@@ -60,7 +62,7 @@ export default function AdminFundoPage() {
             setUsuario(dadosUsuario)
             setIsAuthenticated(true)
             // Carregar dados após autenticação
-            carregarDados()
+            carregarFundo()
           } else {
             // Não é admin, redirecionar
             window.location.href = '/dashboard'
