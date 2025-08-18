@@ -3,7 +3,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { EyeIcon, EyeSlashIcon, CheckIcon } from '@heroicons/react/24/outline'
+import { EyeIcon, EyeSlashIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function RegistroPage() {

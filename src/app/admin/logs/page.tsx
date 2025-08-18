@@ -9,7 +9,7 @@ import {
   ArrowLeftIcon,
   MagnifyingGlassIcon,
   CalendarIcon,
-  FilterIcon,
+  FunnelIcon,
   EyeIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
