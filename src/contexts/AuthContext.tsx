@@ -55,6 +55,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  // Não mostrar usuário enquanto está carregando
+  const usuarioExibicao = loading ? null : usuario
+
   const verificarToken = async (token: string) => {
     try {
       // Aqui você pode fazer uma chamada para verificar o token
@@ -161,7 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const value = {
-    usuario,
+    usuario: usuarioExibicao,
     isAuthenticated,
     login,
     registro,

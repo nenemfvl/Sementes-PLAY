@@ -24,7 +24,7 @@ export default function Navbar() {
   const [showMobileMenu, setShowMobileMenu] = React.useState(false)
 
   // Usar o contexto de autenticação
-  const { usuario, isAuthenticated, logout } = useAuth()
+  const { usuario, isAuthenticated, logout, loading } = useAuth()
 
   const handleProfileClick = () => {
     setShowProfileMenu(!showProfileMenu)
@@ -180,7 +180,9 @@ export default function Navbar() {
                       <UserIcon className="w-5 h-5 text-white" />
                     </div>
                   )}
-                  <span className="text-gray-300 hidden sm:block">{usuario.nome}</span>
+                  <span className="text-gray-300 hidden sm:block">
+                    {loading ? 'Carregando...' : usuario.nome}
+                  </span>
                   <ChevronDownIcon className="w-4 h-4 text-gray-400" />
                 </button>
               ) : (
