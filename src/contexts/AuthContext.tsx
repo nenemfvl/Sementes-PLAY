@@ -67,17 +67,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (payload.exp > agora) {
         // Token válido
-        setUsuario({
-          id: payload.userId,
-          nome: payload.nome || 'Usuário',
-          email: payload.email,
-          tipo: payload.tipo,
-          sementes: 0,
-          nivel: 'comum',
-          xp: 0,
-          pontuacao: 0
-        })
-        setIsAuthenticated(true)
+        if (payload.nome) {
+          setUsuario({
+            id: payload.userId,
+            nome: payload.nome,
+            email: payload.email,
+            tipo: payload.tipo,
+            sementes: 0,
+            nivel: 'comum',
+            xp: 0,
+            pontuacao: 0
+          })
+          setIsAuthenticated(true)
+        } else {
+          // Token não tem nome válido, remover
+          localStorage.removeItem('auth-token')
+          removeCookie('auth-token')
+        }
       } else {
         // Token expirado
         localStorage.removeItem('auth-token')
