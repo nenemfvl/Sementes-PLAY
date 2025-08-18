@@ -44,27 +44,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
-  // Verificar se usuário está logado ao carregar
+  // Verificar se usuário está logado ao carregar - simples como no site antigo
   useEffect(() => {
-    const verificarAutenticacao = async () => {
-      const token = localStorage.getItem('auth-token')
+    const verificarAutenticacao = () => {
       const usuarioSalvo = localStorage.getItem('usuario-dados')
       
-      if (token && usuarioSalvo) {
+      if (usuarioSalvo) {
         try {
-          // Verificar se token ainda é válido
-          await verificarToken(token)
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          setUsuario(dadosUsuario)
+          setIsAuthenticated(true)
         } catch (error) {
-          console.error('Erro ao verificar token:', error)
-          // Limpar dados inválidos
-          localStorage.removeItem('auth-token')
+          console.error('Erro ao ler dados do usuário:', error)
           localStorage.removeItem('usuario-dados')
-          removeCookie('auth-token')
           setUsuario(null)
           setIsAuthenticated(false)
         }
       } else {
-        // Sem token ou dados, usuário não está logado
         setUsuario(null)
         setIsAuthenticated(false)
       }
