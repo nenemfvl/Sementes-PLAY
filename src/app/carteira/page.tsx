@@ -7,8 +7,8 @@ import {
   ArrowLeftIcon,
   CurrencyDollarIcon,
   ClockIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   PlusIcon,
   MinusIcon,
   ArrowPathIcon,
@@ -16,7 +16,7 @@ import {
   EyeSlashIcon,
   ChartBarIcon,
   CalendarIcon,
-  FilterIcon
+  FunnelIcon
 } from '@heroicons/react/24/outline'
 
 interface Carteira {
@@ -260,7 +260,7 @@ export default function CarteiraPage() {
             {/* Total Recebido */}
             <div className="card p-6 text-center">
               <div className="flex items-center justify-center mb-4">
-                <TrendingUpIcon className="w-8 h-8 text-green-500" />
+                <ArrowTrendingUpIcon className="w-8 h-8 text-green-500" />
               </div>
               <p className="text-gray-400 text-sm mb-2">Total Recebido</p>
               <p className="text-2xl font-bold text-white">
@@ -272,7 +272,7 @@ export default function CarteiraPage() {
             {/* Total Sacado */}
             <div className="card p-6 text-center">
               <div className="flex items-center justify-center mb-4">
-                <TrendingDownIcon className="w-8 h-8 text-red-500" />
+                <ArrowTrendingDownIcon className="w-8 h-8 text-red-500" />
               </div>
               <p className="text-gray-400 text-sm mb-2">Total Sacado</p>
               <p className="text-2xl font-bold text-white">
@@ -291,7 +291,7 @@ export default function CarteiraPage() {
           >
             <div className="flex flex-col md:flex-row gap-4 items-center">
               <div className="flex items-center space-x-2">
-                <FilterIcon className="w-5 h-5 text-gray-400" />
+                <FunnelIcon className="w-5 h-5 text-gray-400" />
                 <span className="text-white font-medium">Filtros:</span>
               </div>
               
