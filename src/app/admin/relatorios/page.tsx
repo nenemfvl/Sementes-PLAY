@@ -14,8 +14,8 @@ import {
   UsersIcon,
   EyeIcon,
   DocumentArrowDownIcon,
-  TrendingUpIcon,
-  TrendingDownIcon
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline'
 
 interface RelatorioGeral {
@@ -182,7 +182,7 @@ export default function AdminRelatorios() {
   }
 
   const getCrescimentoIcon = (valor: number) => {
-    return valor >= 0 ? TrendingUpIcon : TrendingDownIcon
+    return valor >= 0 ? ArrowTrendingUpIcon : ArrowTrendingDownIcon
   }
 
   if (loading) {
