@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import {
   GiftIcon,
@@ -42,8 +41,7 @@ interface DistribuicaoFundo {
   }
 }
 
-export default function AdminFundo() {
-  const { usuario, isAuthenticated } = useAuth()
+export default function AdminFundoPage() {
   const router = useRouter()
   const [fundoAtual, setFundoAtual] = useState<FundoSementes | null>(null)
   const [distribuicoes, setDistribuicoes] = useState<DistribuicaoFundo[]>([])
@@ -52,18 +50,33 @@ export default function AdminFundo() {
   const [notificacao, setNotificacao] = useState<{ tipo: 'sucesso' | 'erro' | 'info', mensagem: string } | null>(null)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          // Verificar se é admin (nivel >= 5)
+          if (dadosUsuario.nivel && dadosUsuario.nivel >= 5) {
+            setUsuario(dadosUsuario)
+            setIsAuthenticated(true)
+            // Carregar dados após autenticação
+            carregarDados()
+          } else {
+            // Não é admin, redirecionar
+            window.location.href = '/dashboard'
+          }
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          window.location.href = '/login'
+        }
+      } else {
+        window.location.href = '/login'
+      }
+      setLoading(false)
     }
-
-    if (!usuario || Number(usuario.nivel) < 5) {
-      router.push('/')
-      return
-    }
-
-    carregarFundo()
-  }, [usuario, isAuthenticated, router])
+    verificarAutenticacao()
+  }, [])
 
   const carregarFundo = async () => {
     try {

@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import {
   BuildingOfficeIcon,
@@ -35,11 +34,12 @@ interface CandidaturaParceiro {
   observacoes?: string
 }
 
-export default function AdminCandidaturasParceiro() {
-  const { usuario, isAuthenticated } = useAuth()
+export default function AdminCandidaturasParceiroPage() {
   const router = useRouter()
-  const [candidaturas, setCandidaturas] = useState<CandidaturaParceiro[]>([])
+  const [usuario, setUsuario] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [candidaturas, setCandidaturas] = useState<CandidaturaParceiro[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('todos')
   const [filterEstado, setFilterEstado] = useState('todos')
@@ -49,18 +49,33 @@ export default function AdminCandidaturasParceiro() {
   const [notificacao, setNotificacao] = useState<{ tipo: 'sucesso' | 'erro' | 'info', mensagem: string } | null>(null)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          // Verificar se é admin (nivel >= 5)
+          if (dadosUsuario.nivel && dadosUsuario.nivel >= 5) {
+            setUsuario(dadosUsuario)
+            setIsAuthenticated(true)
+            // Carregar dados após autenticação
+            carregarCandidaturas()
+          } else {
+            // Não é admin, redirecionar
+            window.location.href = '/dashboard'
+          }
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          window.location.href = '/login'
+        }
+      } else {
+        window.location.href = '/login'
+      }
+      setLoading(false)
     }
-
-    if (!usuario || Number(usuario.nivel) < 5) {
-      router.push('/')
-      return
-    }
-
-    carregarCandidaturas()
-  }, [usuario, isAuthenticated, router])
+    verificarAutenticacao()
+  }, [])
 
   const carregarCandidaturas = async () => {
     try {
