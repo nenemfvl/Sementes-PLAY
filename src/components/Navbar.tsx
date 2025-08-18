@@ -94,6 +94,16 @@ export default function Navbar() {
                Parceiros
              </Link>
                          <Link 
+               href="/cashback" 
+               className={`transition-colors ${
+                 isActiveLink('/cashback') 
+                   ? 'text-sementes-primary font-semibold' 
+                   : 'text-gray-300 hover:text-sementes-primary'
+               }`}
+             >
+               Cashback
+             </Link>
+                         <Link 
                href="/ranking" 
                className={`transition-colors ${
                  isActiveLink('/ranking') 
@@ -296,6 +306,13 @@ export default function Navbar() {
                 onClick={() => setShowMobileMenu(false)}
               >
                 Parceiros
+              </Link>
+              <Link 
+                href="/cashback" 
+                className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Cashback
               </Link>
               <Link 
                 href="/ranking" 
