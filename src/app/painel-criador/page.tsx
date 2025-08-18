@@ -416,7 +416,7 @@ export default function PainelCriador() {
                   <div className="text-center py-8">
                     <VideoCameraIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h4 className="text-lg font-semibold text-white mb-2">Nenhum conteúdo ainda</h4>
-                    <p className="text-gray-400">Comece adicionando seu primeiro vídeo ou tutorial</p>
+                    <p className="text-gray-400">Comece adicionando seu primeiro conteúdo</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -687,9 +687,8 @@ export default function PainelCriador() {
                   >
                     <option value="">Selecione</option>
                     <option value="video">Vídeo</option>
-                    <option value="tutorial">Tutorial</option>
-                    <option value="stream">Stream</option>
-                    <option value="artigo">Artigo</option>
+                    <option value="live">Live</option>
+                    <option value="post">Post</option>
                   </select>
                 </div>
                 
