@@ -324,59 +324,37 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl font-bold text-sss-white mb-6">
-              Comece Agora Mesmo
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Junte-se à comunidade SementesPLAY e comece a ganhar cashback 
-              enquanto apoia seus criadores favoritos.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {!loading && (
-                isAuthenticated ? (
-                  <>
-                    <Link href="/dashboard" className="btn-primary">
-                      <ArrowRightIcon className="w-5 h-5 mr-2" />
-                      Ir para Dashboard
-                    </Link>
-                    <button 
-                      onClick={() => {
-                        localStorage.removeItem('usuario-dados')
-                        localStorage.removeItem('auth-token')
-                        window.location.href = '/'
-                      }}
-                      className="btn-secondary"
-                    >
-                      <FireIcon className="w-5 h-5 mr-2" />
-                      Fazer Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/registro" className="btn-primary">
-                      <UsersIcon className="w-5 h-5 mr-2" />
-                      Criar Conta
-                    </Link>
-                    <Link href="/login" className="btn-secondary">
-                      <FireIcon className="w-5 h-5 mr-2" />
-                      Fazer Login
-                    </Link>
-                  </>
-                )
-              )}
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      {/* CTA Section - Só aparece para usuários não logados */}
+      {!loading && !isAuthenticated && (
+        <section className="py-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl font-bold text-sss-white mb-6">
+                Comece Agora Mesmo
+              </h2>
+              <p className="text-xl text-gray-300 mb-8">
+                Junte-se à comunidade SementesPLAY e comece a ganhar cashback 
+                enquanto apoia seus criadores favoritos.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/registro" className="btn-primary">
+                  <UsersIcon className="w-5 h-5 mr-2" />
+                  Criar Conta
+                </Link>
+                <Link href="/login" className="btn-secondary">
+                  <FireIcon className="w-5 h-5 mr-2" />
+                  Fazer Login
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
