@@ -5,7 +5,6 @@ import { jwtVerify } from 'jose'
 export async function middleware(request: NextRequest) {
   // Rotas que precisam de autenticação
   const protectedRoutes = [
-    '/dashboard',
     '/perfil',
     '/doacoes',
     '/relatorios',
@@ -49,7 +48,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
     '/perfil/:path*',
     '/doacoes/:path*',
     '/relatorios/:path*',
