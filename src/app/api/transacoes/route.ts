@@ -53,7 +53,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const saldoAnterior = carteira.saldo
+    // TypeScript guard para garantir que carteira não é null
+    const carteiraValida = carteira as NonNullable<typeof carteira>
+    const saldoAnterior = carteiraValida.saldo
     let saldoPosterior = saldoAnterior
     let tipoMovimentacao = 'credito'
     let descricaoMovimentacao = descricao || `Transação: ${tipo}`
@@ -125,18 +127,18 @@ export async function POST(request: NextRequest) {
     const resultado = await prisma.$transaction(async (tx) => {
       // 1. Atualizar carteira
       const carteiraAtualizada = await tx.carteiraDigital.update({
-        where: { id: carteira.id },
+        where: { id: carteiraValida.id },
         data: {
           saldo: saldoPosterior,
-          totalRecebido: tipoMovimentacao === 'credito' ? carteira.totalRecebido + valor : carteira.totalRecebido,
-          totalSacado: tipoMovimentacao === 'debito' ? carteira.totalSacado + valor : carteira.totalSacado
+          totalRecebido: tipoMovimentacao === 'credito' ? carteiraValida.totalRecebido + valor : carteiraValida.totalRecebido,
+          totalSacado: tipoMovimentacao === 'debito' ? carteiraValida.totalSacado + valor : carteiraValida.totalSacado
         }
       })
 
       // 2. Registrar movimentação
       const movimentacao = await tx.movimentacaoCarteira.create({
         data: {
-          carteiraId: carteira.id,
+          carteiraId: carteiraValida.id,
           tipo: tipoMovimentacao,
           valor,
           saldoAnterior,
