@@ -232,7 +232,7 @@ export default function CandidaturaCriadorPage() {
       case 2:
         return form.experiencia
       case 3:
-        return form.motivacao && form.metas && form.disponibilidade
+        return form.motivacao && form.metas
       case 4:
         return true
       default:
@@ -453,19 +453,7 @@ export default function CandidaturaCriadorPage() {
                   />
                 </div>
 
-                <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Disponibilidade</label>
-                  <select
-                    value={form.disponibilidade}
-                    onChange={(e) => handleInputChange('disponibilidade', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:border-sementes-primary focus:outline-none transition-colors"
-                  >
-                    <option value="">Selecione sua disponibilidade</option>
-                    {disponibilidades.map((disp) => (
-                      <option key={disp} value={disp}>{disp}</option>
-                    ))}
-                  </select>
-                </div>
+
               </div>
             )}
 
@@ -532,10 +520,7 @@ export default function CandidaturaCriadorPage() {
                       <p className="text-white">{form.email}</p>
                     </div>
 
-                    <div>
-                      <p className="text-gray-400">Disponibilidade:</p>
-                      <p className="text-white">{form.disponibilidade}</p>
-                    </div>
+
                   </div>
                 </div>
               </div>
