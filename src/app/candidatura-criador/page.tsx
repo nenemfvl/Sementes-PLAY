@@ -457,74 +457,46 @@ export default function CandidaturaCriadorPage() {
               </div>
             )}
 
-            {/* Step 4: Portfolio e Revisão */}
-            {currentStep === 4 && (
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-                  <DocumentTextIcon className="w-6 h-6 mr-3 text-sementes-primary" />
-                  Portfolio e Revisão
-                </h2>
-                
-                <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Descrição do Portfolio</label>
-                  <textarea
-                    value={form.portfolio.descricao}
-                    onChange={(e) => handleInputChange('portfolio.descricao', e.target.value)}
-                    rows={4}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                    placeholder="Descreva seus trabalhos mais relevantes, projetos especiais..."
-                  />
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Links do Portfolio</label>
-                  {form.portfolio.links.map((link, index) => (
-                    <div key={index} className="flex items-center space-x-2 mb-2">
-                      <input
-                        type="url"
-                        value={link}
-                        onChange={(e) => handlePortfolioLinkChange(index, e.target.value)}
-                        className="flex-1 px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                        placeholder="https://exemplo.com"
-                      />
-                      {form.portfolio.links.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removePortfolioLink(index)}
-                          className="px-3 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addPortfolioLink}
-                    className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                  >
-                    + Adicionar Link
-                  </button>
-                </div>
-
-                {/* Resumo da Candidatura */}
-                <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600/50">
-                  <h3 className="text-lg font-semibold text-white mb-4">📋 Resumo da Sua Candidatura</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-400">Nome:</p>
-                      <p className="text-white">{form.nome}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400">Email:</p>
-                      <p className="text-white">{form.email}</p>
-                    </div>
-
-
-                  </div>
-                </div>
-              </div>
-            )}
+                         {/* Step 4: Revisão */}
+             {currentStep === 4 && (
+               <div>
+                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+                   <DocumentTextIcon className="w-6 h-6 mr-3 text-sementes-primary" />
+                   Revisão
+                 </h2>
+                 
+                 {/* Resumo da Candidatura */}
+                 <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600/50">
+                   <h3 className="text-lg font-semibold text-white mb-4">📋 Resumo da Sua Candidatura</h3>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                     <div>
+                       <p className="text-gray-400">Nome:</p>
+                       <p className="text-white">{form.nome}</p>
+                     </div>
+                     <div>
+                       <p className="text-gray-400">Email:</p>
+                       <p className="text-white">{form.email}</p>
+                     </div>
+                     <div>
+                       <p className="text-gray-400">Bio:</p>
+                       <p className="text-white">{form.bio}</p>
+                     </div>
+                     <div>
+                       <p className="text-gray-400">Experiência:</p>
+                       <p className="text-white">{form.experiencia}</p>
+                     </div>
+                     <div>
+                       <p className="text-gray-400">Motivação:</p>
+                       <p className="text-white">{form.motivacao}</p>
+                     </div>
+                     <div>
+                       <p className="text-gray-400">Metas:</p>
+                       <p className="text-white">{form.metas}</p>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             )}
 
             {/* Navigation Buttons */}
             <div className="flex justify-between mt-8">
