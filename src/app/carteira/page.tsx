@@ -24,7 +24,6 @@ interface CarteiraData {
   sementes: number
   totalRecebido: number
   totalSacado: number
-  saldoPendente: number
 }
 
 interface Movimentacao {
@@ -55,50 +54,33 @@ export default function Carteira() {
   const [savingSaque, setSavingSaque] = useState(false)
 
   useEffect(() => {
-    // Aguardar a verificação de autenticação completar
-    if (loading) return
-    
-    // Se não estiver autenticado, redirecionar para login
+    // Verificar se usuário está logado
     if (!usuario) {
       router.push('/login')
       return
     }
     
-    // Se estiver autenticado, carregar dados
+    // Carregar dados da carteira
     loadCarteira()
-    loadMovimentacoes()
-  }, [usuario, loading, router])
+  }, [usuario, router])
 
   const loadCarteira = async () => {
     try {
-      const response = await fetch(`/api/carteira?usuarioId=${usuario?.id}`)
+      // Buscar dados do usuário atual - igual ao site antigo
+      const userResponse = await fetch('/api/usuario/atual')
       
-      if (response.ok) {
-        const data = await response.json()
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
         setCarteira({
-          sementes: data.saldo || 0,
-          totalRecebido: data.totalRecebido || 0,
-          totalSacado: data.totalSacado || 0,
-          saldoPendente: data.saldoPendente || 0
+          sementes: userData.usuario.sementes,
+          totalRecebido: 0, // Será calculado se necessário
+          totalSacado: 0    // Será calculado se necessário
         })
       }
     } catch (error) {
       console.error('Erro ao carregar carteira:', error)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const loadMovimentacoes = async () => {
-    try {
-      const response = await fetch(`/api/carteira/movimentacoes?usuarioId=${usuario?.id}`)
-      
-      if (response.ok) {
-        const data = await response.json()
-        setMovimentacoes(data.movimentacoes || [])
-      }
-    } catch (error) {
-      console.error('Erro ao carregar movimentações:', error)
     }
   }
 
@@ -221,40 +203,74 @@ export default function Carteira() {
       return
     }
 
-    if (parseFloat(valorSaque) > (carteira?.sementes || 0)) {
-      alert('Saldo insuficiente para saque')
+    if (!carteira || parseFloat(valorSaque) > carteira.sementes) {
+      alert('Sementes insuficientes para o saque')
       return
     }
 
-    setSavingSaque(true)
-
+    // Verificar se tem dados PIX cadastrados - igual ao site antigo
     try {
+      const dadosPixResponse = await fetch(`/api/dados-pix?usuarioId=${usuario?.id}`)
+      if (!dadosPixResponse.ok) {
+        alert('Você precisa cadastrar seus dados PIX antes de solicitar um saque. Redirecionando...')
+        router.push('/dados-bancarios')
+        return
+      }
+
+      const dadosPix = await dadosPixResponse.json()
+      if (!dadosPix || !dadosPix.chavePix) {
+        alert('Você precisa cadastrar seus dados PIX antes de solicitar um saque. Redirecionando...')
+        router.push('/dados-bancarios')
+        return
+      }
+
+      setSavingSaque(true)
       const response = await fetch('/api/saques', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          usuarioId: usuario?.id,
-          valor: parseFloat(valorSaque)
+          valor: parseFloat(valorSaque),
+          usuarioId: usuario?.id
         })
       })
 
-      const data = await response.json()
-
       if (response.ok) {
-        alert('Saque solicitado com sucesso! Será processado em até 24 horas.')
-        setShowSaque(false)
+        const data = await response.json()
+        setCarteira(prev => prev ? { ...prev, sementes: prev.sementes - parseFloat(valorSaque) } : null)
         setValorSaque('')
-        await loadCarteira()
+        setShowSaque(false)
+        alert('Saque solicitado com sucesso! Você receberá o pagamento via PIX em até 24 horas.')
+        loadCarteira()
       } else {
-        alert(`Erro: ${data.error}`)
+        const error = await response.json()
+        alert(`Erro: ${error.error}`)
       }
     } catch (error) {
       console.error('Erro ao solicitar saque:', error)
       alert('Erro ao solicitar saque')
     } finally {
       setSavingSaque(false)
+    }
+  }
+
+  const getTipoIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'credito': return <PlusIcon className="w-4 h-4 text-green-500" />
+      case 'debito': return <MinusIcon className="w-4 h-4 text-red-500" />
+      case 'saque': return <BanknotesIcon className="w-4 h-4 text-blue-500" />
+      case 'pagamento': return <CreditCardIcon className="w-4 h-4 text-purple-500" />
+      default: return <WalletIcon className="w-4 h-4 text-gray-500" />
+    }
+  }
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'processado': return <CheckCircleIcon className="w-4 h-4 text-green-500" />
+      case 'pendente': return <ClockIcon className="w-4 h-4 text-yellow-500" />
+      case 'cancelado': return <XCircleIcon className="w-4 h-4 text-red-500" />
+      default: return <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" />
     }
   }
 
@@ -265,52 +281,23 @@ export default function Carteira() {
     }).format(valor)
   }
 
-  const getTipoIcon = (tipo: string) => {
-    switch (tipo) {
-      case 'credito':
-        return <PlusIcon className="w-4 h-4 text-green-500" />
-      case 'debito':
-        return <MinusIcon className="w-4 h-4 text-red-500" />
-      default:
-        return <CreditCardIcon className="w-4 h-4 text-gray-500" />
-    }
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'processado':
-        return <CheckCircleIcon className="w-4 h-4 text-green-500" />
-      case 'pendente':
-        return <ClockIcon className="w-4 h-4 text-yellow-500" />
-      case 'rejeitado':
-        return <XCircleIcon className="w-4 h-4 text-red-500" />
-      default:
-        return <ExclamationTriangleIcon className="w-4 h-4 text-gray-500" />
-    }
-  }
-
-  // Mostrar loading enquanto verifica autenticação
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
       </div>
     )
-  }
-
-  // Redirecionar se não estiver autenticado
-  if (!usuario) {
-    return null
   }
 
   return (
     <>
       <div className="min-h-screen bg-gray-900">
-        <header className="bg-gray-800 border-b border-gray-700">
+        {/* Header */}
+        <header className="bg-gray-800 shadow-lg border-b border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-4">
               <div className="flex items-center space-x-4">
-                <Link href="/dashboard" className="inline-flex items-center text-green-500 hover:text-green-400">
+                <Link href="/dashboard" className="inline-flex items-center text-green-500 hover:text-red-400">
                   <ArrowLeftIcon className="w-5 h-5 mr-2" />
                   Voltar ao Dashboard
                 </Link>
@@ -372,85 +359,6 @@ export default function Carteira() {
                   <p className="font-semibold">1 Real = 1 Semente</p>
                 </div>
               </div>
-            </div>
-
-            {/* Resumo da Carteira */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="bg-gray-800 rounded-lg p-6 border border-gray-700"
-              >
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                    <WalletIcon className="w-5 h-5 text-green-500" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-400">Saldo Disponível</p>
-                    <p className="text-lg font-semibold text-white">
-                      {carteira ? carteira.sementes.toLocaleString() : '0'} Sementes
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="bg-gray-800 rounded-lg p-6 border border-gray-700"
-              >
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                    <ClockIcon className="w-5 h-5 text-yellow-500" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-400">Saldo Pendente</p>
-                    <p className="text-lg font-semibold text-white">
-                      {carteira ? carteira.saldoPendente.toLocaleString() : '0'} Sementes
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="bg-gray-800 rounded-lg p-6 border border-gray-700"
-              >
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                    <PlusIcon className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-400">Total Recebido</p>
-                    <p className="text-lg font-semibold text-white">
-                      {carteira ? carteira.totalRecebido.toLocaleString() : '0'} Sementes
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="bg-gray-800 rounded-lg p-6 border border-gray-700"
-              >
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
-                    <MinusIcon className="w-5 h-5 text-red-500" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-400">Total Sacado</p>
-                    <p className="text-lg font-semibold text-white">
-                      {carteira ? carteira.totalSacado.toLocaleString() : '0'} Sementes
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
             </div>
 
             {/* Ações */}
@@ -552,72 +460,64 @@ export default function Carteira() {
                 </h3>
               </div>
               
-              {movimentacoes.length === 0 ? (
-                <div className="p-12 text-center">
-                  <ChartBarIcon className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                  <h4 className="text-lg font-medium text-gray-400 mb-2">Nenhuma movimentação</h4>
-                  <p className="text-gray-500">Sua carteira ainda não possui movimentações</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-700">
-                    <thead className="bg-gray-700">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Tipo
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Valor
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Descrição
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                          Data
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-gray-800 divide-y divide-gray-700">
-                      {movimentacoes.map((mov) => (
-                        <tr key={mov.id} className="hover:bg-gray-700 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              {getTipoIcon(mov.tipo)}
-                              <span className="ml-2 text-sm text-white capitalize">
-                                {mov.tipo}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`text-sm font-medium ${
-                              mov.tipo === 'credito' ? 'text-green-500' : 'text-red-500'
-                            }`}>
-                              {mov.tipo === 'credito' ? '+' : '-'} {formatarMoeda(mov.valor)}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-700">
+                  <thead className="bg-gray-700">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Tipo
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Valor
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Descrição
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                        Data
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-gray-800 divide-y divide-gray-700">
+                    {movimentacoes.map((mov) => (
+                      <tr key={mov.id} className="hover:bg-gray-700 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            {getTipoIcon(mov.tipo)}
+                            <span className="ml-2 text-sm text-white capitalize">
+                              {mov.tipo}
                             </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-300">{mov.descricao}</span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              {getStatusIcon(mov.status)}
-                              <span className="ml-2 text-sm text-gray-300 capitalize">
-                                {mov.status}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                            {new Date(mov.data).toLocaleDateString('pt-BR')}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`text-sm font-medium ${
+                            mov.tipo === 'credito' ? 'text-green-500' : 'text-red-500'
+                          }`}>
+                            {mov.tipo === 'credito' ? '+' : '-'} {formatarMoeda(mov.valor)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-300">{mov.descricao}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            {getStatusIcon(mov.status)}
+                            <span className="ml-2 text-sm text-gray-300 capitalize">
+                              {mov.status}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                          {new Date(mov.data).toLocaleDateString('pt-BR')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -767,7 +667,7 @@ export default function Carteira() {
                       />
                       <button
                         onClick={() => navigator.clipboard.writeText(pixData.qrCode)}
-                        className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-r-lg transition-colors"
+                        className="px-3 py-2 bg-green-500 hover:bg-red-600 text-white rounded-r-lg transition-colors"
                       >
                         Copiar
                       </button>
@@ -920,3 +820,4 @@ export default function Carteira() {
     </>
   )
 }
+

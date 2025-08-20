@@ -188,6 +188,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // SALVAR DADOS COMPLETOS DO USUÁRIO para evitar fallbacks
       localStorage.setItem('usuario-dados', JSON.stringify(data.usuario))
       
+      // Salvar no cookie também - igual ao site antigo
+      document.cookie = `sementesplay_user=${encodeURIComponent(JSON.stringify(data.usuario))}; path=/; max-age=86400`
+      
       // Atualizar estado
       setUsuario(data.usuario)
       setIsAuthenticated(true)
