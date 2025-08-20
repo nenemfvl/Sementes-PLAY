@@ -230,7 +230,7 @@ export default function CandidaturaCriadorPage() {
       case 1:
         return form.nome && form.email && form.bio
       case 2:
-        return form.categoria && form.experiencia
+        return form.experiencia
       case 3:
         return form.motivacao && form.metas && form.disponibilidade
       case 4:
@@ -374,19 +374,7 @@ export default function CandidaturaCriadorPage() {
                   Experiência e Categoria
                 </h2>
                 
-                <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Categoria Principal</label>
-                  <select
-                    value={form.categoria}
-                    onChange={(e) => handleInputChange('categoria', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:border-sementes-primary focus:outline-none transition-colors"
-                  >
-                    <option value="">Selecione uma categoria</option>
-                    {categorias.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
+
 
                 <div className="mb-6">
                   <label className="block text-white font-medium mb-2">Experiência</label>
@@ -543,10 +531,7 @@ export default function CandidaturaCriadorPage() {
                       <p className="text-gray-400">Email:</p>
                       <p className="text-white">{form.email}</p>
                     </div>
-                    <div>
-                      <p className="text-gray-400">Categoria:</p>
-                      <p className="text-white">{form.categoria}</p>
-                    </div>
+
                     <div>
                       <p className="text-gray-400">Disponibilidade:</p>
                       <p className="text-white">{form.disponibilidade}</p>
