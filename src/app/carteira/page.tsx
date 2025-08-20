@@ -18,7 +18,7 @@ import {
   ChartBarIcon
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { useAuth } from '@/contexts/AuthContext'
+
 
 interface CarteiraData {
   sementes: number
@@ -37,7 +37,7 @@ interface Movimentacao {
 
 export default function Carteira() {
   const router = useRouter()
-  const { usuario } = useAuth()
+  const [usuario, setUsuario] = useState<any>(null)
   const [carteira, setCarteira] = useState<CarteiraData | null>(null)
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([])
   const [loading, setLoading] = useState(true)
@@ -54,25 +54,37 @@ export default function Carteira() {
   const [savingSaque, setSavingSaque] = useState(false)
 
   useEffect(() => {
-    // Verificar se usuário está logado
-    if (!usuario) {
-      router.push('/login')
-      return
+    // Verificação direta no localStorage como no site antigo
+    const verificarAutenticacao = () => {
+      const usuarioSalvo = localStorage.getItem('usuario-dados')
+      
+      if (usuarioSalvo) {
+        try {
+          const dadosUsuario = JSON.parse(usuarioSalvo)
+          setUsuario(dadosUsuario)
+          
+          // Carregar dados da carteira
+          loadCarteira()
+        } catch (error) {
+          console.error('Erro ao ler dados do usuário:', error)
+          localStorage.removeItem('usuario-dados')
+          router.push('/login')
+        }
+      } else {
+        // Sem usuário, redirecionar imediatamente
+        router.push('/login')
+      }
     }
     
-    // Carregar dados da carteira
-    loadCarteira()
-  }, [usuario, router])
+    verificarAutenticacao()
+  }, [router])
 
   const loadCarteira = async () => {
     try {
-      // Buscar dados do usuário atual - igual ao site antigo
-      const userResponse = await fetch('/api/usuario/atual')
-      
-      if (userResponse.ok) {
-        const userData = await userResponse.json()
+      // Usar dados do usuário já carregados do localStorage
+      if (usuario) {
         setCarteira({
-          sementes: userData.usuario.sementes,
+          sementes: usuario.sementes || 0,
           totalRecebido: 0, // Será calculado se necessário
           totalSacado: 0    // Será calculado se necessário
         })
@@ -100,7 +112,7 @@ export default function Carteira() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          usuarioId: usuario?.id,
+          usuarioId: usuario.id,
           tipo: tipoPagamento,
           valor: parseFloat(valorPagamento)
         })
@@ -210,7 +222,7 @@ export default function Carteira() {
 
     // Verificar se tem dados PIX cadastrados - igual ao site antigo
     try {
-      const dadosPixResponse = await fetch(`/api/dados-pix?usuarioId=${usuario?.id}`)
+      const dadosPixResponse = await fetch(`/api/dados-pix?usuarioId=${usuario.id}`)
       if (!dadosPixResponse.ok) {
         alert('Você precisa cadastrar seus dados PIX antes de solicitar um saque. Redirecionando...')
         router.push('/dados-bancarios')
@@ -232,7 +244,7 @@ export default function Carteira() {
         },
         body: JSON.stringify({
           valor: parseFloat(valorSaque),
-          usuarioId: usuario?.id
+          usuarioId: usuario.id
         })
       })
 
@@ -386,7 +398,7 @@ export default function Carteira() {
               </motion.div>
 
               {/* Card de Saque para Criadores */}
-              {usuario?.criador && (
+              {usuario.criador && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -419,7 +431,7 @@ export default function Carteira() {
               )}
 
               {/* Card de Informação para Não-Criadores */}
-              {!usuario?.criador && (
+              {!usuario.criador && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
