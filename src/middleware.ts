@@ -7,7 +7,6 @@ export async function middleware(request: NextRequest) {
   const protectedRoutes = [
     '/dashboard',
     '/perfil',
-    '/carteira',
     '/doacoes',
     '/relatorios',
     '/configuracoes'
@@ -19,6 +18,7 @@ export async function middleware(request: NextRequest) {
   )
 
   if (isProtectedRoute) {
+    // Verificar token nos cookies
     const token = request.cookies.get('auth-token')?.value
 
     if (!token) {
@@ -51,7 +51,6 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/perfil/:path*',
-    '/carteira/:path*',
     '/doacoes/:path*',
     '/relatorios/:path*',
     '/configuracoes/:path*'
