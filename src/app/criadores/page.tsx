@@ -42,11 +42,36 @@ interface ConteudoParceiro {
   }
 }
 
+interface Criador {
+  id: string
+  nome: string
+  bio: string
+  categoria: string
+  nivel: string
+  sementes: number
+  apoiadores: number
+  doacoes: number
+  dataCriacao: string
+  redesSociais: any
+  portfolio: any
+  usuario: {
+    id: string
+    nome: string
+    avatarUrl?: string
+    corPerfil?: string
+    nivel: string
+    sementes: number
+    dataCriacao: string
+  }
+}
+
 export default function CriadoresPage() {
   const [loading, setLoading] = useState(true)
   const [totalSementes, setTotalSementes] = useState(0)
   const [dadosCiclo, setDadosCiclo] = useState<DadosCiclo | null>(null)
   const [conteudosParceiros, setConteudosParceiros] = useState<ConteudoParceiro[]>([])
+  const [criadores, setCriadores] = useState<Criador[]>([])
+  const [criadoresLoading, setCriadoresLoading] = useState(true)
 
   useEffect(() => {
     carregarDados()
@@ -80,6 +105,27 @@ export default function CriadoresPage() {
       setLoading(false)
     }
   }
+
+  const carregarCriadores = async () => {
+    try {
+      setCriadoresLoading(true)
+      const response = await fetch('/api/criadores')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setCriadores(data.dados.criadores)
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar criadores:', error)
+    } finally {
+      setCriadoresLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    carregarCriadores()
+  }, [])
 
   const getTipoIcon = (tipo: string) => {
     switch (tipo) {
@@ -334,11 +380,118 @@ export default function CriadoresPage() {
             </div>
           </motion.div>
 
-          {/* Conteúdos dos Parceiros */}
+          {/* Lista de Criadores */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
+            className="mb-12"
+          >
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-4">👥 Criadores da Plataforma</h2>
+              <p className="text-gray-400">Conheça nossos criadores de conteúdo aprovados</p>
+            </div>
+
+            {criadoresLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sementes-primary mx-auto mb-4"></div>
+                <p className="text-gray-400">Carregando criadores...</p>
+              </div>
+            ) : criadores.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-20 h-20 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <UserGroupIcon className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">Nenhum Criador Encontrado</h3>
+                <p className="text-gray-400 mb-6">Ainda não há criadores aprovados na plataforma</p>
+                <Link
+                  href="/candidatura-criador"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-sementes-primary to-sementes-accent text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300"
+                >
+                  <UserGroupIcon className="w-5 h-5 mr-2" />
+                  Seja o Primeiro Criador
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {criadores.map((criador, index) => (
+                  <motion.div
+                    key={criador.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    className="group relative overflow-hidden cursor-pointer"
+                  >
+                    {/* Efeito de brilho no hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-sementes-primary/10 via-sementes-accent/10 to-sementes-primary/10 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-700 opacity-0 group-hover:opacity-100"></div>
+                    
+                    {/* Card principal */}
+                    <div className="relative bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-6 hover:border-sementes-primary/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
+                      {/* Header do Card */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-sementes-primary to-sementes-accent rounded-xl flex items-center justify-center shadow-lg">
+                            <UserGroupIcon className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-white group-hover:text-sementes-primary transition-colors mb-1">
+                              {criador.nome}
+                            </h3>
+                            <span className="px-2 py-1 rounded-lg text-xs font-medium border border-sementes-primary/30 text-sementes-primary">
+                              {criador.categoria}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bio */}
+                      <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+                        {criador.bio}
+                      </p>
+
+                      {/* Nível e Estatísticas */}
+                      <div className="grid grid-cols-3 gap-3 mb-4">
+                        <div className="text-center p-2 bg-blue-500/20 rounded-lg border border-blue-500/30">
+                          <p className="text-blue-400 text-xs font-bold mb-1">Nível</p>
+                          <p className="text-white font-bold">{criador.nivel}</p>
+                        </div>
+                        <div className="text-center p-2 bg-green-500/20 rounded-lg border border-green-500/30">
+                          <p className="text-green-400 text-xs font-bold mb-1">Sementes</p>
+                          <p className="text-white font-bold">{(criador.sementes / 1000).toFixed(1)}k</p>
+                        </div>
+                        <div className="text-center p-2 bg-purple-500/20 rounded-lg border border-purple-500/30">
+                          <p className="text-purple-400 text-xs font-bold mb-1">Apoiadores</p>
+                          <p className="text-white font-bold">{criador.apoiadores}</p>
+                        </div>
+                      </div>
+
+                      {/* Data de Criação */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-gray-400 text-sm">
+                          <CalendarIcon className="w-4 h-4" />
+                          <span>Criador desde {new Date(criador.dataCriacao).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                        
+                        <Link
+                          href={`/criador/${criador.id}`}
+                          className="inline-flex items-center space-x-2 bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-4 py-2 rounded-xl font-bold hover:shadow-lg hover:shadow-sementes-primary/25 transition-all duration-300 hover:scale-105"
+                        >
+                          <EyeIcon className="w-4 h-4" />
+                          <span>Ver</span>
+                        </Link>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+
+          {/* Conteúdos dos Parceiros */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
             className="mb-12"
           >
             <div className="text-center mb-8">
@@ -432,7 +585,7 @@ export default function CriadoresPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
             className="mb-8"
           >
             <div className="card">
