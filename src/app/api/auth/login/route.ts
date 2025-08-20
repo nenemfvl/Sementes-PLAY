@@ -22,7 +22,9 @@ export async function POST(request: NextRequest) {
     const usuario = await prisma.usuario.findUnique({
       where: { email },
       include: {
-        carteira: true
+        carteira: true,
+        criador: true,
+        parceiro: true
       }
     })
 

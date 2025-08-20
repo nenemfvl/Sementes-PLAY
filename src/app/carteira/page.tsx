@@ -473,7 +473,7 @@ export default function Carteira() {
               </motion.div>
 
               {/* Card de Saque para Criadores */}
-              {usuario?.tipo === 'criador' && (
+              {usuario?.criador && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -506,7 +506,7 @@ export default function Carteira() {
               )}
 
               {/* Card de Informação para Não-Criadores */}
-              {usuario?.tipo !== 'criador' && (
+              {!usuario?.criador && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}

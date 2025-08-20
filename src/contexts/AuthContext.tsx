@@ -13,6 +13,18 @@ interface Usuario {
   xp: number
   pontuacao: number
   avatarUrl?: string
+  criador?: {
+    id: string
+    nome: string
+    categoria: string
+    nivel: string
+    status?: string
+  } | null
+  parceiro?: {
+    id: string
+    nomeCidade: string
+    status?: string
+  } | null
 }
 
 interface AuthContextType {
