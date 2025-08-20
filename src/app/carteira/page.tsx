@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { 
   WalletIcon,
@@ -36,6 +37,7 @@ interface Movimentacao {
 }
 
 export default function Carteira() {
+  const router = useRouter()
   const { usuario } = useAuth()
   const [carteira, setCarteira] = useState<CarteiraData | null>(null)
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([])
@@ -54,13 +56,13 @@ export default function Carteira() {
 
   useEffect(() => {
     if (!usuario) {
-      window.location.href = '/login'
+      router.push('/login')
       return
     }
     
     loadCarteira()
     loadMovimentacoes()
-  }, [usuario])
+  }, [usuario, router])
 
   const loadCarteira = async () => {
     try {
@@ -282,12 +284,18 @@ export default function Carteira() {
     }
   }
 
+  // Mostrar loading enquanto verifica autenticação
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500"></div>
       </div>
     )
+  }
+
+  // Redirecionar se não estiver autenticado
+  if (!usuario) {
+    return null
   }
 
   return (
