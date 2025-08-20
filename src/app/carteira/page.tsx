@@ -55,14 +55,19 @@ export default function Carteira() {
   const [savingSaque, setSavingSaque] = useState(false)
 
   useEffect(() => {
+    // Aguardar a verificação de autenticação completar
+    if (loading) return
+    
+    // Se não estiver autenticado, redirecionar para login
     if (!usuario) {
       router.push('/login')
       return
     }
     
+    // Se estiver autenticado, carregar dados
     loadCarteira()
     loadMovimentacoes()
-  }, [usuario, router])
+  }, [usuario, loading, router])
 
   const loadCarteira = async () => {
     try {

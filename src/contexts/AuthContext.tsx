@@ -60,30 +60,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log('🔍 [AUTH] useEffect executado')
     
-    const verificarAutenticacao = () => {
+    const verificarAutenticacao = async () => {
       console.log('🔍 [AUTH] Verificando autenticação...')
       
+      // Primeiro, verificar se temos dados do usuário salvos no localStorage
       const usuarioSalvo = localStorage.getItem('usuario-dados')
-      console.log('📱 [AUTH] Usuário no localStorage:', usuarioSalvo ? 'EXISTE' : 'NÃO EXISTE')
+      const token = localStorage.getItem('auth-token')
       
-      if (usuarioSalvo) {
+      console.log('📱 [AUTH] Usuário no localStorage:', usuarioSalvo ? 'EXISTE' : 'NÃO EXISTE')
+      console.log('🔑 [AUTH] Token no localStorage:', token ? 'EXISTE' : 'NÃO EXISTE')
+      
+      if (usuarioSalvo && token) {
         try {
-          console.log('✅ [AUTH] Usuário encontrado, parseando...')
+          console.log('✅ [AUTH] Usuário e token encontrados, parseando...')
           const dadosUsuario = JSON.parse(usuarioSalvo)
           console.log('👤 [AUTH] Dados do usuário:', dadosUsuario)
           
-          setUsuario(dadosUsuario)
-          setIsAuthenticated(true)
-          console.log('✅ [AUTH] Usuário definido, isAuthenticated = true')
+          // Verificar se o token ainda é válido
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]))
+            const agora = Math.floor(Date.now() / 1000)
+            
+            if (payload.exp > agora) {
+              console.log('✅ [AUTH] Token válido, usuário autenticado')
+              setUsuario(dadosUsuario)
+              setIsAuthenticated(true)
+            } else {
+              console.log('❌ [AUTH] Token expirado, removendo dados')
+              localStorage.removeItem('usuario-dados')
+              localStorage.removeItem('auth-token')
+              setUsuario(null)
+              setIsAuthenticated(false)
+            }
+          } catch (tokenError) {
+            console.error('❌ [AUTH] Erro ao verificar token:', tokenError)
+            localStorage.removeItem('usuario-dados')
+            localStorage.removeItem('auth-token')
+            setUsuario(null)
+            setIsAuthenticated(false)
+          }
         } catch (error) {
           console.error('❌ [AUTH] Erro ao parsear usuário:', error)
           localStorage.removeItem('usuario-dados')
+          localStorage.removeItem('auth-token')
           setUsuario(null)
           setIsAuthenticated(false)
           console.log('🧹 [AUTH] Dados inválidos removidos')
         }
       } else {
-        console.log('❌ [AUTH] Sem usuário no localStorage')
+        console.log('❌ [AUTH] Sem usuário ou token no localStorage')
         setUsuario(null)
         setIsAuthenticated(false)
       }
