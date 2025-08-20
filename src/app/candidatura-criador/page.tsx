@@ -22,13 +22,14 @@ interface FormCandidatura {
   email: string
   bio: string
   categoria: string
-  redesSociais: {
-    youtube: string
-    twitch: string
-    instagram: string
-    tiktok: string
-    twitter: string
-  }
+     redesSociais: {
+     youtube: string
+     twitch: string
+     instagram: string
+     tiktok: string
+     twitter: string
+     discord: string
+   }
   portfolio: {
     descricao: string
     links: string[]
@@ -51,13 +52,14 @@ export default function CandidaturaCriadorPage() {
     email: '',
     bio: '',
     categoria: '',
-    redesSociais: {
-      youtube: '',
-      twitch: '',
-      instagram: '',
-      tiktok: '',
-      twitter: ''
-    },
+         redesSociais: {
+       youtube: '',
+       twitch: '',
+       instagram: '',
+       tiktok: '',
+       twitter: '',
+       discord: ''
+     },
     portfolio: {
       descricao: '',
       links: ['', '']
@@ -387,39 +389,53 @@ export default function CandidaturaCriadorPage() {
                   />
                 </div>
 
-                <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Redes Sociais</label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="url"
-                      value={form.redesSociais.youtube}
-                      onChange={(e) => handleInputChange('redesSociais.youtube', e.target.value)}
-                      className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                      placeholder="YouTube (opcional)"
-                    />
-                    <input
-                      type="url"
-                      value={form.redesSociais.twitch}
-                      onChange={(e) => handleInputChange('redesSociais.twitch', e.target.value)}
-                      className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                      placeholder="Twitch (opcional)"
-                    />
-                    <input
-                      type="url"
-                      value={form.redesSociais.instagram}
-                      onChange={(e) => handleInputChange('redesSociais.instagram', e.target.value)}
-                      className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                      placeholder="Instagram (opcional)"
-                    />
-                    <input
-                      type="url"
-                      value={form.redesSociais.tiktok}
-                      onChange={(e) => handleInputChange('redesSociais.tiktok', e.target.value)}
-                      className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                      placeholder="TikTok (opcional)"
-                    />
-                  </div>
-                </div>
+                                 <div className="mb-6">
+                   <label className="block text-white font-medium mb-2">Redes Sociais</label>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <input
+                       type="url"
+                       value={form.redesSociais.youtube}
+                       onChange={(e) => handleInputChange('redesSociais.youtube', e.target.value)}
+                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                       placeholder="YouTube (opcional)"
+                     />
+                     <input
+                       type="url"
+                       value={form.redesSociais.twitch}
+                       onChange={(e) => handleInputChange('redesSociais.twitch', e.target.value)}
+                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                       placeholder="Twitch (opcional)"
+                     />
+                     <input
+                       type="url"
+                       value={form.redesSociais.instagram}
+                       onChange={(e) => handleInputChange('redesSociais.instagram', e.target.value)}
+                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                       placeholder="Instagram (opcional)"
+                     />
+                     <input
+                       type="url"
+                       value={form.redesSociais.tiktok}
+                       onChange={(e) => handleInputChange('redesSociais.tiktok', e.target.value)}
+                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                       placeholder="TikTok (opcional)"
+                     />
+                     <input
+                       type="text"
+                       value={form.redesSociais.discord}
+                       onChange={(e) => handleInputChange('redesSociais.discord', e.target.value)}
+                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                       placeholder="Discord (ex: username#1234)"
+                     />
+                     <input
+                       type="url"
+                       value={form.redesSociais.twitter}
+                       onChange={(e) => handleInputChange('redesSociais.twitter', e.target.value)}
+                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                       placeholder="Twitter (opcional)"
+                     />
+                   </div>
+                 </div>
               </div>
             )}
 

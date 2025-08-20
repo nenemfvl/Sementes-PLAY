@@ -7,11 +7,11 @@ const prisma = new PrismaClient()
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { usuarioId, valor, dadosBancarios } = body
+    const { usuarioId, valor } = body
 
-    if (!usuarioId || !valor || !dadosBancarios) {
+    if (!usuarioId || !valor) {
       return NextResponse.json(
-        { error: 'Todos os campos são obrigatórios' },
+        { error: 'Usuário ID e valor são obrigatórios' },
         { status: 400 }
       )
     }
@@ -82,6 +82,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Buscar dados PIX do usuário
+    const dadosPix = await prisma.dadosPix.findUnique({
+      where: { usuarioId }
+    })
+
+    if (!dadosPix) {
+      return NextResponse.json(
+        { error: 'Dados PIX não encontrados. Configure seus dados PIX primeiro.' },
+        { status: 400 }
+      )
+    }
+
     // Iniciar transação para garantir consistência
     const resultado = await prisma.$transaction(async (tx) => {
       // 1. Criar solicitação de saque
@@ -91,7 +103,7 @@ export async function POST(request: NextRequest) {
           valor,
           taxa,
           valorLiquido,
-          dadosBancarios: JSON.stringify(dadosBancarios),
+          dadosBancarios: JSON.stringify(dadosPix),
           status: 'pendente',
           dataSolicitacao: new Date()
         }
