@@ -81,31 +81,13 @@ export default function AdminCriadores() {
   const carregarCriadores = async () => {
     try {
       setCriadoresLoading(true)
-      const response = await fetch('/api/criadores')
+      const response = await fetch('/api/admin/criadores')
       if (response.ok) {
         const data = await response.json()
         if (data.sucesso) {
-          // Mapear os dados da API para o formato esperado pela interface
-          const criadoresMapeados = data.dados.criadores.map((criador: any) => ({
-            id: criador.id,
-            nome: criador.nome,
-            email: criador.usuario.email,
-            avatarUrl: criador.usuario.avatarUrl,
-            nivel: parseInt(criador.nivel) || 1,
-            categoria: criador.categoria,
-            status: 'ativo', // Por padrão, criadores aprovados são ativos
-            dataCadastro: new Date(criador.dataCriacao),
-            ultimaAtividade: new Date(criador.dataCriacao), // Usar data de criação como última atividade por enquanto
-            totalConteudos: 0, // TODO: Implementar contagem de conteúdos
-            totalVisualizacoes: 0, // TODO: Implementar contagem de visualizações
-            totalGanhos: 0, // TODO: Implementar cálculo de ganhos
-            biografia: criador.bio || 'Sem biografia',
-            redesSociais: criador.redesSociais ? Object.keys(criador.redesSociais) : [],
-            especialidades: [criador.categoria] // Usar categoria como especialidade por enquanto
-          }))
-          setCriadores(criadoresMapeados)
+          setCriadores(data.criadores)
         } else {
-          setNotificacao({ tipo: 'erro', mensagem: 'Erro ao carregar dados dos criadores' })
+          setNotificacao({ tipo: 'erro', mensagem: data.error || 'Erro ao carregar dados dos criadores' })
         }
       } else {
         setNotificacao({ tipo: 'erro', mensagem: 'Erro na resposta da API' })
@@ -133,9 +115,37 @@ export default function AdminCriadores() {
 
   const alterarStatus = async (criadorId: string, novoStatus: 'ativo' | 'suspenso' | 'banido') => {
     try {
-      // TODO: Implementar API para alterar status
-      setNotificacao({ tipo: 'sucesso', mensagem: `Status alterado para ${novoStatus} com sucesso!` })
-      carregarCriadores()
+      let acao = 'alterar_status'
+      let valor = novoStatus
+      
+      if (novoStatus === 'banido') {
+        acao = 'banir'
+        valor = 'banido'
+      }
+
+      const response = await fetch('/api/admin/criadores', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          criadorId,
+          acao,
+          valor
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setNotificacao({ tipo: 'sucesso', mensagem: data.mensagem })
+          carregarCriadores()
+        } else {
+          setNotificacao({ tipo: 'erro', mensagem: data.error || 'Erro ao alterar status' })
+        }
+      } else {
+        setNotificacao({ tipo: 'erro', mensagem: 'Erro ao alterar status' })
+      }
     } catch (error) {
       console.error('Erro ao alterar status:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao alterar status' })
@@ -144,13 +154,61 @@ export default function AdminCriadores() {
 
   const alterarNivel = async (criadorId: string, novoNivel: number) => {
     try {
-      // TODO: Implementar API para alterar nível
-      setNotificacao({ tipo: 'sucesso', mensagem: `Nível alterado para ${novoNivel} com sucesso!` })
-      carregarCriadores()
-      setShowModal(false)
+      const response = await fetch('/api/admin/criadores', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          criadorId,
+          acao: 'alterar_nivel',
+          valor: novoNivel
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setNotificacao({ tipo: 'sucesso', mensagem: data.mensagem })
+          carregarCriadores()
+          setShowModal(false)
+        } else {
+          setNotificacao({ tipo: 'erro', mensagem: data.error || 'Erro ao alterar nível' })
+        }
+      } else {
+        setNotificacao({ tipo: 'erro', mensagem: 'Erro ao alterar nível' })
+      }
     } catch (error) {
       console.error('Erro ao alterar nível:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao alterar nível' })
+    }
+  }
+
+  const removerCriador = async (criadorId: string) => {
+    if (!confirm('Tem certeza que deseja remover este criador? Ele será rebaixado para usuário comum.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/criadores?id=${criadorId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setNotificacao({ tipo: 'sucesso', mensagem: data.mensagem })
+          carregarCriadores()
+          setShowModal(false)
+        } else {
+          setNotificacao({ tipo: 'erro', mensagem: data.error || 'Erro ao remover criador' })
+        }
+      } else {
+        setNotificacao({ tipo: 'erro', mensagem: 'Erro ao remover criador' })
+      }
+    } catch (error) {
+      console.error('Erro ao remover criador:', error)
+      setNotificacao({ tipo: 'erro', mensagem: 'Erro ao remover criador' })
     }
   }
 
@@ -588,6 +646,19 @@ export default function AdminCriadores() {
                       ))}
                     </div>
                   </div>
+                </div>
+
+                <div className="border-t border-gray-600 pt-4">
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Ação Destrutiva</label>
+                  <button
+                    onClick={() => removerCriador(selectedCriador.id)}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
+                  >
+                    Remover Criador (Rebaixar para Usuário)
+                  </button>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Esta ação removerá o status de criador e rebaixará para usuário comum
+                  </p>
                 </div>
               </div>
             </div>
