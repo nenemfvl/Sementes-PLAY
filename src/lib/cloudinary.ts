@@ -2,9 +2,9 @@ import { v2 as cloudinary } from 'cloudinary'
 
 // Configuração do Cloudinary
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: 'dccx2gioc',
+  api_key: '818818384845217',
+  api_secret: 'tO0BWstFtQ3nO-VMeFdn5gZxf1g',
 })
 
 export default cloudinary
@@ -24,7 +24,7 @@ export const uploadImage = async (
     formData.append('upload_preset', 'sementesplay')
 
     const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
+      `https://api.cloudinary.com/v1_1/dccx2gioc/image/upload`,
       {
         method: 'POST',
         body: formData,
@@ -76,7 +76,7 @@ export const uploadAvatar = async (file: File, usuarioId: string): Promise<{ url
   formData.append('transformation', 'w_200,h_200,c_fill,g_face,q_auto,f_auto')
 
   const response = await fetch(
-    `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
+    `https://api.cloudinary.com/v1_1/dccx2gioc/image/upload`,
     {
       method: 'POST',
       body: formData,
