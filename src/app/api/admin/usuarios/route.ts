@@ -22,29 +22,29 @@ export async function GET(request: NextRequest) {
     
     // Filtrar por tipo se especificado
     if (tipo && tipo !== 'todos') {
-      if (tipo === 'admin') {
-        where.nivel = { gte: 5 }
-      } else if (tipo === 'criador') {
-        where.criador = { isNot: null }
-      } else if (tipo === 'parceiro') {
-        where.parceiro = { isNot: null }
-      } else {
-        where.AND = [
-          { criador: null },
-          { parceiro: null },
-          { nivel: { lt: 5 } }
-        ]
-      }
+             if (tipo === 'admin') {
+         where.nivel = { in: ['admin', 'moderador', 'supervisor'] }
+       } else if (tipo === 'criador') {
+         where.criador = { isNot: null }
+       } else if (tipo === 'parceiro') {
+         where.parceiro = { isNot: null }
+       } else {
+         where.AND = [
+           { criador: null },
+           { parceiro: null },
+           { nivel: { notIn: ['admin', 'moderador', 'supervisor'] } }
+         ]
+       }
     }
     
-    // Filtrar por nível se especificado
-    if (nivel && nivel !== 'todos') {
-      where.nivel = parseInt(nivel)
-    }
+         // Filtrar por nível se especificado
+     if (nivel && nivel !== 'todos') {
+       where.nivel = nivel
+     }
     
     // Filtrar por status se especificado
     if (status && status !== 'todos') {
-      where.status = status
+      where.suspenso = status === 'suspenso'
     }
 
     const [usuarios, total] = await Promise.all([
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
           nome: true,
           email: true,
           nivel: true,
-          status: true,
+          suspenso: true,
           dataCriacao: true,
           criador: {
             select: {
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       email: usuario.email,
       tipo: usuario.criador ? 'criador' : 
             usuario.parceiro ? 'parceiro' : 
-            usuario.nivel >= 5 ? 'admin' : 'usuario',
+            ['admin', 'moderador', 'supervisor'].includes(usuario.nivel) ? 'admin' : 'usuario',
       nivel: usuario.nivel.toString(),
       sementes: usuario.carteira?.saldo || 0,
       pontuacao: 0, // TODO: Implementar sistema de pontuação
@@ -141,7 +141,7 @@ export async function PATCH(request: NextRequest) {
 
     const updateData: any = {}
     
-    if (nivel !== undefined) updateData.nivel = parseInt(nivel)
+    if (nivel !== undefined) updateData.nivel = nivel
     if (status !== undefined) updateData.suspenso = status === 'suspenso'
 
     const usuario = await prisma.usuario.update({
