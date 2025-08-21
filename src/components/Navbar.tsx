@@ -123,8 +123,8 @@ export default function Navbar() {
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Ir para o topo"
         >
-          <span className="text-2xl text-sementes-accent">🌱</span>
-          <span className="text-xl font-bold text-sementes-accent">SementesPLAY</span>
+          <span className="text-2xl text-red-500">🌱</span>
+          <span className="text-xl font-bold text-red-500">SementesPLAY</span>
         </button>
 
         {/* Navegação central */}
@@ -134,8 +134,8 @@ export default function Navbar() {
               href="/" 
               className={`transition-colors ${
                 isActiveLink('/') 
-                  ? 'text-sementes-accent font-bold' 
-                  : 'text-gray-300 hover:text-sementes-accent'
+                  ? 'text-red-500 font-bold' 
+                  : 'text-gray-300 hover:text-red-500'
               }`}
             >
               Início
@@ -144,8 +144,8 @@ export default function Navbar() {
               href="/criadores" 
               className={`transition-colors ${
                 isActiveLink('/criadores') 
-                  ? 'text-sementes-accent font-bold' 
-                  : 'text-gray-300 hover:text-sementes-accent'
+                  ? 'text-red-500 font-bold' 
+                  : 'text-gray-300 hover:text-red-500'
               }`}
             >
               Criadores
@@ -154,8 +154,8 @@ export default function Navbar() {
               href="/parceiros" 
               className={`transition-colors ${
                 isActiveLink('/parceiros') 
-                  ? 'text-sementes-accent font-bold' 
-                  : 'text-gray-300 hover:text-sementes-accent'
+                  ? 'text-red-500 font-bold' 
+                  : 'text-gray-300 hover:text-red-500'
               }`}
             >
               Parceiros
@@ -164,8 +164,8 @@ export default function Navbar() {
               href="/ranking" 
               className={`transition-colors ${
                 isActiveLink('/ranking') 
-                  ? 'text-sementes-accent font-bold' 
-                  : 'text-gray-300 hover:text-sementes-accent'
+                  ? 'text-red-500 font-bold' 
+                  : 'text-gray-300 hover:text-red-500'
               }`}
             >
               Ranking
@@ -177,8 +177,8 @@ export default function Navbar() {
                 href="/painel-criador" 
                 className={`transition-colors ${
                   isActiveLink('/painel-criador') 
-                    ? 'text-sementes-accent font-bold' 
-                    : 'text-gray-300 hover:text-sementes-accent'
+                    ? 'text-red-500 font-bold' 
+                    : 'text-gray-300 hover:text-red-500'
                 }`}
               >
                 Painel Criador
@@ -191,8 +191,8 @@ export default function Navbar() {
                 href="/painel-parceiro" 
                 className={`transition-colors ${
                   isActiveLink('/painel-parceiro') 
-                    ? 'text-sementes-accent font-bold' 
-                    : 'text-gray-300 hover:text-sementes-accent'
+                    ? 'text-red-500 font-bold' 
+                    : 'text-gray-300 hover:text-red-500'
                 }`}
               >
                 Painel Parceiro
@@ -205,8 +205,8 @@ export default function Navbar() {
                 href="/admin" 
                 className={`transition-colors ${
                   isActiveLink('/admin') 
-                    ? 'text-sementes-accent font-bold' 
-                    : 'text-gray-300 hover:text-sementes-accent'
+                    ? 'text-red-500 font-bold' 
+                    : 'text-gray-300 hover:text-red-500'
                 }`}
               >
                 Painel Admin
@@ -226,7 +226,7 @@ export default function Navbar() {
                   className="flex items-center gap-2 hover:bg-gray-800 rounded-lg px-2 py-1 transition-colors"
                 >
                   {/* Avatar do usuário */}
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-sementes-accent flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-red-500 flex items-center justify-center">
                     {usuario.avatarUrl ? (
                       <img 
                         src={usuario.avatarUrl} 
@@ -244,7 +244,7 @@ export default function Navbar() {
                     ) : null}
                     <UserIcon className={`w-5 h-5 text-white ${usuario.avatarUrl ? 'hidden' : ''}`} />
                   </div>
-                  <span className="text-sementes-accent font-bold">{usuario.nome}</span>
+                  <span className="text-red-500 font-bold">{usuario.nome}</span>
                   <ChevronDownIcon className={`w-4 h-4 text-gray-300 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
                 </button>
                 
@@ -254,55 +254,55 @@ export default function Navbar() {
                     <div className="py-1">
                       <button
                         onClick={() => handleMenuItemClick('/perfil')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
                       >
                         👤 Perfil
                       </button>
                       <button
                         onClick={() => handleMenuItemClick('/doar')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
                       >
                         💝 Fazer Doação
                       </button>
                       <button
                         onClick={() => handleMenuItemClick('/cashback')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
                       >
                         💰 Cashback
                       </button>
                       <button
                         onClick={() => handleMenuItemClick('/carteira')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
                       >
                         🏦 Carteira
                       </button>
                       <button
                         onClick={() => handleMenuItemClick('/amigos')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
                       >
                         👥 Amigos
                       </button>
                       <button
                         onClick={() => handleMenuItemClick('/notificacoes')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
                       >
                         🔔 Notificações
                       </button>
                       <button
                         onClick={() => handleMenuItemClick('/criadores-favoritos')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
                       >
                         ⭐ Criadores Favoritos
                       </button>
                       <button
                         onClick={() => handleMenuItemClick('/parceiros-favoritos')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
                       >
                         🏢 Parceiros Favoritos
                       </button>
                       <button
                         onClick={() => handleMenuItemClick('/suporte')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
                       >
                         💬 Suporte
                       </button>
@@ -315,18 +315,18 @@ export default function Navbar() {
               <div className="relative inline-block text-left socials-menu">
                 <button
                   onClick={() => setShowSocials((v) => !v)}
-                  className="p-2 text-gray-300 hover:text-sementes-accent focus:outline-none"
+                  className="p-2 text-gray-300 hover:text-red-500 focus:outline-none"
                   title="Redes sociais"
                 >
                   <UserGroupIcon className="w-6 h-6" />
                 </button>
                 {showSocials && (
                   <div className="origin-top-right absolute right-0 mt-2 w-16 rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 z-50 flex flex-col items-center py-2 gap-2">
-                    <a href="https://discord.gg/7vtVZYvR" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="Discord" aria-label="Discord"><i className="fab fa-discord fa-lg"></i></a>
-                    <a href="https://www.instagram.com/sementesplay/" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="Instagram" aria-label="Instagram"><i className="fab fa-instagram fa-lg"></i></a>
-                    <a href="https://www.tiktok.com/@sementesplay" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="TikTok" aria-label="TikTok"><i className="fab fa-tiktok fa-lg"></i></a>
-                    <a href="https://www.youtube.com/@SementesPLAY" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="YouTube" aria-label="YouTube"><i className="fab fa-youtube fa-lg"></i></a>
-                    <a href="https://x.com/SementesPLAY" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="Twitter" aria-label="Twitter"><i className="fab fa-twitter fa-lg"></i></a>
+                    <a href="https://discord.gg/7vtVZYvR" target="_blank" rel="noopener noreferrer" className="hover:text-red-500" title="Discord" aria-label="Discord"><i className="fab fa-discord fa-lg"></i></a>
+                    <a href="https://www.instagram.com/sementesplay/" target="_blank" rel="noopener noreferrer" className="hover:text-red-500" title="Instagram" aria-label="Instagram"><i className="fab fa-instagram fa-lg"></i></a>
+                    <a href="https://www.tiktok.com/@sementesplay" target="_blank" rel="noopener noreferrer" className="hover:text-red-500" title="TikTok" aria-label="TikTok"><i className="fab fa-tiktok fa-lg"></i></a>
+                    <a href="https://www.youtube.com/@SementesPLAY" target="_blank" rel="noopener noreferrer" className="hover:text-red-500" title="YouTube" aria-label="YouTube"><i className="fab fa-youtube fa-lg"></i></a>
+                    <a href="https://x.com/SementesPLAY" target="_blank" rel="noopener noreferrer" className="hover:text-red-500" title="Twitter" aria-label="Twitter"><i className="fab fa-twitter fa-lg"></i></a>
                   </div>
                 )}
               </div>
@@ -337,7 +337,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login" className="text-gray-300 hover:text-sementes-accent transition-colors">Entrar</Link>
+              <Link href="/login" className="text-gray-300 hover:text-red-500 transition-colors">Entrar</Link>
               <Link href="/registro" className="bg-sementes-primary hover:bg-sementes-secondary text-white px-4 py-2 rounded-lg transition-colors">Cadastrar</Link>
             </>
           )}
