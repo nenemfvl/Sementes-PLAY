@@ -71,21 +71,21 @@ export default function AdminPermissoesPage() {
     },
     {
       nivel: 2,
-      nome: 'Usuário Premium',
+      nome: 'Usuário Premium', 
       descricao: 'Acesso a recursos avançados',
       permissoes: ['visualizar_conteudo', 'solicitar_cashback', 'comentar', 'avaliar'],
       cor: 'bg-blue-500/20 text-blue-300'
     },
     {
       nivel: 3,
-      nome: 'Criador Nível 1',
+      nome: 'Criador Iniciante',
       descricao: 'Pode criar e gerenciar conteúdo básico',
       permissoes: ['visualizar_conteudo', 'solicitar_cashback', 'criar_conteudo', 'editar_proprio_conteudo'],
       cor: 'bg-green-500/20 text-green-300'
     },
     {
       nivel: 4,
-      nome: 'Criador Nível 2',
+      nome: 'Criador Comum',
       descricao: 'Pode criar conteúdo avançado e receber pagamentos',
       permissoes: ['visualizar_conteudo', 'solicitar_cashback', 'criar_conteudo', 'editar_proprio_conteudo', 'receber_pagamentos', 'gerenciar_perfil'],
       cor: 'bg-purple-500/20 text-purple-300'

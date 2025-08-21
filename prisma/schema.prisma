@@ -30,7 +30,7 @@ model Usuario {
   suspenso             Boolean                     @default(false)
   advertencias         Advertencia[]
   amizadesRecebidas    Amizade[]                   @relation("AmigoUsuario")
-  amizades             Amizade[]                   @relation("UsuarioAmizade")
+  amizades             Amizade[]                   @relation("UsuarioAmigo")
   candidaturas         CandidaturaCriador[]
   candidaturasParceiro CandidaturaParceiro[]
   carteira             CarteiraDigital?
@@ -38,7 +38,6 @@ model Usuario {
   comentarios          Comentario[]
   comentariosParceiro  ComentarioParceiro[]
   comprasParceiro      CompraParceiro[]
-  conquistas           ConquistaUsuario[]
   conversas1           Conversa[]                  @relation("Usuario1Conversa")
   conversas2           Conversa[]                  @relation("Usuario2Conversa")
   conversasSuporte     ConversaSuporte[]
@@ -181,7 +180,7 @@ model Criador {
   categoria        String
   redesSociais     String
   portfolio        String
-  nivel            String              @default("iniciante")
+  nivel            String              @default("criador-iniciante")
   sementes         Float               @default(0)
   apoiadores       Int                 @default(0)
   doacoes          Int                 @default(0)
@@ -466,35 +465,6 @@ model InteracaoConteudoParceiro {
   @@map("interacoes_conteudo_parceiros")
 }
 
-model Conquista {
-  id           String             @id @default(cuid())
-  titulo       String
-  descricao    String
-  icone        String
-  criterio     String
-  ativa        Boolean            @default(true)
-  recompensaXp Int                @default(0)
-  tipo         String
-  usuarios     ConquistaUsuario[]
-
-  @@map("conquistas")
-}
-
-model ConquistaUsuario {
-  id            String    @id @default(cuid())
-  conquistaId   String
-  usuarioId     String
-  dataConquista DateTime?
-  concluida     Boolean   @default(false)
-  dataInicio    DateTime  @default(now())
-  progresso     Int       @default(0)
-  conquista     Conquista @relation(fields: [conquistaId], references: [id], onDelete: Cascade)
-  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@unique([conquistaId, usuarioId])
-  @@map("conquistas_usuarios")
-}
-
 model EmblemaUsuario {
   id            String   @id @default(cuid())
   usuarioId     String
@@ -530,7 +500,7 @@ model Amizade {
   dataSolicitacao DateTime  @default(now())
   dataResposta    DateTime?
   amigo           Usuario   @relation("AmigoUsuario", fields: [amigoId], references: [id], onDelete: Cascade)
-  usuario         Usuario   @relation("UsuarioAmizade", fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuario         Usuario   @relation("UsuarioAmigo", fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@unique([usuarioId, amigoId])
   @@map("amizades")

@@ -79,21 +79,21 @@ export default function Home() {
       nome: 'Criador Parceiro',
       cor: 'blue',
       icone: '💎',
-      requisitos: 'Top 51-200 do ranking',
+      requisitos: 'Top 51-100 do ranking',
       beneficios: ['Destaque especial', 'Visibilidade aumentada', 'Acesso a recursos premium']
     },
     {
       nome: 'Criador Comum',
       cor: 'gray',
       icone: '⭐',
-      requisitos: 'Top 201-500 do ranking',
+      requisitos: 'Top 101-150 do ranking',
       beneficios: ['Visibilidade padrão', 'Acesso a recursos básicos', 'Suporte da comunidade']
     },
     {
       nome: 'Criador Iniciante',
       cor: 'green',
       icone: '🌱',
-      requisitos: 'Novos criadores',
+      requisitos: 'Demais criadores',
       beneficios: ['Visibilidade básica', 'Recursos essenciais', 'Apoio da comunidade']
     }
   ]
