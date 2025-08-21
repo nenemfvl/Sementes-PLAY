@@ -119,16 +119,16 @@ export default function Perfil() {
 
   const getNivelIcon = (nivel: string) => {
     switch (nivel.toLowerCase()) {
-      case 'criador-supremo':
-        return <StarIcon className="w-6 h-6 text-yellow-500" />
-      case 'criador-parceiro':
-        return <StarIcon className="w-6 h-6 text-blue-500" />
-      case 'criador-comum':
-        return <StarIcon className="w-6 h-6 text-orange-600" />
-      case 'criador-iniciante':
-        return <StarIcon className="w-6 h-6 text-green-500" />
+      case 'criador supremo':
+        return <span className="text-2xl">👑</span>
+      case 'criador parceiro':
+        return <span className="text-2xl">💎</span>
+      case 'criador comum':
+        return <span className="text-2xl">⭐</span>
+      case 'criador iniciante':
+        return <span className="text-2xl">🌱</span>
       case 'parceiro':
-        return <StarIcon className="w-6 h-6 text-purple-500" />
+        return <span className="text-2xl">🏢</span>
       default:
         return <UserIcon className="w-6 h-6 text-gray-400" />
     }
@@ -136,13 +136,13 @@ export default function Perfil() {
 
   const getNivelColor = (nivel: string) => {
     switch (nivel.toLowerCase()) {
-      case 'criador-supremo':
+      case 'criador supremo':
         return 'text-yellow-500'
-      case 'criador-parceiro':
+      case 'criador parceiro':
         return 'text-blue-500'
-      case 'criador-comum':
-        return 'text-orange-600'
-      case 'criador-iniciante':
+      case 'criador comum':
+        return 'text-gray-400'
+      case 'criador iniciante':
         return 'text-green-500'
       case 'parceiro':
         return 'text-purple-500'
