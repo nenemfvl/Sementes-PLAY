@@ -410,9 +410,25 @@ export default function CandidaturaCriadorPage() {
                   />
                 </div>
 
-                                 <div className="mb-6">
-                   <label className="block text-white font-medium mb-2">Redes Sociais</label>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mb-6">
+                  <label className="block text-white font-medium mb-2">Categoria</label>
+                  <select
+                    value={form.categoria}
+                    onChange={(e) => handleInputChange('categoria', e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:border-sementes-primary focus:outline-none transition-colors"
+                  >
+                    <option value="">Selecione uma categoria</option>
+                    {categorias.map((categoria) => (
+                      <option key={categoria} value={categoria}>
+                        {categoria}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-white font-medium mb-2">Redes Sociais (Opcionais)</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <input
                        type="url"
                        value={form.redesSociais.youtube}
@@ -521,6 +537,10 @@ export default function CandidaturaCriadorPage() {
                      <div>
                        <p className="text-gray-400">Experiência:</p>
                        <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.experiencia}</p>
+                     </div>
+                     <div>
+                       <p className="text-gray-400">Categoria:</p>
+                       <p className="text-white break-words">{form.categoria}</p>
                      </div>
                      <div>
                        <p className="text-gray-400">Motivação:</p>
