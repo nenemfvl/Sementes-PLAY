@@ -25,13 +25,13 @@ export async function GET(request: NextRequest) {
       prisma.usuario.count(),
              prisma.criador.count(),
        prisma.parceiro.count(),
-      prisma.usuario.count({ where: { nivel: { gte: 5 } } }),
-      prisma.usuario.count({ where: { status: 'ativo' } }),
-      prisma.usuario.count({ where: { status: 'banido' } }),
-      prisma.usuario.count({ where: { status: 'suspenso' } }),
-      prisma.carteiraDigital.aggregate({
-        _sum: { saldoSementes: true }
-      }),
+             prisma.usuario.count({ where: { nivel: { in: ['admin', 'moderador', 'supervisor'] } } }),
+             prisma.usuario.count({ where: { suspenso: false } }),
+       prisma.usuario.count({ where: { suspenso: true } }),
+       prisma.usuario.count({ where: { suspenso: true } }),
+             prisma.carteiraDigital.aggregate({
+         _sum: { saldo: true }
+       }),
       prisma.conteudo.count(),
       prisma.saque.count(),
       prisma.saque.count({ where: { status: 'pendente' } }),
@@ -89,8 +89,8 @@ export async function GET(request: NextRequest) {
       admins: {
         total: totalAdmins
       },
-      sistema: {
-        totalSementes: totalSementes._sum.saldoSementes || 0,
+             sistema: {
+         totalSementes: totalSementes._sum.saldo || 0,
         totalConteudos: totalConteudos,
         novosConteudosUltimos30Dias: novosConteudos
       },
