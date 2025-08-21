@@ -22,8 +22,12 @@ export async function GET(request: NextRequest) {
         doacoesFeitas: {
           select: { quantidade: true }
         },
-        doacoesRecebidas: {
-          select: { quantidade: true }
+        criador: {
+          include: {
+            doacoesRecebidas: {
+              select: { quantidade: true }
+            }
+          }
         }
       }
     })
@@ -36,8 +40,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Calcular estatísticas
-    const totalDoacoes = usuario.doacoesFeitas?.reduce((total, doacao) => total + doacao.quantidade, 0) || 0
-    const totalRecebido = usuario.doacoesRecebidas?.reduce((total, doacao) => total + doacao.quantidade, 0) || 0
+    const totalDoacoes = usuario.doacoesFeitas?.reduce((total: number, doacao: any) => total + doacao.quantidade, 0) || 0
+    const totalRecebido = usuario.criador?.doacoesRecebidas?.reduce((total: number, doacao: any) => total + doacao.quantidade, 0) || 0
     const pontuacao = usuario.pontuacao || 0
     const totalXP = usuario.xp || 0
 
