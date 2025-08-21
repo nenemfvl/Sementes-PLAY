@@ -89,9 +89,17 @@ export default function AdminCandidaturasCriadorPage() {
 
   const carregarCandidaturas = async () => {
     try {
-      // TODO: Implementar API para buscar candidaturas
-      // Por enquanto, usando dados mockados para desenvolvimento
-      setCandidaturas([])
+      const response = await fetch('/api/admin/candidaturas-criador')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setCandidaturas(data.candidaturas)
+        } else {
+          setNotificacao({ tipo: 'erro', mensagem: data.error || 'Erro ao carregar candidaturas' })
+        }
+      } else {
+        setNotificacao({ tipo: 'erro', mensagem: 'Erro ao carregar candidaturas' })
+      }
     } catch (error) {
       console.error('Erro ao carregar candidaturas:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao carregar candidaturas' })
@@ -113,11 +121,31 @@ export default function AdminCandidaturasCriadorPage() {
 
   const aprovarCandidatura = async (candidaturaId: string) => {
     try {
-      // TODO: Implementar API para aprovar candidatura
-      setNotificacao({ tipo: 'sucesso', mensagem: 'Candidatura aprovada com sucesso!' })
-      carregarCandidaturas()
-      setShowModal(false)
-      setObservacoes('')
+      const response = await fetch('/api/admin/candidaturas-criador', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          candidaturaId,
+          status: 'aprovada',
+          observacoes
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setNotificacao({ tipo: 'sucesso', mensagem: data.mensagem })
+          carregarCandidaturas()
+          setShowModal(false)
+          setObservacoes('')
+        } else {
+          setNotificacao({ tipo: 'erro', mensagem: data.error || 'Erro ao aprovar candidatura' })
+        }
+      } else {
+        setNotificacao({ tipo: 'erro', mensagem: 'Erro ao aprovar candidatura' })
+      }
     } catch (error) {
       console.error('Erro ao aprovar candidatura:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao aprovar candidatura' })
@@ -131,11 +159,31 @@ export default function AdminCandidaturasCriadorPage() {
     }
 
     try {
-      // TODO: Implementar API para rejeitar candidatura
-      setNotificacao({ tipo: 'sucesso', mensagem: 'Candidatura rejeitada com sucesso!' })
-      carregarCandidaturas()
-      setShowModal(false)
-      setObservacoes('')
+      const response = await fetch('/api/admin/candidaturas-criador', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          candidaturaId,
+          status: 'rejeitada',
+          observacoes
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setNotificacao({ tipo: 'sucesso', mensagem: data.mensagem })
+          carregarCandidaturas()
+          setShowModal(false)
+          setObservacoes('')
+        } else {
+          setNotificacao({ tipo: 'erro', mensagem: data.error || 'Erro ao rejeitar candidatura' })
+        }
+      } else {
+        setNotificacao({ tipo: 'erro', mensagem: 'Erro ao rejeitar candidatura' })
+      }
     } catch (error) {
       console.error('Erro ao rejeitar candidatura:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao rejeitar candidatura' })
