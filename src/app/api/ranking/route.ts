@@ -28,13 +28,13 @@ export async function GET(request: NextRequest) {
     // Filtrar por nível
     if (nivel && nivel !== 'todos') {
       if (nivel === 'criador-iniciante') {
-        where.criador = { nivel: 1 }
+        where.criador = { nivel: 'iniciante' }
       } else if (nivel === 'criador-comum') {
-        where.criador = { nivel: 2 }
+        where.criador = { nivel: 'comum' }
       } else if (nivel === 'criador-parceiro') {
-        where.criador = { nivel: 3 }
+        where.criador = { nivel: 'parceiro' }
       } else if (nivel === 'criador-supremo') {
-        where.criador = { nivel: 4 }
+        where.criador = { nivel: 'supremo' }
       } else if (nivel === 'parceiro') {
         where.parceiro = { isNot: null }
       }
@@ -85,10 +85,10 @@ export async function GET(request: NextRequest) {
             usuario.parceiro ? 'parceiro' : 
             ['admin', 'moderador', 'supervisor'].includes(usuario.nivel) ? 'admin' : 'usuario',
       nivel: usuario.criador ? 
-        (usuario.criador.nivel === 1 ? 'criador-iniciante' :
-         usuario.criador.nivel === 2 ? 'criador-comum' :
-         usuario.criador.nivel === 3 ? 'criador-parceiro' :
-         usuario.criador.nivel === 4 ? 'criador-supremo' : 'criador') :
+        (usuario.criador.nivel === 'iniciante' ? 'criador-iniciante' :
+         usuario.criador.nivel === 'comum' ? 'criador-comum' :
+         usuario.criador.nivel === 'parceiro' ? 'criador-parceiro' :
+         usuario.criador.nivel === 'supremo' ? 'criador-supremo' : 'criador') :
         usuario.parceiro ? 'parceiro' : 'usuario',
       estado: 'Não informado', // Campo não existe no schema
       cidade: 'Não informado', // Campo não existe no schema
