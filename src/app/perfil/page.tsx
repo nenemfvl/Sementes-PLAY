@@ -13,12 +13,13 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useAuth } from '@/contexts/AuthContext'
 
 // Forçar renderização dinâmica para evitar erro de prerendering
 export const dynamic = 'force-dynamic'
 
 export default function Perfil() {
-  const [usuario, setUsuario] = useState<any>(null)
+  const { usuario, isAuthenticated, loading: authLoading } = useAuth()
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
@@ -26,31 +27,17 @@ export default function Perfil() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    const verificarAutenticacao = () => {
-      const usuarioSalvo = localStorage.getItem('usuario-dados')
-      
-      if (usuarioSalvo) {
-        try {
-          const dadosUsuario = JSON.parse(usuarioSalvo)
-          setUsuario(dadosUsuario)
-          setAvatarUrl(dadosUsuario.avatarUrl || null)
-          
-          // Carregar estatísticas
-          carregarEstatisticas(dadosUsuario.id)
-        } catch (error) {
-          console.error('Erro ao ler dados do usuário:', error)
-          localStorage.removeItem('usuario-dados')
-          setUsuario(null)
-        }
-      } else {
+    if (!authLoading) {
+      if (isAuthenticated && usuario) {
+        setAvatarUrl(usuario.avatarUrl || null)
+        carregarEstatisticas(usuario.id)
+        setLoading(false)
+      } else if (!isAuthenticated) {
         // Redirecionar para login se não estiver autenticado
         window.location.href = '/login'
       }
-      setLoading(false)
     }
-    
-    verificarAutenticacao()
-  }, [])
+  }, [authLoading, isAuthenticated, usuario])
 
   const carregarEstatisticas = async (userId: string) => {
     try {
