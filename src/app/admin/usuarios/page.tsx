@@ -77,9 +77,13 @@ export default function AdminUsuariosPage() {
 
   const carregarUsuarios = async () => {
     try {
-      // TODO: Implementar API para buscar usuários
-      // Por enquanto, usando dados mockados para desenvolvimento
-      setUsuarios([])
+      const response = await fetch('/api/admin/usuarios')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setUsuarios(data.dados.usuarios)
+        }
+      }
     } catch (error) {
       console.error('Erro ao carregar usuários:', error)
     } finally {
@@ -155,10 +159,25 @@ export default function AdminUsuariosPage() {
 
   const alterarNivel = async (usuarioId: string, novoNivel: string) => {
     try {
-      // TODO: Implementar API para alterar nível
-      alert('Nível alterado com sucesso!')
-      setShowModal(false)
-      carregarUsuarios()
+      const response = await fetch('/api/admin/usuarios', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: usuarioId,
+          nivel: novoNivel
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          alert('Nível alterado com sucesso!')
+          setShowModal(false)
+          await carregarUsuarios()
+        }
+      } else {
+        alert('Erro ao alterar nível')
+      }
     } catch (error) {
       console.error('Erro ao alterar nível:', error)
       alert('Erro ao alterar nível')
@@ -280,7 +299,12 @@ export default function AdminUsuariosPage() {
                     <tr>
                       <td colSpan={8} className="text-center text-gray-400 p-8">
                         <UsersIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                        <p>Nenhum usuário encontrado</p>
+                        <p className="text-lg font-medium mb-2">
+                          {usuarios.length === 0 ? 'Nenhum usuário cadastrado' : 'Nenhum usuário encontrado com os filtros aplicados'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {usuarios.length === 0 ? 'O sistema ainda não possui usuários cadastrados.' : 'Tente ajustar os filtros de busca.'}
+                        </p>
                       </td>
                     </tr>
                   ) : filtrarUsuarios().map((user) => (
@@ -425,7 +449,11 @@ export default function AdminUsuariosPage() {
                   Cancelar
                 </button>
                 <button
-                  onClick={() => alterarNivel(selectedUser.id, '1')}
+                  onClick={() => {
+                    const select = document.querySelector('select') as HTMLSelectElement
+                    const novoNivel = select?.value || '1'
+                    alterarNivel(selectedUser.id, novoNivel)
+                  }}
                   className="flex-1 px-4 py-2 bg-sementes-primary hover:bg-sementes-primary/80 text-white rounded-lg transition-colors"
                 >
                   Confirmar
