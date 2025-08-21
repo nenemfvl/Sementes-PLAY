@@ -10,24 +10,18 @@ export async function GET(request: NextRequest) {
     const tipo = searchParams.get('tipo')
     const nivel = searchParams.get('nivel')
     const estado = searchParams.get('estado')
-    const limite = parseInt(searchParams.get('limite') || '100')
+    const limite = parseInt(searchParams.get('limite') || '50')
 
     const where: any = {}
     
     // Filtrar por tipo
     if (tipo && tipo !== 'todos') {
-      if (tipo === 'admin') {
-        where.nivel = { gte: 5 }
-      } else if (tipo === 'criador') {
+      if (tipo === 'criador') {
         where.criador = { isNot: null }
       } else if (tipo === 'parceiro') {
         where.parceiro = { isNot: null }
-      } else {
-        where.AND = [
-          { criador: null },
-          { parceiro: null },
-          { nivel: { lt: 5 } }
-        ]
+      } else if (tipo === 'admin') {
+        where.nivel = { in: ['admin', 'moderador', 'supervisor'] }
       }
     }
     
@@ -45,11 +39,6 @@ export async function GET(request: NextRequest) {
         where.parceiro = { isNot: null }
       }
     }
-    
-    // Filtrar por estado
-    if (estado && estado !== 'todos') {
-      where.estado = estado
-    }
 
     const usuarios = await prisma.usuario.findMany({
       where,
@@ -58,35 +47,31 @@ export async function GET(request: NextRequest) {
         nome: true,
         email: true,
         nivel: true,
-        estado: true,
-        cidade: true,
         avatarUrl: true,
         criador: {
           select: {
             id: true,
             categoria: true,
             nivel: true,
-            sementes: true,
             apoiadores: true
           }
         },
         parceiro: {
           select: {
             id: true,
-            categoria: true,
-            nivel: true,
-            sementes: true
+            nomeCidade: true,
+            totalVendas: true
           }
         },
         carteira: {
           select: {
-            saldoSementes: true
+            saldo: true
           }
         }
       },
       orderBy: [
         { nivel: 'desc' },
-        { carteira: { saldoSementes: 'desc' } }
+        { carteira: { saldo: 'desc' } }
       ],
       take: limite
     })
@@ -98,19 +83,19 @@ export async function GET(request: NextRequest) {
       email: usuario.email,
       tipo: usuario.criador ? 'criador' : 
             usuario.parceiro ? 'parceiro' : 
-            usuario.nivel >= 5 ? 'admin' : 'usuario',
+            ['admin', 'moderador', 'supervisor'].includes(usuario.nivel) ? 'admin' : 'usuario',
       nivel: usuario.criador ? 
         (usuario.criador.nivel === 1 ? 'criador-iniciante' :
          usuario.criador.nivel === 2 ? 'criador-comum' :
          usuario.criador.nivel === 3 ? 'criador-parceiro' :
          usuario.criador.nivel === 4 ? 'criador-supremo' : 'criador') :
         usuario.parceiro ? 'parceiro' : 'usuario',
-      estado: usuario.estado || 'Não informado',
-      cidade: usuario.cidade || 'Não informado',
+      estado: 'Não informado', // Campo não existe no schema
+      cidade: 'Não informado', // Campo não existe no schema
       avatarUrl: usuario.avatarUrl,
-      sementes: usuario.carteira?.saldoSementes || 0,
+      sementes: usuario.carteira?.saldo || 0,
       pontuacao: usuario.criador?.apoiadores || 0,
-      categoria: usuario.criador?.categoria || usuario.parceiro?.categoria || 'N/A'
+      categoria: usuario.criador?.categoria || usuario.parceiro?.nomeCidade || 'N/A'
     }))
 
     return NextResponse.json({
