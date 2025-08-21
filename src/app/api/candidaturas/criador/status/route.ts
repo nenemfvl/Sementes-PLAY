@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Verificar se já é criador
+    // Verificar se já é criador ATIVO (não removido)
     const criador = await prisma.criador.findFirst({
       where: {
         usuarioId: usuarioId
@@ -52,6 +52,27 @@ export async function GET(request: NextRequest) {
           candidatura: null,
           criador: criador,
           status: 'criador_aprovado'
+        }
+      })
+    }
+
+    // Verificar se existe candidatura aprovada (mesmo que o criador tenha sido removido)
+    const candidaturaAprovada = await prisma.candidaturaCriador.findFirst({
+      where: {
+        usuarioId: usuarioId,
+        status: 'aprovada'
+      }
+    })
+
+    if (candidaturaAprovada) {
+      // Se tem candidatura aprovada mas não é mais criador, significa que foi removido
+      // Permitir nova candidatura
+      return NextResponse.json({
+        sucesso: true,
+        dados: {
+          candidatura: null,
+          criador: null,
+          status: 'pode_candidatar'
         }
       })
     }

@@ -117,6 +117,10 @@ export default function CandidaturaCriadorPage() {
             // Se já é criador, redirecionar para o painel
             router.push('/painel-criador')
             return
+          } else if (data.dados.status === 'pode_candidatar') {
+            // Usuário pode fazer nova candidatura (foi removido anteriormente)
+            setCandidaturaExistente(null)
+            setCandidaturaEnviada(false)
           } else if (data.dados.candidatura) {
             setCandidaturaExistente(data.dados.candidatura)
           }
