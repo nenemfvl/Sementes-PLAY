@@ -58,6 +58,29 @@ export default function AdminCandidaturasCriadorPage() {
   const [observacoes, setObservacoes] = useState('')
   const [notificacao, setNotificacao] = useState<{ tipo: 'sucesso' | 'erro' | 'info', mensagem: string } | null>(null)
 
+  // Função para formatar textos longos
+  const formatarTexto = (texto: string, maxLength: number = 100) => {
+    if (!texto) return ''
+    if (texto.length <= maxLength) return texto
+    
+    // Quebrar em palavras e juntar com quebras de linha
+    const palavras = texto.split(' ')
+    let resultado = ''
+    let linhaAtual = ''
+    
+    palavras.forEach(palavra => {
+      if ((linhaAtual + palavra).length > maxLength) {
+        resultado += linhaAtual + '\n'
+        linhaAtual = palavra + ' '
+      } else {
+        linhaAtual += palavra + ' '
+      }
+    })
+    
+    resultado += linhaAtual
+    return resultado.trim()
+  }
+
   useEffect(() => {
     const verificarAutenticacao = () => {
       const usuarioSalvo = localStorage.getItem('usuario-dados')
@@ -405,12 +428,12 @@ export default function AdminCandidaturasCriadorPage() {
 
       {/* Modal de Detalhes/Ações */}
       {showModal && selectedCandidatura && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
-          >
+                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+           <motion.div
+             initial={{ opacity: 0, scale: 0.9 }}
+             animate={{ opacity: 1, scale: 1 }}
+             className="bg-gray-800 rounded-lg p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto"
+           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-white">
                 Candidatura de {selectedCandidatura.nome}
@@ -423,7 +446,7 @@ export default function AdminCandidaturasCriadorPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
               {/* Informações Básicas */}
               <div className="space-y-4">
                 <div>
@@ -454,15 +477,19 @@ export default function AdminCandidaturasCriadorPage() {
                   </div>
                 </div>
 
-                <div>
-                  <h4 className="text-lg font-medium text-white mb-2">Bio</h4>
-                  <p className="text-gray-300 text-sm">{selectedCandidatura.bio}</p>
-                </div>
+                                 <div>
+                   <h4 className="text-lg font-medium text-white mb-2">Bio</h4>
+                   <p className="text-gray-300 text-sm break-words whitespace-pre-wrap leading-relaxed">
+                     {formatarTexto(selectedCandidatura.bio, 80)}
+                   </p>
+                 </div>
 
-                <div>
-                  <h4 className="text-lg font-medium text-white mb-2">Experiência</h4>
-                  <p className="text-gray-300 text-sm">{selectedCandidatura.experiencia}</p>
-                </div>
+                 <div>
+                   <h4 className="text-lg font-medium text-white mb-2">Experiência</h4>
+                   <p className="text-gray-300 text-sm break-words whitespace-pre-wrap leading-relaxed">
+                     {formatarTexto(selectedCandidatura.experiencia, 80)}
+                   </p>
+                 </div>
               </div>
 
               {/* Redes Sociais e Portfolio */}
@@ -483,28 +510,36 @@ export default function AdminCandidaturasCriadorPage() {
                   </div>
                 </div>
 
-                <div>
-                  <h4 className="text-lg font-medium text-white mb-2">Portfolio</h4>
-                  <p className="text-gray-300 text-sm mb-2">{selectedCandidatura.portfolio.descricao}</p>
-                  <div className="space-y-1">
-                    {selectedCandidatura.portfolio.links.map((link, index) => (
-                      <a key={index} href={link} target="_blank" rel="noopener noreferrer" className="block text-sementes-primary hover:underline text-sm">
-                        {link}
-                      </a>
-                    ))}
-                  </div>
-                </div>
+                                 <div>
+                   <h4 className="text-lg font-medium text-white mb-2">Portfolio</h4>
+                   <p className="text-gray-300 text-sm mb-2 break-words whitespace-pre-wrap leading-relaxed">
+                     {formatarTexto(selectedCandidatura.portfolio.descricao, 80)}
+                   </p>
+                   <div className="space-y-1">
+                     {selectedCandidatura.portfolio.links.map((link, index) => (
+                       <a key={index} href={link} target="_blank" rel="noopener noreferrer" className="block text-sementes-primary hover:underline text-sm break-all">
+                         {link}
+                       </a>
+                     ))}
+                   </div>
+                 </div>
 
-                <div>
-                  <h4 className="text-lg font-medium text-white mb-2">Motivação e Metas</h4>
-                  <p className="text-gray-300 text-sm mb-2"><strong>Motivação:</strong> {selectedCandidatura.motivacao}</p>
-                  <p className="text-gray-300 text-sm"><strong>Metas:</strong> {selectedCandidatura.metas}</p>
-                </div>
+                 <div>
+                   <h4 className="text-lg font-medium text-white mb-2">Motivação e Metas</h4>
+                   <p className="text-gray-300 text-sm mb-2 break-words whitespace-pre-wrap leading-relaxed">
+                     <strong>Motivação:</strong> {formatarTexto(selectedCandidatura.motivacao, 70)}
+                   </p>
+                   <p className="text-gray-300 text-sm break-words whitespace-pre-wrap leading-relaxed">
+                     <strong>Metas:</strong> {formatarTexto(selectedCandidatura.metas, 70)}
+                   </p>
+                 </div>
 
-                <div>
-                  <h4 className="text-lg font-medium text-white mb-2">Disponibilidade</h4>
-                  <p className="text-gray-300 text-sm">{selectedCandidatura.disponibilidade}</p>
-                </div>
+                 <div>
+                   <h4 className="text-lg font-medium text-white mb-2">Disponibilidade</h4>
+                   <p className="text-gray-300 text-sm break-words whitespace-pre-wrap leading-relaxed">
+                     {formatarTexto(selectedCandidatura.disponibilidade, 80)}
+                   </p>
+                 </div>
               </div>
             </div>
 
