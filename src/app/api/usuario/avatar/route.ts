@@ -52,8 +52,24 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Upload para o Cloudinary usando a função otimizada
-    const { url: avatarUrl, publicId } = await uploadAvatar(avatar, usuarioId)
+    let avatarUrl: string
+    let publicId: string | null = null
+
+    try {
+      // Tentar upload para o Cloudinary
+      const result = await uploadAvatar(avatar, usuarioId)
+      avatarUrl = result.url
+      publicId = result.publicId
+    } catch (cloudinaryError) {
+      console.warn('Erro no Cloudinary, usando fallback:', cloudinaryError)
+      
+      // Fallback: converter para base64
+      const bytes = await avatar.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      const base64 = buffer.toString('base64')
+      const mimeType = avatar.type
+      avatarUrl = `data:${mimeType};base64,${base64}`
+    }
 
     // Atualizar o usuário no banco de dados
     await prisma.usuario.update({

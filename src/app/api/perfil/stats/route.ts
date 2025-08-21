@@ -39,6 +39,9 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Verificar se o usuário é um criador
+    const isCriador = !!usuario.criador
+
     // Calcular estatísticas
     const totalDoacoes = usuario.doacoesFeitas?.reduce((total: number, doacao: any) => total + doacao.quantidade, 0) || 0
     const totalRecebido = usuario.criador?.doacoesRecebidas?.reduce((total: number, doacao: any) => total + doacao.quantidade, 0) || 0
