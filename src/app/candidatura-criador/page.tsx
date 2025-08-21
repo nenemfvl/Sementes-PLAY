@@ -228,18 +228,39 @@ export default function CandidaturaCriadorPage() {
   }
 
   const isStepValid = (step: number) => {
+    let isValid = false
     switch (step) {
       case 1:
-        return form.nome && form.email && form.bio
+        isValid = Boolean(form.nome && form.email && form.bio)
+        break
       case 2:
-        return form.experiencia
+        isValid = Boolean(form.experiencia && form.categoria)
+        break
       case 3:
-        return form.motivacao && form.metas
+        isValid = Boolean(form.motivacao && form.metas)
+        break
       case 4:
-        return true
+        // Verificar se todos os campos obrigatórios estão preenchidos
+        isValid = Boolean(form.nome && form.email && form.bio && form.experiencia && form.categoria && form.motivacao && form.metas)
+        break
       default:
-        return false
+        isValid = false
     }
+    
+    // Debug: mostrar quais campos estão faltando
+    if (step === 4 && !isValid) {
+      console.log('Validação step 4 falhou:', {
+        nome: !!form.nome,
+        email: !!form.email,
+        bio: !!form.bio,
+        experiencia: !!form.experiencia,
+        categoria: !!form.categoria,
+        motivacao: !!form.motivacao,
+        metas: !!form.metas
+      })
+    }
+    
+    return isValid
   }
 
   if (loading) {
