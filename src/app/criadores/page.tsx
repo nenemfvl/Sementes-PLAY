@@ -97,6 +97,9 @@ export default function CriadoresPage() {
         }
       }
 
+      // Carregar criadores
+      await carregarCriadores()
+
       // TODO: Implementar API para carregar conteúdos dos parceiros
       setConteudosParceiros([])
       setLoading(false)
