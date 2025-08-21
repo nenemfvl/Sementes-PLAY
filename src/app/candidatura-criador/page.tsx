@@ -41,7 +41,7 @@ interface FormCandidatura {
 
 interface CandidaturaExistente {
   id: string
-  status: 'pendente' | 'aprovada' | 'rejeitada'
+  status: 'pendente' | 'aprovada' | 'rejeitada' | 'pode_candidatar'
   dataCandidatura: string
   observacoes?: string
 }
@@ -121,7 +121,13 @@ export default function CandidaturaCriadorPage() {
           } else if (data.dados.status === 'pode_candidatar') {
             // Usuário pode fazer nova candidatura (foi removido anteriormente)
             console.log('Usuário pode candidatar novamente') // Debug
-            setCandidaturaExistente(null)
+            // Criar um objeto candidatura com status 'pode_candidatar' para indicar que pode candidatar
+            setCandidaturaExistente({
+              id: 'pode_candidatar',
+              status: 'pode_candidatar',
+              dataCandidatura: new Date().toISOString(),
+              observacoes: 'Usuário pode fazer nova candidatura'
+            })
             setCandidaturaEnviada(false)
           } else if (data.dados.candidatura) {
             console.log('Candidatura existente encontrada:', data.dados.candidatura) // Debug
@@ -277,6 +283,8 @@ export default function CandidaturaCriadorPage() {
           return <CheckCircleIcon className="w-8 h-8 text-green-500" />
         case 'rejeitada':
           return <XCircleIcon className="w-8 h-8 text-red-500" />
+        case 'pode_candidatar':
+          return <ArrowLeftIcon className="w-8 h-8 text-blue-500" />
         default:
           return <ClockIcon className="w-8 h-8 text-gray-500" />
       }
@@ -290,6 +298,8 @@ export default function CandidaturaCriadorPage() {
           return 'Candidatura Aprovada!'
         case 'rejeitada':
           return 'Candidatura Rejeitada'
+        case 'pode_candidatar':
+          return 'Pode Fazer Nova Candidatura'
         default:
           return 'Status Desconhecido'
       }
@@ -303,6 +313,8 @@ export default function CandidaturaCriadorPage() {
           return 'bg-green-500/20 border-green-500/30 text-green-400'
         case 'rejeitada':
           return 'bg-red-500/20 border-red-500/30 text-red-400'
+        case 'pode_candidatar':
+          return 'bg-blue-500/20 border-blue-500/30 text-blue-400'
         default:
           return 'bg-gray-500/20 border-gray-500/30 text-gray-400'
       }
@@ -326,6 +338,8 @@ export default function CandidaturaCriadorPage() {
               candidaturaExistente.observacoes ? 
               `Sua candidatura não foi aprovada. Motivo: ${candidaturaExistente.observacoes}` :
               'Sua candidatura não foi aprovada. Entre em contato conosco para mais detalhes.'}
+            {candidaturaExistente.status === 'pode_candidatar' && 
+              'Você pode fazer uma nova candidatura para se tornar criador novamente.'}
           </p>
           
           {candidaturaExistente.status === 'pendente' && (
@@ -349,7 +363,7 @@ export default function CandidaturaCriadorPage() {
               {new Date(candidaturaExistente.dataCandidatura).toLocaleDateString('pt-BR')}
             </div>
             
-            {candidaturaExistente.status === 'rejeitada' && (
+            {(candidaturaExistente.status === 'rejeitada' || candidaturaExistente.status === 'pode_candidatar') && (
               <button
                 onClick={() => {
                   setCandidaturaExistente(null)
@@ -357,7 +371,7 @@ export default function CandidaturaCriadorPage() {
                 }}
                 className="px-6 py-3 bg-sementes-primary hover:bg-sementes-accent text-white font-medium rounded-xl transition-colors"
               >
-                Nova Candidatura
+                {candidaturaExistente.status === 'pode_candidatar' ? 'Nova Candidatura' : 'Nova Candidatura'}
               </button>
             )}
             
@@ -384,9 +398,9 @@ export default function CandidaturaCriadorPage() {
     )
   }
 
-  // Se já existe candidatura aprovada, mostrar status
-  if (candidaturaExistente && candidaturaExistente.status === 'aprovada') {
-    console.log('Renderizando status de candidatura aprovada') // Debug
+  // Se já existe candidatura com status específico, mostrar status
+  if (candidaturaExistente && ['aprovada', 'pendente', 'rejeitada', 'pode_candidatar'].includes(candidaturaExistente.status)) {
+    console.log('Renderizando status de candidatura:', candidaturaExistente.status) // Debug
     return (
       <div className="min-h-screen bg-sss-dark">
         <div className="container mx-auto px-8">
