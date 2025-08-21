@@ -2,34 +2,33 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import {
+  UserIcon,
+  EnvelopeIcon,
+  DocumentTextIcon,
+  StarIcon,
+  HeartIcon,
   ArrowLeftIcon,
-  UserGroupIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
-  StarIcon,
-  GlobeAltIcon,
-  DocumentTextIcon,
   ClockIcon,
-  HeartIcon,
-  TrophyIcon
+  XCircleIcon
 } from '@heroicons/react/24/outline'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface FormCandidatura {
   nome: string
   email: string
   bio: string
-  categoria: string
-     redesSociais: {
-     youtube: string
-     twitch: string
-     instagram: string
-     tiktok: string
-     twitter: string
-     discord: string
-   }
+  redesSociais: {
+    youtube: string
+    twitch: string
+    instagram: string
+    tiktok: string
+    twitter: string
+    discord: string
+  }
   portfolio: {
     descricao: string
     links: string[]
@@ -51,15 +50,14 @@ export default function CandidaturaCriadorPage() {
     nome: '',
     email: '',
     bio: '',
-    categoria: '',
-         redesSociais: {
-       youtube: '',
-       twitch: '',
-       instagram: '',
-       tiktok: '',
-       twitter: '',
-       discord: ''
-     },
+    redesSociais: {
+      youtube: '',
+      twitch: '',
+      instagram: '',
+      tiktok: '',
+      twitter: '',
+      discord: ''
+    },
     portfolio: {
       descricao: '',
       links: ['', '']
@@ -70,27 +68,6 @@ export default function CandidaturaCriadorPage() {
     disponibilidade: ''
   })
   const [notificacao, setNotificacao] = useState<{ tipo: 'sucesso' | 'erro' | 'info', mensagem: string } | null>(null)
-
-  const categorias = [
-    'Gaming',
-    'Tecnologia',
-    'Educação',
-    'Entretenimento',
-    'Lifestyle',
-    'Esportes',
-    'Música',
-    'Arte',
-    'Comédia',
-    'Outros'
-  ]
-
-  const disponibilidades = [
-    'Tempo integral (40h+ por semana)',
-    'Meio período (20-30h por semana)',
-    'Tempo livre (10-20h por semana)',
-    'Fins de semana apenas',
-    'Horário flexível'
-  ]
 
   useEffect(() => {
     const verificarAutenticacao = () => {
@@ -228,39 +205,18 @@ export default function CandidaturaCriadorPage() {
   }
 
   const isStepValid = (step: number) => {
-    let isValid = false
     switch (step) {
       case 1:
-        isValid = Boolean(form.nome && form.email && form.bio)
-        break
+        return form.nome && form.email && form.bio
       case 2:
-        isValid = Boolean(form.experiencia && form.categoria)
-        break
+        return true // Redes sociais são opcionais
       case 3:
-        isValid = Boolean(form.motivacao && form.metas)
-        break
+        return form.experiencia && form.motivacao && form.metas && form.disponibilidade
       case 4:
-        // Verificar se todos os campos obrigatórios estão preenchidos
-        isValid = Boolean(form.nome && form.email && form.bio && form.experiencia && form.categoria && form.motivacao && form.metas)
-        break
+        return form.nome && form.email && form.bio && form.experiencia && form.motivacao && form.metas && form.disponibilidade
       default:
-        isValid = false
+        return false
     }
-    
-    // Debug: mostrar quais campos estão faltando
-    if (step === 4 && !isValid) {
-      console.log('Validação step 4 falhou:', {
-        nome: !!form.nome,
-        email: !!form.email,
-        bio: !!form.bio,
-        experiencia: !!form.experiencia,
-        categoria: !!form.categoria,
-        motivacao: !!form.motivacao,
-        metas: !!form.metas
-      })
-    }
-    
-    return isValid
   }
 
   if (loading) {
@@ -298,14 +254,14 @@ export default function CandidaturaCriadorPage() {
             <div className="text-center">
               <div className="flex items-center justify-center mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-sementes-primary to-sementes-accent rounded-2xl flex items-center justify-center shadow-2xl">
-                  <UserGroupIcon className="w-10 h-10 text-white" />
+                  <StarIcon className="w-10 h-10 text-white" />
                 </div>
               </div>
               <h1 className="text-4xl md:text-5xl font-black text-white mb-4 bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                Seja um Criador
+                Candidatura para Criador
               </h1>
               <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                Junte-se à nossa comunidade de criadores e comece sua jornada no SementesPLAY
+                Junte-se à nossa comunidade de criadores de conteúdo
               </p>
             </div>
           </motion.div>
@@ -330,8 +286,8 @@ export default function CandidaturaCriadorPage() {
               </div>
               <div className="flex justify-between mt-2 text-sm text-gray-400">
                 <span>Informações Básicas</span>
+                <span>Redes Sociais</span>
                 <span>Experiência</span>
-                <span>Motivação</span>
                 <span>Revisão</span>
               </div>
             </div>
@@ -348,11 +304,11 @@ export default function CandidaturaCriadorPage() {
             {currentStep === 1 && (
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-                  <UserGroupIcon className="w-6 h-6 mr-3 text-sementes-primary" />
+                  <UserIcon className="w-6 h-6 mr-3 text-sementes-primary" />
                   Informações Básicas
                 </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div>
                     <label className="block text-white font-medium mb-2">Nome Completo</label>
                     <input
@@ -376,184 +332,253 @@ export default function CandidaturaCriadorPage() {
                   </div>
                 </div>
 
-                <div className="mt-6">
+                <div className="mb-6">
                   <label className="block text-white font-medium mb-2">Biografia</label>
                   <textarea
                     value={form.bio}
                     onChange={(e) => handleInputChange('bio', e.target.value)}
                     rows={4}
                     className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                    placeholder="Conte-nos um pouco sobre você, suas paixões e interesses..."
+                    placeholder="Conte um pouco sobre você e seu conteúdo..."
                   />
                 </div>
               </div>
             )}
 
-            {/* Step 2: Experiência e Categoria */}
+            {/* Step 2: Redes Sociais */}
             {currentStep === 2 && (
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                   <StarIcon className="w-6 h-6 mr-3 text-sementes-primary" />
-                  Experiência e Categoria
+                  Redes Sociais
                 </h2>
                 
-
-
-                <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Experiência</label>
-                  <textarea
-                    value={form.experiencia}
-                    onChange={(e) => handleInputChange('experiencia', e.target.value)}
-                    rows={4}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                    placeholder="Descreva sua experiência na área escolhida, projetos anteriores, conquistas..."
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-white font-medium mb-2">YouTube</label>
+                    <input
+                      type="url"
+                      value={form.redesSociais.youtube}
+                      onChange={(e) => handleInputChange('redesSociais.youtube', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                      placeholder="https://youtube.com/@seucanal"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-white font-medium mb-2">Twitch</label>
+                    <input
+                      type="url"
+                      value={form.redesSociais.twitch}
+                      onChange={(e) => handleInputChange('redesSociais.twitch', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                      placeholder="https://twitch.tv/seucanal"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-white font-medium mb-2">Instagram</label>
+                    <input
+                      type="url"
+                      value={form.redesSociais.instagram}
+                      onChange={(e) => handleInputChange('redesSociais.instagram', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                      placeholder="https://instagram.com/seuperfil"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-white font-medium mb-2">TikTok</label>
+                    <input
+                      type="url"
+                      value={form.redesSociais.tiktok}
+                      onChange={(e) => handleInputChange('redesSociais.tiktok', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                      placeholder="https://tiktok.com/@seuperfil"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-white font-medium mb-2">Discord</label>
+                    <input
+                      type="text"
+                      value={form.redesSociais.discord}
+                      onChange={(e) => handleInputChange('redesSociais.discord', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                      placeholder="username#1234"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-white font-medium mb-2">Twitter</label>
+                    <input
+                      type="url"
+                      value={form.redesSociais.twitter}
+                      onChange={(e) => handleInputChange('redesSociais.twitter', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                      placeholder="https://twitter.com/seuperfil"
+                    />
+                  </div>
                 </div>
-
-                <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Categoria</label>
-                  <select
-                    value={form.categoria}
-                    onChange={(e) => handleInputChange('categoria', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:border-sementes-primary focus:outline-none transition-colors"
-                  >
-                    <option value="">Selecione uma categoria</option>
-                    {categorias.map((categoria) => (
-                      <option key={categoria} value={categoria}>
-                        {categoria}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Redes Sociais (Opcionais)</label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <input
-                       type="url"
-                       value={form.redesSociais.youtube}
-                       onChange={(e) => handleInputChange('redesSociais.youtube', e.target.value)}
-                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                       placeholder="YouTube (opcional)"
-                     />
-                     <input
-                       type="url"
-                       value={form.redesSociais.twitch}
-                       onChange={(e) => handleInputChange('redesSociais.twitch', e.target.value)}
-                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                       placeholder="Twitch (opcional)"
-                     />
-                     <input
-                       type="url"
-                       value={form.redesSociais.instagram}
-                       onChange={(e) => handleInputChange('redesSociais.instagram', e.target.value)}
-                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                       placeholder="Instagram (opcional)"
-                     />
-                     <input
-                       type="url"
-                       value={form.redesSociais.tiktok}
-                       onChange={(e) => handleInputChange('redesSociais.tiktok', e.target.value)}
-                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                       placeholder="TikTok (opcional)"
-                     />
-                     <input
-                       type="text"
-                       value={form.redesSociais.discord}
-                       onChange={(e) => handleInputChange('redesSociais.discord', e.target.value)}
-                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                       placeholder="Discord (ex: username#1234)"
-                     />
-                     <input
-                       type="url"
-                       value={form.redesSociais.twitter}
-                       onChange={(e) => handleInputChange('redesSociais.twitter', e.target.value)}
-                       className="px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                       placeholder="Twitter (opcional)"
-                     />
-                   </div>
-                 </div>
               </div>
             )}
 
-            {/* Step 3: Motivação e Metas */}
+            {/* Step 3: Experiência e Motivação */}
             {currentStep === 3 && (
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                   <HeartIcon className="w-6 h-6 mr-3 text-sementes-primary" />
-                  Motivação e Metas
+                  Experiência e Motivação
                 </h2>
                 
                 <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Por que você quer ser um criador?</label>
+                  <label className="block text-white font-medium mb-2">Experiência em Criação de Conteúdo</label>
                   <textarea
-                    value={form.motivacao}
-                    onChange={(e) => handleInputChange('motivacao', e.target.value)}
-                    rows={4}
+                    value={form.experiencia}
+                    onChange={(e) => handleInputChange('experiencia', e.target.value)}
+                    rows={3}
                     className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                    placeholder="Conte-nos sua motivação para se tornar um criador no SementesPLAY..."
+                    placeholder="Conte sobre sua experiência criando conteúdo..."
                   />
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-white font-medium mb-2">Suas Metas</label>
+                  <label className="block text-white font-medium mb-2">Por que você quer ser um criador no SementesPLAY?</label>
                   <textarea
-                    value={form.metas}
-                    onChange={(e) => handleInputChange('metas', e.target.value)}
-                    rows={4}
+                    value={form.motivacao}
+                    onChange={(e) => handleInputChange('motivacao', e.target.value)}
+                    rows={3}
                     className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
-                    placeholder="Quais são seus objetivos como criador? O que você espera alcançar?"
+                    placeholder="Explique sua motivação..."
                   />
                 </div>
 
+                <div className="mb-6">
+                  <label className="block text-white font-medium mb-2">Metas como Criador</label>
+                  <textarea
+                    value={form.metas}
+                    onChange={(e) => handleInputChange('metas', e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                    placeholder="Quais são suas metas e objetivos?"
+                  />
+                </div>
 
+                <div className="mb-6">
+                  <label className="block text-white font-medium mb-2">Disponibilidade para Criação</label>
+                  <textarea
+                    value={form.disponibilidade}
+                    onChange={(e) => handleInputChange('disponibilidade', e.target.value)}
+                    rows={2}
+                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-sementes-primary focus:outline-none transition-colors"
+                    placeholder="Quantas horas por semana você pode dedicar?"
+                  />
+                </div>
               </div>
             )}
 
-                         {/* Step 4: Revisão */}
-             {currentStep === 4 && (
-               <div>
-                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-                   <DocumentTextIcon className="w-6 h-6 mr-3 text-sementes-primary" />
-                   Revisão
-                 </h2>
-                 
-                 {/* Resumo da Candidatura */}
-                 <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600/50">
-                   <h3 className="text-lg font-semibold text-white mb-4">📋 Resumo da Sua Candidatura</h3>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                     <div>
-                       <p className="text-gray-400">Nome:</p>
-                       <p className="text-white break-words">{form.nome}</p>
-                     </div>
-                     <div>
-                       <p className="text-gray-400">Email:</p>
-                       <p className="text-white break-all">{form.email}</p>
-                     </div>
-                     <div>
-                       <p className="text-gray-400">Bio:</p>
-                       <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.bio}</p>
-                     </div>
-                     <div>
-                       <p className="text-gray-400">Experiência:</p>
-                       <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.experiencia}</p>
-                     </div>
-                     <div>
-                       <p className="text-gray-400">Categoria:</p>
-                       <p className="text-white break-words">{form.categoria}</p>
-                     </div>
-                     <div>
-                       <p className="text-gray-400">Motivação:</p>
-                       <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.motivacao}</p>
-                     </div>
-                     <div>
-                       <p className="text-gray-400">Metas:</p>
-                       <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.metas}</p>
-                     </div>
-                   </div>
-                 </div>
-               </div>
-             )}
+            {/* Step 4: Revisão */}
+            {currentStep === 4 && (
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+                  <DocumentTextIcon className="w-6 h-6 mr-3 text-sementes-primary" />
+                  Revisão
+                </h2>
+                
+                {/* Critérios de Aprovação */}
+                <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600/50 mb-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Critérios de Aprovação</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <CheckCircleIcon className="w-5 h-5 text-green-500 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium">Ter pelo menos 100 seguidores</p>
+                        <p className="text-gray-400 text-sm">Em pelo menos uma rede social</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <CheckCircleIcon className="w-5 h-5 text-green-500 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium">Criar conteúdo regularmente</p>
+                        <p className="text-gray-400 text-sm">Pelo menos 1 post/vídeo por semana</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <CheckCircleIcon className="w-5 h-5 text-green-500 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium">Ter conteúdo de qualidade</p>
+                        <p className="text-gray-400 text-sm">Original e relevante para a comunidade</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <CheckCircleIcon className="w-5 h-5 text-green-500 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium">Seguir as diretrizes da comunidade</p>
+                        <p className="text-gray-400 text-sm">Conteúdo apropriado e sem violações</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Processo de Aprovação */}
+                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
+                  <div className="flex items-start space-x-3">
+                    <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-yellow-400 font-semibold">Processo de Aprovação</h4>
+                      <p className="text-yellow-200 text-sm mt-1">
+                        Sua candidatura será revisada pela nossa equipe em até 7 dias úteis. 
+                        Você receberá uma notificação por email com o resultado.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Resumo da Candidatura */}
+                <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600/50">
+                  <h3 className="text-lg font-semibold text-white mb-4">📋 Resumo da Sua Candidatura</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-400">Nome:</p>
+                      <p className="text-white break-words">{form.nome}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Email:</p>
+                      <p className="text-white break-all">{form.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Bio:</p>
+                      <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.bio}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Experiência:</p>
+                      <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.experiencia}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Motivação:</p>
+                      <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.motivacao}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Metas:</p>
+                      <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.metas}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Disponibilidade:</p>
+                      <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.disponibilidade}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Redes Sociais:</p>
+                      <p className="text-white">
+                        {Object.values(form.redesSociais).filter(Boolean).length} configuradas
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Navigation Buttons */}
             <div className="flex justify-between mt-8">
@@ -600,7 +625,7 @@ export default function CandidaturaCriadorPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <TrophyIcon className="w-8 h-8 text-white" />
+                    <StarIcon className="w-8 h-8 text-white" />
                   </div>
                   <h4 className="text-white font-semibold mb-2">Recompensas</h4>
                   <p className="text-gray-300 text-sm">
@@ -610,7 +635,7 @@ export default function CandidaturaCriadorPage() {
                 
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <GlobeAltIcon className="w-8 h-8 text-white" />
+                    <HeartIcon className="w-8 h-8 text-white" />
                   </div>
                   <h4 className="text-white font-semibold mb-2">Visibilidade</h4>
                   <p className="text-gray-300 text-sm">
@@ -641,19 +666,12 @@ export default function CandidaturaCriadorPage() {
           className={`fixed bottom-4 right-4 p-4 rounded-xl shadow-lg z-50 ${
             notificacao.tipo === 'sucesso' 
               ? 'bg-green-600 text-white' 
-              : notificacao.tipo === 'erro'
-              ? 'bg-red-600 text-white'
+              : notificacao.tipo === 'erro' 
+              ? 'bg-red-600 text-white' 
               : 'bg-blue-600 text-white'
           }`}
         >
-          <div className="flex items-center">
-            {notificacao.tipo === 'sucesso' ? (
-              <CheckCircleIcon className="w-5 h-5 mr-2" />
-            ) : (
-              <ExclamationTriangleIcon className="w-5 h-5 mr-2" />
-            )}
-            <span>{notificacao.mensagem}</span>
-          </div>
+          {notificacao.mensagem}
         </motion.div>
       )}
     </div>
