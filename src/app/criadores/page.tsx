@@ -72,10 +72,48 @@ export default function CriadoresPage() {
   const [conteudosParceiros, setConteudosParceiros] = useState<ConteudoParceiro[]>([])
   const [criadores, setCriadores] = useState<Criador[]>([])
   const [criadoresLoading, setCriadoresLoading] = useState(true)
+  const [usuario, setUsuario] = useState<any>(null)
+  const [statusCandidatura, setStatusCandidatura] = useState<string | null>(null)
+  const [verificandoStatus, setVerificandoStatus] = useState(true)
 
   useEffect(() => {
+    verificarUsuario()
     carregarDados()
   }, [])
+
+  const verificarUsuario = () => {
+    const usuarioSalvo = localStorage.getItem('usuario-dados')
+    if (usuarioSalvo) {
+      try {
+        const dadosUsuario = JSON.parse(usuarioSalvo)
+        setUsuario(dadosUsuario)
+        
+        // Verificar status da candidatura
+        verificarStatusCandidatura(dadosUsuario.id)
+      } catch (error) {
+        console.error('Erro ao ler dados do usuário:', error)
+        setVerificandoStatus(false)
+      }
+    } else {
+      setVerificandoStatus(false)
+    }
+  }
+
+  const verificarStatusCandidatura = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/candidaturas/criador/status?usuarioId=${userId}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setStatusCandidatura(data.dados.status)
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status da candidatura:', error)
+    } finally {
+      setVerificandoStatus(false)
+    }
+  }
 
   const carregarDados = async () => {
     try {
@@ -201,13 +239,46 @@ export default function CriadoresPage() {
                 
                 {/* Botão Seja Criador */}
                 <div className="mt-8">
-                  <Link
-                    href="/candidatura-criador"
-                    className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-sementes-primary to-sementes-accent text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-sementes-primary/25 transition-all duration-300 hover:scale-105 transform"
-                  >
-                    <UserGroupIcon className="w-6 h-6 mr-3" />
-                    Seja um Criador
-                  </Link>
+                  {verificandoStatus ? (
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-sementes-primary mx-auto mb-4"></div>
+                  ) : statusCandidatura === 'criador_aprovado' ? (
+                    <Link
+                      href="/painel-criador"
+                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-green-600/25 transition-all duration-300 hover:scale-105 transform"
+                    >
+                      <UserGroupIcon className="w-6 h-6 mr-3" />
+                      Acessar Painel Criador
+                    </Link>
+                  ) : statusCandidatura === 'pendente' ? (
+                    <div className="inline-flex items-center justify-center px-8 py-4 bg-yellow-600 text-white font-bold text-lg rounded-2xl">
+                      <UserGroupIcon className="w-6 h-6 mr-3" />
+                      Candidatura em Análise
+                    </div>
+                  ) : statusCandidatura === 'aprovada' ? (
+                    <Link
+                      href="/painel-criador"
+                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-green-600/25 transition-all duration-300 hover:scale-105 transform"
+                    >
+                      <UserGroupIcon className="w-6 h-6 mr-3" />
+                      Acessar Painel Criador
+                    </Link>
+                  ) : statusCandidatura === 'rejeitada' ? (
+                    <Link
+                      href="/candidatura-criador"
+                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-red-600/25 transition-all duration-300 hover:scale-105 transform"
+                    >
+                      <UserGroupIcon className="w-6 h-6 mr-3" />
+                      Nova Candidatura
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/candidatura-criador"
+                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-sementes-primary to-sementes-accent text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-sementes-primary/25 transition-all duration-300 hover:scale-105 transform"
+                    >
+                      <UserGroupIcon className="w-6 h-6 mr-3" />
+                      Seja um Criador
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
