@@ -92,14 +92,18 @@ export default function AdminPage() {
       if (response.ok) {
         const data = await response.json()
         if (data.sucesso) {
-          setStats({
+          const novasStats = {
             totalUsuarios: data.dados.usuarios.total,
             totalCriadores: data.dados.criadores.total,
             totalParceiros: data.dados.parceiros.total,
             candidaturasPendentes: 0, // TODO: Implementar API de candidaturas
             denunciasPendentes: 0, // TODO: Implementar API de denúncias
             fundoAtual: data.dados.sistema.totalSementes
-          })
+          }
+          setStats(novasStats)
+          
+          // Salvar estatísticas no localStorage para sincronização
+          localStorage.setItem('admin-stats', JSON.stringify(novasStats))
         }
       }
     } catch (error) {
@@ -108,6 +112,50 @@ export default function AdminPage() {
       setLoading(false)
     }
   }
+
+  // Função para atualizar estatísticas quando receber notificação
+  const atualizarEstatisticas = () => {
+    const statsSalvas = localStorage.getItem('admin-stats')
+    if (statsSalvas) {
+      try {
+        const statsAtualizadas = JSON.parse(statsSalvas)
+        setStats(statsAtualizadas)
+      } catch (error) {
+        console.error('Erro ao parsear estatísticas salvas:', error)
+      }
+    }
+  }
+
+  // Listener para mudanças no localStorage
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'admin-stats' && e.newValue) {
+        try {
+          const statsAtualizadas = JSON.parse(e.newValue)
+          setStats(statsAtualizadas)
+        } catch (error) {
+          console.error('Erro ao parsear estatísticas atualizadas:', error)
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Verificar se há estatísticas salvas no localStorage
+    const statsSalvas = localStorage.getItem('admin-stats')
+    if (statsSalvas) {
+      try {
+        const statsAtualizadas = JSON.parse(statsSalvas)
+        setStats(statsAtualizadas)
+      } catch (error) {
+        console.error('Erro ao parsear estatísticas salvas:', error)
+      }
+    }
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [])
 
   if (loading) {
     return (

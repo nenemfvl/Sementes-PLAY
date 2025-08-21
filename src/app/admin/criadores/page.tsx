@@ -140,6 +140,26 @@ export default function AdminCriadores() {
         if (data.sucesso) {
           setNotificacao({ tipo: 'sucesso', mensagem: data.mensagem })
           carregarCriadores()
+          
+          // Atualizar estatísticas no localStorage se necessário
+          if (valor === 'banido') {
+            const statsSalvas = localStorage.getItem('admin-stats')
+            if (statsSalvas) {
+              try {
+                const statsAtualizadas = JSON.parse(statsSalvas)
+                statsAtualizadas.totalCriadores = Math.max(0, statsAtualizadas.totalCriadores - 1)
+                localStorage.setItem('admin-stats', JSON.stringify(statsAtualizadas))
+                
+                // Disparar evento para notificar outras páginas
+                window.dispatchEvent(new StorageEvent('storage', {
+                  key: 'admin-stats',
+                  newValue: JSON.stringify(statsAtualizadas)
+                }))
+              } catch (error) {
+                console.error('Erro ao atualizar estatísticas:', error)
+              }
+            }
+          }
         } else {
           setNotificacao({ tipo: 'erro', mensagem: data.error || 'Erro ao alterar status' })
         }
@@ -200,6 +220,24 @@ export default function AdminCriadores() {
           setNotificacao({ tipo: 'sucesso', mensagem: data.mensagem })
           carregarCriadores()
           setShowModal(false)
+          
+          // Atualizar estatísticas no localStorage para sincronizar com a página admin principal
+          const statsSalvas = localStorage.getItem('admin-stats')
+          if (statsSalvas) {
+            try {
+              const statsAtualizadas = JSON.parse(statsSalvas)
+              statsAtualizadas.totalCriadores = Math.max(0, statsAtualizadas.totalCriadores - 1)
+              localStorage.setItem('admin-stats', JSON.stringify(statsAtualizadas))
+              
+              // Disparar evento para notificar outras páginas
+              window.dispatchEvent(new StorageEvent('storage', {
+                key: 'admin-stats',
+                newValue: JSON.stringify(statsAtualizadas)
+              }))
+            } catch (error) {
+              console.error('Erro ao atualizar estatísticas:', error)
+            }
+          }
         } else {
           setNotificacao({ tipo: 'erro', mensagem: data.error || 'Erro ao remover criador' })
         }
