@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const usuario = await prisma.usuario.findUnique({
       where: { id: usuarioId },
       include: {
-        doacoes: {
+        doacoesFeitas: {
           select: { quantidade: true }
         },
         doacoesRecebidas: {
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Calcular estatísticas
-    const totalDoacoes = usuario.doacoes?.reduce((total, doacao) => total + doacao.quantidade, 0) || 0
+    const totalDoacoes = usuario.doacoesFeitas?.reduce((total, doacao) => total + doacao.quantidade, 0) || 0
     const totalRecebido = usuario.doacoesRecebidas?.reduce((total, doacao) => total + doacao.quantidade, 0) || 0
     const pontuacao = usuario.pontuacao || 0
     const totalXP = usuario.xp || 0
@@ -44,8 +44,7 @@ export async function GET(request: NextRequest) {
     // Contar criadores únicos apoiados
     const criadoresApoiados = await prisma.doacao.count({
       where: {
-        doadorId: usuarioId,
-        criadorId: { not: null }
+        doadorId: usuarioId
       },
       distinct: ['criadorId']
     })
