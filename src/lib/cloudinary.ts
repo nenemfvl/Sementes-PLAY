@@ -21,7 +21,7 @@ export const uploadImage = async (
   try {
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('upload_preset', 'sementesplay')
+    formData.append('upload_preset', 'ml_default') // Usar preset padrão
 
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/dccx2gioc/image/upload`,
@@ -32,7 +32,9 @@ export const uploadImage = async (
     )
 
     if (!response.ok) {
-      throw new Error(`Upload failed: ${response.statusText}`)
+      const errorText = await response.text()
+      console.error('Cloudinary error response:', errorText)
+      throw new Error(`Upload failed: ${response.statusText} - ${errorText}`)
     }
 
     const data = await response.json()
@@ -71,7 +73,7 @@ export const getOptimizedImageUrl = (
 export const uploadAvatar = async (file: File, usuarioId: string): Promise<{ url: string; publicId: string }> => {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('upload_preset', 'sementesplay')
+  formData.append('upload_preset', 'ml_default') // Usar preset padrão
   formData.append('folder', 'sementesplay/avatars')
   formData.append('transformation', 'w_200,h_200,c_fill,g_face,q_auto,f_auto')
 
@@ -84,7 +86,9 @@ export const uploadAvatar = async (file: File, usuarioId: string): Promise<{ url
   )
 
   if (!response.ok) {
-    throw new Error(`Upload failed: ${response.statusText}`)
+    const errorText = await response.text()
+    console.error('Cloudinary error response:', errorText)
+    throw new Error(`Upload failed: ${response.statusText} - ${errorText}`)
   }
 
   const data = await response.json()
