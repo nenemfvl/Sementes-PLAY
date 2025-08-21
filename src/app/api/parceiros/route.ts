@@ -16,12 +16,12 @@ export async function GET(request: NextRequest) {
             id: true,
             nome: true,
             email: true,
-            avatarUrl: true
-          }
-        },
-        carteira: {
-          select: {
-            saldo: true
+            avatarUrl: true,
+            carteira: {
+              select: {
+                saldo: true
+              }
+            }
           }
         }
       },
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       estado: 'Não informado', // Campo não existe no schema
       cidade: parceiro.nomeCidade,
       sementes: parceiro.totalVendas,
-      saldoCarteira: parceiro.carteira?.saldo || 0,
+      saldoCarteira: parceiro.usuario.carteira?.saldo || 0,
       descricao: '',
       website: parceiro.urlConnect || '',
       redesSociais: {
