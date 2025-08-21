@@ -57,6 +57,12 @@ export default function Perfil() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    // Verificar se o usuário existe
+    if (!usuario) {
+      alert('Usuário não encontrado. Faça login novamente.')
+      return
+    }
+
     // Validar tipo de arquivo
     if (!file.type.startsWith('image/')) {
       alert('Por favor, selecione apenas arquivos de imagem.')
@@ -172,11 +178,11 @@ export default function Perfil() {
   // Calcular dados de XP
   const xpData = {
     usuario: {
-      xp: stats?.xp || usuario.xp || 0,
-      nivelUsuario: stats?.nivelUsuario || usuario.nivelUsuario || 1
+      xp: stats?.xp || usuario?.xp || 0,
+      nivelUsuario: stats?.nivelUsuario || parseInt(usuario?.nivel || '1') || 1
     },
-    xpProximoNivel: Math.pow((stats?.nivelUsuario || usuario.nivelUsuario || 1) + 1, 2) * 100,
-    progressoNivel: ((stats?.xp || usuario.xp || 0) - Math.pow(stats?.nivelUsuario || usuario.nivelUsuario || 1, 2) * 100) / (Math.pow((stats?.nivelUsuario || usuario.nivelUsuario || 1) + 1, 2) * 100 - Math.pow(stats?.nivelUsuario || usuario.nivelUsuario || 1, 2) * 100) * 100
+    xpProximoNivel: Math.pow((stats?.nivelUsuario || parseInt(usuario?.nivel || '1') || 1) + 1, 2) * 100,
+    progressoNivel: ((stats?.xp || usuario?.xp || 0) - Math.pow((stats?.nivelUsuario || parseInt(usuario?.nivel || '1') || 1), 2) * 100) / (Math.pow((stats?.nivelUsuario || parseInt(usuario?.nivel || '1') || 1) + 1, 2) * 100 - Math.pow((stats?.nivelUsuario || parseInt(usuario?.nivel || '1') || 1), 2) * 100) * 100
   }
 
   return (
@@ -244,7 +250,7 @@ export default function Perfil() {
                       <span className="text-sm text-gray-400">
                         ({xpData.usuario.xp} XP)
                       </span>
-                      {usuario.streakLogin > 0 && (
+                      {usuario.streakLogin && usuario.streakLogin > 0 && (
                         <span className="text-sm text-orange-400">
                           🔥 {usuario.streakLogin} dias
                         </span>
@@ -493,7 +499,7 @@ export default function Perfil() {
                             <p className="text-xs text-gray-400">Progresso</p>
                           </div>
                           <div>
-                            <p className="text-2xl font-bold text-orange-400">{usuario.streakLogin || 0}</p>
+                            <p className="text-2xl font-bold text-orange-400">{usuario.streakLogin ?? 0}</p>
                             <p className="text-xs text-gray-400">Dias Consecutivos</p>
                           </div>
                         </div>

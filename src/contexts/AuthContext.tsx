@@ -13,6 +13,8 @@ interface Usuario {
   xp: number
   pontuacao: number
   avatarUrl?: string
+  streakLogin?: number
+  dataCriacao?: string | number
   criador?: {
     id: string
     nome: string
