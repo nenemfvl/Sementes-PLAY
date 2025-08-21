@@ -32,6 +32,7 @@ import {
 interface Conteudo {
   id: string
   titulo: string
+  descricao?: string
   tipo: string
   categoria: string
   url: string
@@ -151,8 +152,10 @@ export default function PainelCriador() {
 
   const carregarDados = async () => {
     try {
-      // TODO: Implementar APIs reais
-      setConteudos([])
+      // Carregar conteúdos do criador
+      await carregarConteudos()
+      
+      // TODO: Implementar outras APIs reais
       setEstatisticas({
         totalDoacoes: 0,
         totalSementes: 0,
@@ -176,18 +179,75 @@ export default function PainelCriador() {
     }
   }
 
+  const carregarConteudos = async () => {
+    try {
+      if (!usuario?.criador?.id) return
+      
+      const response = await fetch(`/api/conteudos?criadorId=${usuario.criador.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setConteudos(data.dados)
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar conteúdos:', error)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
     
     try {
-      // TODO: Implementar API para salvar conteúdo
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      if (!usuario?.criador?.id) {
+        throw new Error('Usuário não é um criador válido')
+      }
+
       if (editando) {
-        setConteudos(prev => prev.map(c => c.id === editando.id ? { ...c, ...form } : c))
+        // Atualizar conteúdo existente
+        const response = await fetch('/api/conteudos', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editando.id,
+            titulo: form.titulo,
+            descricao: form.titulo, // Usar título como descrição por enquanto
+            tipo: form.tipo,
+            categoria: form.categoria,
+            url: form.url
+          })
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.sucesso) {
+            // Recarregar conteúdos para obter dados atualizados
+            await carregarConteudos()
+          }
+        }
       } else {
-        setConteudos(prev => [...prev, { id: Date.now().toString(), ...form, dataPublicacao: new Date().toISOString() }])
+        // Criar novo conteúdo
+        const response = await fetch('/api/conteudos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            criadorId: usuario.criador.id,
+            titulo: form.titulo,
+            descricao: form.titulo, // Usar título como descrição por enquanto
+            tipo: form.tipo,
+            categoria: form.categoria,
+            url: form.url
+          })
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.sucesso) {
+            // Recarregar conteúdos para obter dados atualizados
+            await carregarConteudos()
+          }
+        }
       }
       
       setForm({ titulo: '', url: '', tipo: '', categoria: '' })
@@ -202,14 +262,48 @@ export default function PainelCriador() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este conteúdo?')) {
-      setConteudos(prev => prev.filter(c => c.id !== id))
+      try {
+        const response = await fetch(`/api/conteudos?id=${id}`, {
+          method: 'DELETE'
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.sucesso) {
+            // Recarregar conteúdos para obter dados atualizados
+            await carregarConteudos()
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao excluir conteúdo:', error)
+      }
     }
   }
 
   const handleToggleFixado = async (id: string) => {
-    setConteudos(prev => prev.map(c => 
-      c.id === id ? { ...c, fixado: !c.fixado } : c
-    ))
+    try {
+      const conteudo = conteudos.find(c => c.id === id)
+      if (!conteudo) return
+
+      const response = await fetch('/api/conteudos', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          fixado: !conteudo.fixado
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          // Recarregar conteúdos para obter dados atualizados
+          await carregarConteudos()
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao alterar status fixado:', error)
+    }
   }
 
   const handleResponderRecado = async (id: string) => {
