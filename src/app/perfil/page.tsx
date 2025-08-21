@@ -26,12 +26,31 @@ export default function Perfil() {
   const [uploading, setUploading] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
+  // Função específica para Edge - sincronizar cookies e localStorage
+  const sincronizarEdge = () => {
+    if (navigator.userAgent.includes('Edg')) {
+      console.log('🌐 [PERFIL] Sincronizando Edge...')
+      const token = localStorage.getItem('auth-token')
+      if (token) {
+        try {
+          // Sincronizar cookie para Edge
+          document.cookie = `auth-token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`
+          console.log('🌐 [PERFIL] Cookie sincronizado para Edge')
+        } catch (error) {
+          console.log('🌐 [PERFIL] Erro ao sincronizar cookie:', error)
+        }
+      }
+    }
+  }
+
   useEffect(() => {
     console.log('🔍 [PERFIL] useEffect executado:', {
       authLoading,
       isAuthenticated,
       usuario: usuario ? { id: usuario.id, tipo: usuario.tipo, nivel: usuario.nivel } : null
     })
+    console.log('🌐 [PERFIL] User Agent:', navigator.userAgent)
+    console.log('🌐 [PERFIL] É Edge:', navigator.userAgent.includes('Edg'))
     
     if (!authLoading) {
       if (isAuthenticated && usuario) {
@@ -39,8 +58,33 @@ export default function Perfil() {
         setAvatarUrl(usuario.avatarUrl || null)
         carregarEstatisticas(usuario.id)
         setLoading(false)
+        
+        // Sincronizar Edge se necessário
+        sincronizarEdge()
       } else if (!isAuthenticated) {
         console.log('❌ [PERFIL] Usuário não autenticado, redirecionando para login...')
+        
+        // Verificação específica para Edge
+        if (navigator.userAgent.includes('Edg')) {
+          console.log('🌐 [PERFIL] Detectado Edge, verificando localStorage...')
+          const token = localStorage.getItem('auth-token')
+          const usuarioSalvo = localStorage.getItem('usuario-dados')
+          
+          if (token && usuarioSalvo) {
+            console.log('🌐 [PERFIL] Edge: Token e usuário encontrados no localStorage, tentando recuperar...')
+            try {
+              const dadosUsuario = JSON.parse(usuarioSalvo)
+              // Tentar recuperar autenticação para Edge
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
+              return
+            } catch (error) {
+              console.log('🌐 [PERFIL] Edge: Erro ao parsear usuário, redirecionando...')
+            }
+          }
+        }
+        
         // Redirecionar para login se não estiver autenticado
         window.location.href = '/login'
       } else {

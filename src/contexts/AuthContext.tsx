@@ -61,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Verificar se usuário está logado ao carregar - simples como no site antigo
   useEffect(() => {
     console.log('🔍 [AUTH] useEffect executado')
+    console.log('🌐 [AUTH] User Agent:', navigator.userAgent)
     
     const verificarAutenticacao = async () => {
       console.log('🔍 [AUTH] Verificando autenticação...')
@@ -80,13 +81,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           // Verificar se o token ainda é válido
           try {
-            const payload = JSON.parse(atob(token.split('.')[1]))
+            // Verificação específica para Edge - usar try-catch mais robusto
+            let payload
+            try {
+              // Tentar decodificar o token
+              const tokenParts = token.split('.')
+              if (tokenParts.length === 3) {
+                const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/')
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                  return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                }).join(''))
+                payload = JSON.parse(jsonPayload)
+              } else {
+                throw new Error('Token inválido')
+              }
+            } catch (decodeError) {
+              console.log('⚠️ [AUTH] Erro ao decodificar token, tentando método alternativo...')
+              // Método alternativo para Edge
+              payload = JSON.parse(atob(token.split('.')[1]))
+            }
+            
             const agora = Math.floor(Date.now() / 1000)
             
             if (payload.exp > agora) {
               console.log('✅ [AUTH] Token válido, usuário autenticado')
               setUsuario(dadosUsuario)
               setIsAuthenticated(true)
+              
+              // Sincronizar com cookies para Edge
+              try {
+                document.cookie = `auth-token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`
+                console.log('🍪 [AUTH] Cookie sincronizado para Edge')
+              } catch (cookieError) {
+                console.log('⚠️ [AUTH] Erro ao sincronizar cookie:', cookieError)
+              }
             } else {
               console.log('❌ [AUTH] Token expirado, removendo dados')
               localStorage.removeItem('usuario-dados')

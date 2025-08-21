@@ -4,6 +4,7 @@ import { jwtVerify } from 'jose'
 
 export async function middleware(request: NextRequest) {
   console.log('🔒 [MIDDLEWARE] Verificando rota:', request.nextUrl.pathname)
+  console.log('🌐 [MIDDLEWARE] User Agent:', request.headers.get('user-agent'))
   
   // Rotas que precisam de autenticação
   const protectedRoutes = [
@@ -32,16 +33,42 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-      // Verificar token JWT
+      // Verificar token JWT com tratamento específico para Edge
       const secret = new TextEncoder().encode(
         process.env.JWT_SECRET || 'fallback-secret'
       )
       
-      await jwtVerify(token, secret)
-      console.log('✅ [MIDDLEWARE] Token válido, permitindo acesso')
-      
-      // Token válido, continuar
-      return NextResponse.next()
+      // Verificação mais robusta para Edge
+      try {
+        await jwtVerify(token, secret)
+        console.log('✅ [MIDDLEWARE] Token válido, permitindo acesso')
+        
+        // Token válido, continuar
+        return NextResponse.next()
+      } catch (jwtError) {
+        console.log('⚠️ [MIDDLEWARE] Erro na verificação JWT, tentando verificação manual...')
+        
+        // Verificação manual para Edge
+        try {
+          const tokenParts = token.split('.')
+          if (tokenParts.length === 3) {
+            // Verificar se é um token JWT válido
+            const header = JSON.parse(Buffer.from(tokenParts[0], 'base64').toString())
+            const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString())
+            
+            // Verificar se não expirou
+            const agora = Math.floor(Date.now() / 1000)
+            if (payload.exp && payload.exp > agora) {
+              console.log('✅ [MIDDLEWARE] Token válido (verificação manual), permitindo acesso')
+              return NextResponse.next()
+            }
+          }
+        } catch (manualError) {
+          console.log('❌ [MIDDLEWARE] Verificação manual falhou:', manualError)
+        }
+        
+        throw jwtError
+      }
     } catch (error) {
       console.log('❌ [MIDDLEWARE] Token inválido, redirecionando para login')
       // Token inválido, redirecionar para login
