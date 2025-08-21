@@ -414,6 +414,11 @@ export default function CandidaturaCriadorPage() {
 
   // Debug: mostrar o que está acontecendo
   console.log('Estado atual:', { candidaturaExistente, candidaturaEnviada, loading, verificandoCandidatura })
+  
+  // Se candidaturaExistente for null, não deveria renderizar nada relacionado a candidatura existente
+  if (candidaturaExistente === null) {
+    console.log('candidaturaExistente é null, renderizando formulário normal')
+  }
 
   return (
     <div className="min-h-screen bg-sss-dark">
