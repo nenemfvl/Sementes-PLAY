@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { uploadAvatar, deleteImage } from '@/lib/cloudinary'
 
 const prisma = new PrismaClient()
 
@@ -32,13 +33,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Converter arquivo para base64 para armazenamento temporário
-    // Em produção, você deve usar um serviço como Cloudinary, AWS S3, etc.
-    const bytes = await avatar.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const base64 = buffer.toString('base64')
-    const mimeType = avatar.type
-    const avatarUrl = `data:${mimeType};base64,${base64}`
+    // Buscar usuário atual para verificar se já tem avatar
+    const usuarioAtual = await prisma.usuario.findUnique({
+      where: { id: usuarioId },
+      select: { avatarUrl: true }
+    })
+
+    // Se já tem avatar, deletar o anterior do Cloudinary
+    if (usuarioAtual?.avatarUrl && usuarioAtual.avatarUrl.includes('cloudinary.com')) {
+      try {
+        // Extrair public_id da URL do Cloudinary
+        const urlParts = usuarioAtual.avatarUrl.split('/')
+        const publicId = urlParts[urlParts.length - 1].split('.')[0]
+        await deleteImage(publicId)
+      } catch (error) {
+        console.warn('Erro ao deletar avatar anterior:', error)
+        // Continuar mesmo se falhar ao deletar
+      }
+    }
+
+    // Upload para o Cloudinary usando a função otimizada
+    const { url: avatarUrl, publicId } = await uploadAvatar(avatar, usuarioId)
 
     // Atualizar o usuário no banco de dados
     await prisma.usuario.update({
@@ -49,6 +64,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       avatarUrl,
+      publicId,
       message: 'Avatar atualizado com sucesso'
     })
 
