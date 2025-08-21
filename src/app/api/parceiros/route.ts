@@ -7,46 +7,27 @@ const prisma = new PrismaClient()
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const nivel = searchParams.get('nivel')
-    const categoria = searchParams.get('categoria')
     const limite = parseInt(searchParams.get('limite') || '50')
 
-    const where: any = {}
-    
-    // Filtrar por nível
-    if (nivel && nivel !== 'todos') {
-      where.nivel = nivel
-    }
-    
-    // Filtrar por categoria
-    if (categoria && categoria !== 'todos') {
-      where.categoria = categoria
-    }
-
     const parceiros = await prisma.parceiro.findMany({
-             where: {
-         ...where
-       },
       include: {
         usuario: {
           select: {
             id: true,
             nome: true,
             email: true,
-            avatarUrl: true,
-            estado: true,
-            cidade: true
+            avatarUrl: true
           }
         },
         carteira: {
           select: {
-            saldoSementes: true
+            saldo: true
           }
         }
       },
       orderBy: [
-        { nivel: 'desc' },
-        { sementes: 'desc' }
+        { totalVendas: 'desc' },
+        { comissaoMensal: 'desc' }
       ],
       take: limite
     })
@@ -57,15 +38,21 @@ export async function GET(request: NextRequest) {
       nome: parceiro.usuario.nome,
       email: parceiro.usuario.email,
       avatarUrl: parceiro.usuario.avatarUrl,
-      nivel: parceiro.nivel,
-      categoria: parceiro.categoria,
-      estado: parceiro.usuario.estado || 'Não informado',
-      cidade: parceiro.usuario.cidade || 'Não informado',
-      sementes: parceiro.sementes,
-      saldoCarteira: parceiro.carteira?.saldoSementes || 0,
-      descricao: parceiro.descricao || '',
-      website: parceiro.website || '',
-      redesSociais: parceiro.redesSociais || {}
+      nivel: parceiro.comissaoMensal.toString(),
+      categoria: parceiro.nomeCidade,
+      estado: 'Não informado', // Campo não existe no schema
+      cidade: parceiro.nomeCidade,
+      sementes: parceiro.totalVendas,
+      saldoCarteira: parceiro.carteira?.saldo || 0,
+      descricao: '',
+      website: parceiro.urlConnect || '',
+      redesSociais: {
+        instagram: parceiro.instagram || '',
+        tiktok: parceiro.tiktok || '',
+        twitch: parceiro.twitch || '',
+        youtube: parceiro.youtube || '',
+        discord: parceiro.discord || ''
+      }
     }))
 
     return NextResponse.json({
