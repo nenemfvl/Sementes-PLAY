@@ -124,8 +124,20 @@ export async function PUT(request: NextRequest) {
       }
     })
 
-    // Se aprovada, criar o criador
+    // Se aprovada, verificar se já não existe criador ativo
     if (status === 'aprovada') {
+      const criadorExistente = await prisma.criador.findFirst({
+        where: { usuarioId: candidatura.usuarioId }
+      })
+
+      if (criadorExistente) {
+        return NextResponse.json(
+          { error: 'Este usuário já é um criador ativo. Não é possível aprovar nova candidatura.' },
+          { status: 400 }
+        )
+      }
+
+      // Criar o criador
       await prisma.criador.create({
         data: {
           usuarioId: candidatura.usuarioId,

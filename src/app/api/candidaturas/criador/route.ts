@@ -70,22 +70,24 @@ export async function POST(request: NextRequest) {
 
     if (criadorExistente) {
       return NextResponse.json(
-        { error: 'Você já é um criador aprovado' },
+        { error: 'Você já é um criador aprovado. Não é possível fazer nova candidatura.' },
         { status: 400 }
       )
     }
 
-    // Verificar se já existe candidatura pendente
+    // Verificar se já existe candidatura pendente ou aprovada
     const candidaturaExistente = await prisma.candidaturaCriador.findFirst({
       where: {
         usuarioId: user.id,
-        status: 'pendente'
+        status: {
+          in: ['pendente', 'aprovada']
+        }
       }
     })
 
     if (candidaturaExistente) {
       return NextResponse.json(
-        { error: 'Você já possui uma candidatura pendente' },
+        { error: 'Você já possui uma candidatura pendente ou aprovada. Não é possível fazer nova candidatura.' },
         { status: 400 }
       )
     }

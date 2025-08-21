@@ -11,6 +11,7 @@ import {
   HeartIcon
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface DadosCiclo {
   ciclo: number
@@ -75,6 +76,7 @@ export default function CriadoresPage() {
   const [usuario, setUsuario] = useState<any>(null)
   const [statusCandidatura, setStatusCandidatura] = useState<string | null>(null)
   const [verificandoStatus, setVerificandoStatus] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     verificarUsuario()
@@ -263,13 +265,13 @@ export default function CriadoresPage() {
                       Acessar Painel Criador
                     </Link>
                   ) : statusCandidatura === 'rejeitada' ? (
-                    <Link
-                      href="/candidatura-criador"
-                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-red-600/25 transition-all duration-300 hover:scale-105 transform"
+                    <button
+                      onClick={() => router.push('/candidatura-criador')}
+                      className="inline-flex items-center justify-center px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-red-600/25 transition-all duration-300 hover:scale-105 transform"
                     >
                       <UserGroupIcon className="w-6 h-6 mr-3" />
                       Nova Candidatura
-                    </Link>
+                    </button>
                   ) : (
                     <Link
                       href="/candidatura-criador"
