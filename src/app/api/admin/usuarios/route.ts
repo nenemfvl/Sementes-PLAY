@@ -67,13 +67,13 @@ export async function GET(request: NextRequest) {
           parceiro: {
             select: {
               id: true,
-              categoria: true,
-              nivel: true
+              nomeCidade: true,
+              totalVendas: true
             }
           },
           carteira: {
             select: {
-              sementes: true
+              saldo: true
             }
           }
         },
@@ -96,10 +96,10 @@ export async function GET(request: NextRequest) {
             usuario.parceiro ? 'parceiro' : 
             usuario.nivel >= 5 ? 'admin' : 'usuario',
       nivel: usuario.nivel.toString(),
-      sementes: usuario.carteira?.sementes || 0,
+      sementes: usuario.carteira?.saldo || 0,
       pontuacao: 0, // TODO: Implementar sistema de pontuação
       dataCriacao: usuario.dataCriacao,
-      status: usuario.status || 'ativo'
+      status: usuario.suspenso ? 'suspenso' : 'ativo'
     }))
 
     return NextResponse.json({
@@ -142,7 +142,7 @@ export async function PATCH(request: NextRequest) {
     const updateData: any = {}
     
     if (nivel !== undefined) updateData.nivel = parseInt(nivel)
-    if (status !== undefined) updateData.status = status
+    if (status !== undefined) updateData.suspenso = status === 'suspenso'
 
     const usuario = await prisma.usuario.update({
       where: { id },
