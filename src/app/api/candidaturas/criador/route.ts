@@ -3,54 +3,89 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+// POST - Criar candidatura para criador
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
-      usuarioId,
       nome,
       email,
       bio,
-      categoria,
       redesSociais,
       portfolio,
       experiencia,
       motivacao,
       metas,
-      disponibilidade
+      disponibilidade,
+      usuarioId
     } = body
 
-    // Validação básica
-    if (!usuarioId || !nome || !email || !bio || !categoria || !experiencia || !motivacao || !metas || !disponibilidade) {
+    // Verificar se o usuário existe
+    const user = await prisma.usuario.findUnique({
+      where: { id: usuarioId }
+    })
+
+    if (!user) {
       return NextResponse.json(
-        { error: 'Todos os campos obrigatórios devem ser preenchidos' },
+        { error: 'Usuário não encontrado' },
+        { status: 401 }
+      )
+    }
+
+    // Validações básicas
+    if (!nome || !email || !bio) {
+      return NextResponse.json(
+        { error: 'Campos obrigatórios não preenchidos' },
         { status: 400 }
       )
     }
 
-    // Verificar se o usuário já tem uma candidatura pendente
+    if (bio.length < 50) {
+      return NextResponse.json(
+        { error: 'Biografia deve ter pelo menos 50 caracteres' },
+        { status: 400 }
+      )
+    }
+
+    if (experiencia.length < 30) {
+      return NextResponse.json(
+        { error: 'Experiência deve ter pelo menos 30 caracteres' },
+        { status: 400 }
+      )
+    }
+
+    if (motivacao.length < 30) {
+      return NextResponse.json(
+        { error: 'Motivação deve ter pelo menos 30 caracteres' },
+        { status: 400 }
+      )
+    }
+
+    // Verificar se já existe candidatura pendente
     const candidaturaExistente = await prisma.candidaturaCriador.findFirst({
       where: {
-        usuarioId,
+        usuarioId: user.id,
         status: 'pendente'
       }
     })
 
     if (candidaturaExistente) {
       return NextResponse.json(
-        { error: 'Você já possui uma candidatura pendente. Aguarde a análise da equipe.' },
+        { error: 'Você já possui uma candidatura pendente' },
         { status: 400 }
       )
     }
 
-    // Verificar se o usuário já é um criador
-    const criadorExistente = await prisma.criador.findUnique({
-      where: { usuarioId }
+    // Verificar se já é criador
+    const criadorExistente = await prisma.criador.findFirst({
+      where: {
+        usuarioId: user.id
+      }
     })
 
     if (criadorExistente) {
       return NextResponse.json(
-        { error: 'Você já é um criador na plataforma.' },
+        { error: 'Você já é um criador aprovado' },
         { status: 400 }
       )
     }
@@ -58,11 +93,11 @@ export async function POST(request: NextRequest) {
     // Criar candidatura
     const candidatura = await prisma.candidaturaCriador.create({
       data: {
-        usuarioId,
+        usuarioId: user.id,
         nome,
         email,
         bio,
-        categoria,
+        categoria: 'Streamer', // Categoria padrão
         redesSociais: JSON.stringify(redesSociais),
         portfolio: JSON.stringify(portfolio),
         experiencia,
@@ -74,28 +109,34 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Log de auditoria
-    await prisma.logAuditoria.create({
-      data: {
-        usuarioId,
-        acao: 'CANDIDATURA_CRIADOR',
-        detalhes: `Nova candidatura de criador criada: ${nome} - ${categoria}`,
-        nivel: 'info'
-      }
-    })
+    // Log da ação
+    try {
+      await prisma.logAuditoria.create({
+        data: {
+          usuarioId: user.id,
+          acao: 'CANDIDATURA_CRIADOR',
+          detalhes: `Candidatura criada com ID: ${candidatura.id}`,
+          nivel: 'info'
+        }
+      })
+    } catch (logError) {
+      console.error('Erro ao criar log de auditoria:', logError)
+    }
 
     return NextResponse.json({
       sucesso: true,
       mensagem: 'Candidatura enviada com sucesso!',
-      candidaturaId: candidatura.id
+      dados: candidatura
     })
 
   } catch (error) {
-    console.error('Erro ao processar candidatura:', error)
+    console.error('Erro ao criar candidatura:', error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor. Tente novamente.' },
+      { error: 'Erro interno do servidor' },
       { status: 500 }
     )
+  } finally {
+    await prisma.$disconnect()
   }
 }
 
