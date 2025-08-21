@@ -7,6 +7,7 @@ const prisma = new PrismaClient()
 export async function GET(request: NextRequest) {
   try {
     // Buscar todas as candidaturas com informações do usuário
+    // EXCLUIR candidaturas aprovadas de usuários que foram removidos (não são mais criadores)
     const candidaturas = await prisma.candidaturaCriador.findMany({
       include: {
         usuario: {
@@ -22,8 +23,29 @@ export async function GET(request: NextRequest) {
       orderBy: { dataCandidatura: 'desc' }
     })
 
+    // Filtrar candidaturas aprovadas que não são mais criadores ativos
+    const candidaturasFiltradas = []
+    
+    for (const candidatura of candidaturas) {
+      // Se a candidatura não é aprovada, incluir normalmente
+      if (candidatura.status !== 'aprovada') {
+        candidaturasFiltradas.push(candidatura)
+        continue
+      }
+      
+      // Se é aprovada, verificar se o usuário ainda é criador ativo
+      const criadorAtivo = await prisma.criador.findFirst({
+        where: { usuarioId: candidatura.usuarioId }
+      })
+      
+      // Incluir apenas se o criador ainda estiver ativo
+      if (criadorAtivo) {
+        candidaturasFiltradas.push(candidatura)
+      }
+    }
+
     // Formatar os dados para retornar
-    const candidaturasFormatadas = candidaturas.map(candidatura => ({
+    const candidaturasFormatadas = candidaturasFiltradas.map(candidatura => ({
       id: candidatura.id,
       usuarioId: candidatura.usuarioId,
       nome: candidatura.nome,
