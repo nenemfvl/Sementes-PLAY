@@ -31,7 +31,8 @@ export default function DadosBancariosPage() {
     chavePix: '',
     tipoChave: 'cpf',
     nomeTitular: '',
-    cpfCnpj: ''
+    cpfCnpj: '',
+    validado: false
   })
   const [notificacao, setNotificacao] = useState<{ tipo: 'sucesso' | 'erro' | 'info', mensagem: string } | null>(null)
 
