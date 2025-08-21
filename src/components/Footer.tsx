@@ -29,11 +29,6 @@ export default function Footer() {
             className="text-gray-400 hover:text-sementes-accent" 
             target="_blank" 
             rel="noopener noreferrer"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              window.open('https://www.tiktok.com/@sementesplay', '_blank', 'noopener,noreferrer');
-            }}
           >
             <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12.75 2v14.25a2.25 2.25 0 1 1-2.25-2.25h.75V12h-.75a4.5 4.5 0 1 0 4.5 4.5V7.5a5.25 5.25 0 0 0 5.25 5.25V9.75A3.75 3.75 0 0 1 16.5 6V2h-3.75z"/>
