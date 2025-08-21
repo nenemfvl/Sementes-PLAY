@@ -57,9 +57,9 @@ export async function GET(request: NextRequest) {
            dataCriacao: { gte: trintaDiasAtras }
          }
        }),
-      prisma.conteudo.count({
-        where: { dataCriacao: { gte: trintaDiasAtras } }
-      }),
+             prisma.conteudo.count({
+         where: { dataPublicacao: { gte: trintaDiasAtras } }
+       }),
       prisma.saque.count({
         where: { dataSolicitacao: { gte: trintaDiasAtras } }
       })
