@@ -195,8 +195,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUsuario(data.usuario)
       setIsAuthenticated(true)
       
-      // Redirecionar para dashboard
-      router.push('/dashboard')
+              // Redirecionar para perfil
+        router.push('/perfil')
       
     } catch (error) {
       throw error

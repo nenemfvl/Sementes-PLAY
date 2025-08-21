@@ -144,7 +144,7 @@ export default function PainelParceiroPage() {
             carregarDados()
           } else {
             // Não é parceiro, redirecionar
-            window.location.href = '/dashboard'
+            window.location.href = '/perfil'
           }
         } catch (error) {
           console.error('Erro ao ler dados do usuário:', error)

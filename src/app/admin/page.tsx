@@ -64,7 +64,7 @@ export default function AdminPage() {
           } else {
             console.log('❌ [ADMIN] Usuário não é admin, redirecionando...')
             // Não é admin, redirecionar
-            window.location.href = '/dashboard'
+            window.location.href = '/perfil'
           }
         } catch (error) {
           console.error('❌ [ADMIN] Erro ao parsear usuário:', error)

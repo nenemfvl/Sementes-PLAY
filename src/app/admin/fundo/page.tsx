@@ -65,7 +65,7 @@ export default function AdminFundoPage() {
             carregarFundo()
           } else {
             // Não é admin, redirecionar
-            window.location.href = '/dashboard'
+            window.location.href = '/perfil'
           }
         } catch (error) {
           console.error('Erro ao ler dados do usuário:', error)

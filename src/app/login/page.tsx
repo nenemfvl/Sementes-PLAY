@@ -38,8 +38,8 @@ export default function LoginPage() {
       localStorage.setItem('usuario-dados', JSON.stringify(data.usuario))
       localStorage.setItem('auth-token', data.token)
       
-      // Redirecionar para dashboard
-      window.location.href = '/dashboard'
+              // Redirecionar para perfil
+        window.location.href = '/perfil'
     } catch (error) {
       throw error
     }

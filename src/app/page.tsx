@@ -132,9 +132,9 @@ export default function Home() {
                       <PlayIcon className="w-5 h-5 mr-2" />
                       Solicitar Cashback
                     </Link>
-                    <Link href="/dashboard" className="btn-secondary">
+                    <Link href="/perfil" className="btn-secondary">
                       <UserGroupIcon className="w-5 h-5 mr-2" />
-                      Meu Dashboard
+                      Meu Perfil
                     </Link>
                   </>
                 ) : (
