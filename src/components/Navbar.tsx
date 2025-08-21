@@ -27,6 +27,7 @@ export default function Navbar() {
   const [usuario, setUsuario] = React.useState<any>(null)
   const [isAuthenticated, setIsAuthenticated] = React.useState(false)
   const [loading, setLoading] = React.useState(true)
+  const [statusCandidatura, setStatusCandidatura] = React.useState<string | null>(null)
 
   // Verificar autenticação ao carregar
   React.useEffect(() => {
@@ -38,6 +39,9 @@ export default function Navbar() {
           const dadosUsuario = JSON.parse(usuarioSalvo)
           setUsuario(dadosUsuario)
           setIsAuthenticated(true)
+          
+          // Verificar status da candidatura para determinar se é criador
+          verificarStatusCandidatura(dadosUsuario.id)
         } catch (error) {
           console.error('Erro ao ler dados do usuário:', error)
           localStorage.removeItem('usuario-dados')
@@ -53,6 +57,24 @@ export default function Navbar() {
     
     verificarAutenticacao()
   }, [])
+
+  const verificarStatusCandidatura = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/candidaturas/criador/status?usuarioId=${userId}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setStatusCandidatura(data.dados.status)
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status da candidatura:', error)
+    }
+  }
+
+  const isCriador = () => {
+    return statusCandidatura === 'criador_aprovado' || statusCandidatura === 'aprovada'
+  }
 
   const handleProfileClick = () => {
     setShowProfileMenu(!showProfileMenu)
@@ -80,11 +102,6 @@ export default function Navbar() {
       return pathname === '/'
     }
     return pathname.startsWith(path)
-  }
-
-  const isCriador = (nivel: string | number) => {
-    const niveisCriador = ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
-    return niveisCriador.includes(String(nivel))
   }
 
   return (
@@ -144,7 +161,7 @@ export default function Navbar() {
              </Link>
                          
                          {/* Painel Criador - Apenas para usuários com níveis de criador */}
-                         {isAuthenticated && usuario && isCriador(usuario.nivel) && (
+                         {isAuthenticated && usuario && isCriador() && (
                            <Link 
                              href="/painel-criador" 
                              className={`transition-colors ${
@@ -384,7 +401,7 @@ export default function Navbar() {
               </Link>
               
               {/* Painel Criador Mobile - Apenas para usuários com níveis de criador */}
-              {isAuthenticated && usuario && isCriador(usuario.nivel) && (
+              {isAuthenticated && usuario && isCriador() && (
                 <Link 
                   href="/painel-criador" 
                   className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"

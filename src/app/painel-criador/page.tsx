@@ -118,38 +118,45 @@ export default function PainelCriador() {
   const [formEnquete, setFormEnquete] = useState({ pergunta: '', opcoes: ['', ''], dataFim: '' })
 
   useEffect(() => {
-    const verificarAutenticacao = () => {
+    const verificarAutenticacao = async () => {
       const usuarioSalvo = localStorage.getItem('usuario-dados')
       if (usuarioSalvo) {
         try {
           const dadosUsuario = JSON.parse(usuarioSalvo)
-          // Verificar se é um criador
-          if (dadosUsuario.nivel && ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo'].includes(dadosUsuario.nivel)) {
-            setUsuario(dadosUsuario)
-            setIsAuthenticated(true)
-            // Carregar dados após autenticação
-            carregarDados()
+          setUsuario(dadosUsuario)
+          
+          // Verificar se é realmente um criador aprovado usando a API
+          const response = await fetch(`/api/candidaturas/criador/status?usuarioId=${dadosUsuario.id}`)
+          if (response.ok) {
+            const data = await response.json()
+            if (data.sucesso && (data.dados.status === 'criador_aprovado' || data.dados.status === 'aprovada')) {
+              setIsAuthenticated(true)
+              // Carregar dados após autenticação
+              carregarDados()
+            } else {
+              // Não é criador aprovado, redirecionar
+              router.push('/candidatura-criador')
+              return
+            }
           } else {
-            // Não é criador, redirecionar
-            window.location.href = '/dashboard'
+            // Erro na API, redirecionar
+            router.push('/candidatura-criador')
+            return
           }
         } catch (error) {
-          console.error('Erro ao ler dados do usuário:', error)
+          console.error('Erro ao verificar dados do usuário:', error)
           localStorage.removeItem('usuario-dados')
-          window.location.href = '/login'
+          router.push('/login')
+          return
         }
       } else {
-        window.location.href = '/login'
+        router.push('/login')
+        return
       }
       setLoading(false)
     }
     verificarAutenticacao()
-  }, [])
-
-  const isCriador = (nivel: string | number) => {
-    const niveisCriador = ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
-    return niveisCriador.includes(String(nivel))
-  }
+  }, [router])
 
   const carregarDados = async () => {
     try {
