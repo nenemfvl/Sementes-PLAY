@@ -142,6 +142,7 @@ Para suporte, entre em contato através de:
 - [x] Estrutura base do projeto
 - [x] Componentes principais (Navbar, Footer)
 - [x] Página inicial
+- [x] Página de doação para criadores
 - [x] Schema do banco de dados
 - [x] Configurações de deploy
 - [ ] Sistema de autenticação
