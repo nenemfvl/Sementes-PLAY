@@ -66,6 +66,57 @@ export default function Perfil() {
     }
   }
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, selecione apenas arquivos de imagem.')
+      return
+    }
+
+    // Validar tamanho (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('A imagem deve ter no máximo 5MB.')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('avatar', file)
+      formData.append('usuarioId', usuario.id)
+
+      const response = await fetch('/api/usuario/avatar', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Erro ao fazer upload da imagem')
+      }
+
+      const data = await response.json()
+      
+      // Atualizar o avatar na interface
+      setAvatarUrl(data.avatarUrl)
+      
+      // Atualizar o usuário no localStorage
+      const usuarioAtualizado = { ...usuario, avatarUrl: data.avatarUrl }
+      localStorage.setItem('usuario-dados', JSON.stringify(usuarioAtualizado))
+      
+      alert('Avatar atualizado com sucesso!')
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error)
+      alert('Erro ao fazer upload da imagem. Tente novamente.')
+    } finally {
+      setUploading(false)
+      // Limpar o input
+      e.target.value = ''
+    }
+  }
+
   const atualizarEstatisticas = async () => {
     if (!usuario) return
     
@@ -167,6 +218,7 @@ export default function Perfil() {
                     className="hidden"
                     disabled={uploading}
                     aria-label="Upload de avatar"
+                    onChange={handleAvatarChange}
                   />
                 </label>
                 {uploading && (
