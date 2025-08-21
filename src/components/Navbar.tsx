@@ -9,18 +9,13 @@ import {
   ChevronDownIcon,
   ArrowLeftOnRectangleIcon,
   UserIcon,
-  HeartIcon,
-  CurrencyDollarIcon,
-  ChartBarIcon,
-  CogIcon,
-  BellIcon,
 } from '@heroicons/react/24/outline'
-
 
 export default function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const [showProfileMenu, setShowProfileMenu] = React.useState(false)
+  const [showSocials, setShowSocials] = React.useState(false)
   const [showMobileMenu, setShowMobileMenu] = React.useState(false)
 
   // Verificação direta no localStorage como no site antigo
@@ -76,8 +71,23 @@ export default function Navbar() {
     return statusCandidatura === 'criador_aprovado' || statusCandidatura === 'aprovada'
   }
 
+  // Fechar dropdowns quando clicar fora (igual ao site antigo)
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      if (!target.closest('.profile-menu') && !target.closest('.socials-menu')) {
+        setShowProfileMenu(false)
+        setShowSocials(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const handleProfileClick = () => {
     setShowProfileMenu(!showProfileMenu)
+    setShowSocials(false) // Fechar outros dropdowns
   }
 
   const handleMenuItemClick = (path: string) => {
@@ -105,338 +115,234 @@ export default function Navbar() {
   }
 
   return (
-    <header className="bg-black shadow-lg border-b border-gray-700 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <span className="text-3xl">🌱</span>
-            <span className="text-xl font-bold text-sementes-primary group-hover:text-sementes-accent transition-colors">
-              SementesPLAY
-            </span>
-          </Link>
+    <>
+      <header className="bg-black shadow-lg border-b border-gray-700 sticky top-0 z-50 relative">
+        {/* Logo e nome colados à esquerda como botão para o topo */}
+        <button
+          className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 px-6 focus:outline-none bg-transparent border-none cursor-pointer"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Ir para o topo"
+        >
+          <span className="text-2xl text-sementes-accent">🌱</span>
+          <span className="text-xl font-bold text-sementes-accent">SementesPLAY</span>
+        </button>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-                         <Link 
-               href="/" 
-               className={`transition-colors ${
-                 isActiveLink('/') 
-                   ? 'text-sementes-primary font-semibold' 
-                   : 'text-gray-300 hover:text-sementes-primary'
-               }`}
-             >
-               Início
-             </Link>
-                         <Link 
-               href="/criadores" 
-               className={`transition-colors ${
-                 isActiveLink('/criadores') 
-                   ? 'text-sementes-primary font-semibold' 
-                   : 'text-gray-300 hover:text-sementes-primary'
-               }`}
-             >
-               Criadores
-             </Link>
-                         <Link 
-               href="/parceiros" 
-               className={`transition-colors ${
-                 isActiveLink('/parceiros') 
-                   ? 'text-sementes-primary font-semibold' 
-                   : 'text-gray-300 hover:text-sementes-primary'
-               }`}
-             >
-               Parceiros
-             </Link>
-
-                         <Link 
-               href="/ranking" 
-               className={`transition-colors ${
-                 isActiveLink('/ranking') 
-                   ? 'text-sementes-primary font-semibold' 
-                   : 'text-gray-300 hover:text-sementes-primary'
-               }`}
-             >
-               Ranking
-             </Link>
-                         
-                         {/* Painel Criador - Apenas para usuários com níveis de criador */}
-                         {isAuthenticated && usuario && isCriador() && (
-                           <Link 
-                             href="/painel-criador" 
-                             className={`transition-colors ${
-                               isActiveLink('/painel-criador') 
-                                 ? 'text-sementes-primary font-semibold' 
-                                 : 'text-gray-300 hover:text-sementes-primary'
-                             }`}
-                           >
-                             Painel Criador
-                           </Link>
-                         )}
-                         
-                         {/* Painel Parceiro - Apenas para usuários com nível parceiro */}
-                         {isAuthenticated && usuario && usuario.nivel === 'parceiro' && (
-                           <Link 
-                             href="/painel-parceiro" 
-                             className={`transition-colors ${
-                               isActiveLink('/painel-parceiro') 
-                                 ? 'text-sementes-primary font-semibold' 
-                                 : 'text-gray-300 hover:text-sementes-primary'
-                             }`}
-                           >
-                             Painel Parceiro
-                           </Link>
-                         )}
-                         
-                         {/* Admin Link - Apenas para usuários com nível 5+ */}
-                         {isAuthenticated && usuario && Number(usuario.nivel) >= 5 && (
-                           <Link 
-                             href="/admin" 
-                             className={`transition-colors ${
-                               isActiveLink('/admin') 
-                                 ? 'text-sementes-primary font-semibold' 
-                                 : 'text-gray-300 hover:text-sementes-primary'
-                             }`}
-                           >
-                             Admin
-                           </Link>
-                         )}
-                         
-          </nav>
-
-          {/* User Menu */}
-          <div className="flex items-center space-x-4">
-            {/* Notifications */}
-            <button className="p-2 text-gray-400 hover:text-sementes-primary transition-colors relative">
-              <BellIcon className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-            </button>
-
-            {/* User Profile */}
-            <div className="relative">
-              {isAuthenticated && usuario ? (
-                <button
-                  onClick={handleProfileClick}
-                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  {usuario.avatarUrl ? (
-                    <img 
-                      src={usuario.avatarUrl} 
-                      alt={usuario.nome} 
-                      className="w-8 h-8 rounded-full"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 bg-sementes-primary rounded-full flex items-center justify-center">
-                      <UserIcon className="w-5 h-5 text-white" />
-                    </div>
-                  )}
-                  <span className="text-gray-300 hidden sm:block">
-                    {loading ? 'Carregando...' : usuario.nome}
-                  </span>
-                  <ChevronDownIcon className="w-4 h-4 text-gray-400" />
-                </button>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  <Link
-                    href="/login"
-                    className="text-gray-300 hover:text-sementes-primary transition-colors"
-                  >
-                    Entrar
-                  </Link>
-                  <Link
-                    href="/registro"
-                    className="bg-sementes-primary hover:bg-sementes-secondary text-white px-4 py-2 rounded-lg transition-colors"
-                  >
-                    Registrar
-                  </Link>
-                </div>
-              )}
-
-              {/* Profile Dropdown */}
-              {showProfileMenu && isAuthenticated && usuario && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 mt-2 w-64 bg-sss-dark border border-gray-700 rounded-lg shadow-lg py-2"
-                >
-                  {/* User Info */}
-                  <div className="px-4 py-3 border-b border-gray-700">
-                    <div className="flex items-center space-x-3">
-                      {usuario.avatarUrl ? (
-                        <img 
-                          src={usuario.avatarUrl} 
-                          alt={usuario.nome} 
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 bg-sementes-primary rounded-full flex items-center justify-center">
-                          <UserIcon className="w-6 h-6 text-white" />
-                        </div>
-                      )}
-                      <div>
-                        <div className="text-white font-medium">{usuario.nome}</div>
-                        <div className="text-sm text-gray-400">{usuario.email}</div>
-                        <div className="text-sm text-sementes-accent">
-                          {usuario.sementes} Sementes
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Menu Items */}
-                  <div className="py-2">
-                    <button
-                      onClick={() => handleMenuItemClick('/dashboard')}
-                      className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
-                    >
-                      <UserIcon className="w-5 h-5" />
-                      <span>Meu Perfil</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handleMenuItemClick('/carteira')}
-                      className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
-                    >
-                      <CurrencyDollarIcon className="w-5 h-5" />
-                      <span>Minha Carteira</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handleMenuItemClick('/doacoes')}
-                      className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
-                    >
-                      <HeartIcon className="w-5 h-5" />
-                      <span>Minhas Doações</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handleMenuItemClick('/relatorios')}
-                      className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
-                    >
-                      <ChartBarIcon className="w-5 h-5" />
-                      <span>Relatórios</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handleMenuItemClick('/cashback')}
-                      className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
-                    >
-                      <CurrencyDollarIcon className="w-5 h-5" />
-                      <span>Cashback</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handleMenuItemClick('/configuracoes')}
-                      className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
-                    >
-                      <CogIcon className="w-5 h-5" />
-                      <span>Configurações</span>
-                    </button>
-                  </div>
-
-                  {/* Logout */}
-                  <div className="border-t border-gray-700 pt-2">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center space-x-3"
-                    >
-                      <ArrowLeftOnRectangleIcon className="w-5 h-5" />
-                      <span>Sair</span>
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="md:hidden p-2 text-gray-400 hover:text-sementes-primary transition-colors"
+        {/* Navegação central */}
+        <div className="flex justify-center items-center py-6">
+          <nav className="flex-1 flex justify-center hidden md:flex space-x-8">
+            <Link 
+              href="/" 
+              className={`transition-colors ${
+                isActiveLink('/') 
+                  ? 'text-sementes-accent font-bold' 
+                  : 'text-gray-300 hover:text-sementes-accent'
+              }`}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
+              Início
+            </Link>
+            <Link 
+              href="/criadores" 
+              className={`transition-colors ${
+                isActiveLink('/criadores') 
+                  ? 'text-sementes-accent font-bold' 
+                  : 'text-gray-300 hover:text-sementes-accent'
+              }`}
+            >
+              Criadores
+            </Link>
+            <Link 
+              href="/parceiros" 
+              className={`transition-colors ${
+                isActiveLink('/parceiros') 
+                  ? 'text-sementes-accent font-bold' 
+                  : 'text-gray-300 hover:text-sementes-accent'
+              }`}
+            >
+              Parceiros
+            </Link>
+            <Link 
+              href="/ranking" 
+              className={`transition-colors ${
+                isActiveLink('/ranking') 
+                  ? 'text-sementes-accent font-bold' 
+                  : 'text-gray-300 hover:text-sementes-accent'
+              }`}
+            >
+              Ranking
+            </Link>
+            
+            {/* Painel Criador - Apenas para usuários com níveis de criador */}
+            {isAuthenticated && usuario && isCriador() && (
+              <Link 
+                href="/painel-criador" 
+                className={`transition-colors ${
+                  isActiveLink('/painel-criador') 
+                    ? 'text-sementes-accent font-bold' 
+                    : 'text-gray-300 hover:text-sementes-accent'
+                }`}
+              >
+                Painel Criador
+              </Link>
+            )}
+            
+            {/* Painel Parceiro - Apenas para usuários com nível parceiro */}
+            {isAuthenticated && usuario && usuario.nivel === 'parceiro' && (
+              <Link 
+                href="/painel-parceiro" 
+                className={`transition-colors ${
+                  isActiveLink('/painel-parceiro') 
+                    ? 'text-sementes-accent font-bold' 
+                    : 'text-gray-300 hover:text-sementes-accent'
+                }`}
+              >
+                Painel Parceiro
+              </Link>
+            )}
+            
+            {/* Admin Link - Apenas para usuários com nível 5+ */}
+            {isAuthenticated && usuario && Number(usuario.nivel) >= 5 && (
+              <Link 
+                href="/admin" 
+                className={`transition-colors ${
+                  isActiveLink('/admin') 
+                    ? 'text-sementes-accent font-bold' 
+                    : 'text-gray-300 hover:text-sementes-accent'
+                }`}
+              >
+                Painel Admin
+              </Link>
+            )}
+          </nav>
         </div>
 
-        {/* Mobile Menu */}
-        {showMobileMenu && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-gray-700 py-4"
-          >
-            <nav className="flex flex-col space-y-2">
-              <Link 
-                href="/" 
-                className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Início
-              </Link>
-              <Link 
-                href="/criadores" 
-                className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Criadores
-              </Link>
-              <Link 
-                href="/parceiros" 
-                className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Parceiros
-              </Link>
-
-              <Link 
-                href="/ranking" 
-                className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Ranking
-              </Link>
-              
-              {/* Painel Criador Mobile - Apenas para usuários com níveis de criador */}
-              {isAuthenticated && usuario && isCriador() && (
-                <Link 
-                  href="/painel-criador" 
-                  className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
-                  onClick={() => setShowMobileMenu(false)}
+        {/* Usuário e logout colados na borda direita */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center space-x-4 px-6">
+          {isAuthenticated && usuario ? (
+            <>
+              {/* Menu dropdown do perfil */}
+              <div className="relative profile-menu">
+                <button
+                  onClick={handleProfileClick}
+                  className="flex items-center gap-2 hover:bg-gray-800 rounded-lg px-2 py-1 transition-colors"
                 >
-                  Painel Criador
-                </Link>
-              )}
+                  {/* Avatar do usuário */}
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-sementes-accent flex items-center justify-center">
+                    {usuario.avatarUrl ? (
+                      <img 
+                        src={usuario.avatarUrl} 
+                        alt={`Avatar de ${usuario.nome}`}
+                        className="w-full h-full object-cover"
+                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                          // Fallback para ícone se a imagem falhar
+                          e.currentTarget.style.display = 'none'
+                          const nextElement = e.currentTarget.nextElementSibling
+                          if (nextElement) {
+                            nextElement.classList.remove('hidden')
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <UserIcon className={`w-5 h-5 text-white ${usuario.avatarUrl ? 'hidden' : ''}`} />
+                  </div>
+                  <span className="text-sementes-accent font-bold">{usuario.nome}</span>
+                  <ChevronDownIcon className={`w-4 h-4 text-gray-300 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {/* Dropdown menu - EXATAMENTE igual ao site antigo */}
+                {showProfileMenu && (
+                  <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="py-1">
+                      <button
+                        onClick={() => handleMenuItemClick('/dashboard')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                      >
+                        👤 Perfil
+                      </button>
+                      <button
+                        onClick={() => handleMenuItemClick('/doar')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                      >
+                        💝 Fazer Doação
+                      </button>
+                      <button
+                        onClick={() => handleMenuItemClick('/cashback')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                      >
+                        💰 Cashback
+                      </button>
+                      <button
+                        onClick={() => handleMenuItemClick('/carteira')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                      >
+                        🏦 Carteira
+                      </button>
+                      <button
+                        onClick={() => handleMenuItemClick('/amigos')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                      >
+                        👥 Amigos
+                      </button>
+                      <button
+                        onClick={() => handleMenuItemClick('/notificacoes')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                      >
+                        🔔 Notificações
+                      </button>
+                      <button
+                        onClick={() => handleMenuItemClick('/criadores-favoritos')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                      >
+                        ⭐ Criadores Favoritos
+                      </button>
+                      <button
+                        onClick={() => handleMenuItemClick('/parceiros-favoritos')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                      >
+                        🏢 Parceiros Favoritos
+                      </button>
+                      <button
+                        onClick={() => handleMenuItemClick('/suporte')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
+                      >
+                        💬 Suporte
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
               
-              {/* Painel Parceiro Mobile - Apenas para usuários com nível parceiro */}
-              {isAuthenticated && usuario && usuario.nivel === 'parceiro' && (
-                <Link 
-                  href="/painel-parceiro" 
-                  className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
-                  onClick={() => setShowMobileMenu(false)}
+              {/* Dropdown de redes sociais - EXATAMENTE igual ao site antigo */}
+              <div className="relative inline-block text-left socials-menu">
+                <button
+                  onClick={() => setShowSocials((v) => !v)}
+                  className="p-2 text-gray-300 hover:text-sementes-accent focus:outline-none"
+                  title="Redes sociais"
                 >
-                  Painel Parceiro
-                </Link>
-              )}
+                  <UserGroupIcon className="w-6 h-6" />
+                </button>
+                {showSocials && (
+                  <div className="origin-top-right absolute right-0 mt-2 w-16 rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 z-50 flex flex-col items-center py-2 gap-2">
+                    <a href="https://discord.gg/7vtVZYvR" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="Discord" aria-label="Discord"><i className="fab fa-discord fa-lg"></i></a>
+                    <a href="https://www.instagram.com/sementesplay/" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="Instagram" aria-label="Instagram"><i className="fab fa-instagram fa-lg"></i></a>
+                    <a href="https://www.tiktok.com/@sementesplay" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="TikTok" aria-label="TikTok"><i className="fab fa-tiktok fa-lg"></i></a>
+                    <a href="https://www.youtube.com/@SementesPLAY" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="YouTube" aria-label="YouTube"><i className="fab fa-youtube fa-lg"></i></a>
+                    <a href="https://x.com/SementesPLAY" target="_blank" rel="noopener noreferrer" className="hover:text-sementes-accent" title="Twitter" aria-label="Twitter"><i className="fab fa-twitter fa-lg"></i></a>
+                  </div>
+                )}
+              </div>
               
-              {/* Admin Link Mobile - Apenas para usuários com nível 5+ */}
-              {isAuthenticated && usuario && Number(usuario.nivel) >= 5 && (
-                <Link 
-                  href="/admin" 
-                  className="text-gray-300 hover:text-sementes-primary transition-colors px-4 py-2"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  Admin
-                </Link>
-              )}
-              
-            </nav>
-          </motion.div>
-        )}
-      </div>
-    </header>
+              <button onClick={handleLogout} title="Sair" className="p-2 text-gray-300 hover:text-red-400">
+                <ArrowLeftOnRectangleIcon className="w-6 h-6" />
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="text-gray-300 hover:text-sementes-accent transition-colors">Entrar</Link>
+              <Link href="/registro" className="bg-sementes-primary hover:bg-sementes-secondary text-white px-4 py-2 rounded-lg transition-colors">Cadastrar</Link>
+            </>
+          )}
+        </div>
+      </header>
+    </>
   )
 }
