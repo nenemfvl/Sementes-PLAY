@@ -29,32 +29,21 @@ export default function Perfil() {
   // Função específica para Edge - sincronizar cookies e localStorage
   const sincronizarEdge = () => {
     if (navigator.userAgent.includes('Edg')) {
-      console.log('🌐 [PERFIL] Sincronizando Edge...')
       const token = localStorage.getItem('auth-token')
       if (token) {
         try {
           // Sincronizar cookie para Edge
           document.cookie = `auth-token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`
-          console.log('🌐 [PERFIL] Cookie sincronizado para Edge')
         } catch (error) {
-          console.log('🌐 [PERFIL] Erro ao sincronizar cookie:', error)
+          // Silenciar erro
         }
       }
     }
   }
 
   useEffect(() => {
-    console.log('🔍 [PERFIL] useEffect executado:', {
-      authLoading,
-      isAuthenticated,
-      usuario: usuario ? { id: usuario.id, tipo: usuario.tipo, nivel: usuario.nivel } : null
-    })
-    console.log('🌐 [PERFIL] User Agent:', navigator.userAgent)
-    console.log('🌐 [PERFIL] É Edge:', navigator.userAgent.includes('Edg'))
-    
     if (!authLoading) {
       if (isAuthenticated && usuario) {
-        console.log('✅ [PERFIL] Usuário autenticado, carregando dados...')
         setAvatarUrl(usuario.avatarUrl || null)
         carregarEstatisticas(usuario.id)
         setLoading(false)
@@ -62,16 +51,12 @@ export default function Perfil() {
         // Sincronizar Edge se necessário
         sincronizarEdge()
       } else if (!isAuthenticated) {
-        console.log('❌ [PERFIL] Usuário não autenticado, redirecionando para login...')
-        
         // Verificação específica para Edge
         if (navigator.userAgent.includes('Edg')) {
-          console.log('🌐 [PERFIL] Detectado Edge, verificando localStorage...')
           const token = localStorage.getItem('auth-token')
           const usuarioSalvo = localStorage.getItem('usuario-dados')
           
           if (token && usuarioSalvo) {
-            console.log('🌐 [PERFIL] Edge: Token e usuário encontrados no localStorage, tentando recuperar...')
             try {
               const dadosUsuario = JSON.parse(usuarioSalvo)
               // Tentar recuperar autenticação para Edge
@@ -80,36 +65,29 @@ export default function Perfil() {
               }, 1000)
               return
             } catch (error) {
-              console.log('🌐 [PERFIL] Edge: Erro ao parsear usuário, redirecionando...')
+              // Silenciar erro
             }
           }
         }
         
         // Redirecionar para login se não estiver autenticado
         window.location.href = '/login'
-      } else {
-        console.log('⚠️ [PERFIL] Estado intermediário:', { authLoading, isAuthenticated, usuario: !!usuario })
       }
     }
   }, [authLoading, isAuthenticated, usuario])
 
   const carregarEstatisticas = async (userId: string) => {
-    console.log('📊 [PERFIL] Carregando estatísticas para usuário:', userId)
     try {
       const response = await fetch(`/api/perfil/stats?usuarioId=${userId}`)
-      console.log('📡 [PERFIL] Resposta da API:', response.status, response.statusText)
-      
       const data = await response.json()
-      console.log('📊 [PERFIL] Dados recebidos:', data)
       
       if (response.ok) {
         setStats(data)
-        console.log('✅ [PERFIL] Estatísticas carregadas com sucesso')
       } else {
-        console.error('❌ [PERFIL] Erro na API:', data.error)
+        console.error('Erro na API:', data.error)
       }
     } catch (error) {
-      console.error('💥 [PERFIL] Erro ao carregar estatísticas:', error)
+      console.error('Erro ao carregar estatísticas:', error)
     } finally {
       setLoading(false)
     }
@@ -227,26 +205,9 @@ export default function Perfil() {
     }
   }
 
-  // Debug: Mostrar estado atual
-  console.log('🔍 [PERFIL] Estado atual:', {
-    authLoading,
-    isAuthenticated,
-    usuario: usuario ? { id: usuario.id, tipo: usuario.tipo, nivel: usuario.nivel } : null,
-    loading,
-    stats: !!stats
-  })
-
   if (!usuario) {
-    console.log('❌ [PERFIL] Usuário não encontrado, retornando null')
     return null
   }
-
-  console.log('✅ [PERFIL] Usuário válido encontrado:', {
-    id: usuario.id,
-    tipo: usuario.tipo,
-    nivel: usuario.nivel,
-    temCriador: !!usuario.criador
-  })
 
   const tabs = [
     { id: 'overview', label: 'Visão Geral', icon: StarIcon },
