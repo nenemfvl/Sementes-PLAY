@@ -88,16 +88,20 @@ export default function AdminPage() {
 
   const carregarEstatisticas = async () => {
     try {
-      // TODO: Implementar API para buscar estatísticas
-      // Por enquanto, usando dados mockados para desenvolvimento
-      setStats({
-        totalUsuarios: 0,
-        totalCriadores: 0,
-        totalParceiros: 0,
-        candidaturasPendentes: 0,
-        denunciasPendentes: 0,
-        fundoAtual: 0
-      })
+      const response = await fetch('/api/admin/estatisticas')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setStats({
+            totalUsuarios: data.dados.usuarios.total,
+            totalCriadores: data.dados.criadores.total,
+            totalParceiros: data.dados.parceiros.total,
+            candidaturasPendentes: 0, // TODO: Implementar API de candidaturas
+            denunciasPendentes: 0, // TODO: Implementar API de denúncias
+            fundoAtual: data.dados.sistema.totalSementes
+          })
+        }
+      }
     } catch (error) {
       console.error('Erro ao carregar estatísticas:', error)
     } finally {

@@ -119,8 +119,13 @@ export default function RankingPage() {
 
   const carregarUsuarios = async () => {
     try {
-      // TODO: Implementar API para buscar usuários
-      setUsuarios([])
+      const response = await fetch('/api/ranking')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setUsuarios(data.dados.usuarios)
+        }
+      }
     } catch (error) {
       console.error('Erro ao carregar usuários:', error)
     }

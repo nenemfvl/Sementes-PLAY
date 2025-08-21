@@ -72,8 +72,13 @@ export default function ParceirosPage() {
 
   const carregarParceiros = async () => {
     try {
-      // TODO: Implementar API para buscar parceiros
-      setParceiros([])
+      const response = await fetch('/api/parceiros')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setParceiros(data.dados.parceiros)
+        }
+      }
     } catch (error) {
       console.error('Erro ao carregar parceiros:', error)
     } finally {
