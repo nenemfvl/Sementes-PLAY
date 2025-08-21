@@ -5,6 +5,8 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 
+// Forçar renderização dinâmica para evitar erro de prerendering
+export const dynamic = 'force-dynamic'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = React.useState(false)

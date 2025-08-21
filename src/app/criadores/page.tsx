@@ -13,6 +13,9 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+// Forçar renderização dinâmica para evitar erro de prerendering
+export const dynamic = 'force-dynamic'
+
 interface DadosCiclo {
   ciclo: number
   season: number

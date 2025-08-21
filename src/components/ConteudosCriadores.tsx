@@ -15,6 +15,9 @@ import {
 } from '@heroicons/react/24/outline'
 import { FaInstagram, FaYoutube, FaTwitch, FaTiktok } from 'react-icons/fa'
 
+// Forçar renderização dinâmica para evitar erro de prerendering
+export const dynamic = 'force-dynamic'
+
 interface Conteudo {
   id: string
   titulo: string

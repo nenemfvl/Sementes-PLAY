@@ -29,6 +29,9 @@ import {
   ClipboardDocumentIcon
 } from '@heroicons/react/24/outline'
 
+// Forçar renderização dinâmica para evitar erro de prerendering
+export const dynamic = 'force-dynamic'
+
 interface Transacao {
   id: string
   valor: number

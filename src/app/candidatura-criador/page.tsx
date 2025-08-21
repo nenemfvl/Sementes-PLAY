@@ -17,6 +17,9 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+// Forçar renderização dinâmica para evitar erro de prerendering
+export const dynamic = 'force-dynamic'
+
 interface FormCandidatura {
   nome: string
   email: string

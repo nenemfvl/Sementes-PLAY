@@ -19,6 +19,8 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 
+// Forçar renderização dinâmica para evitar erro de prerendering
+export const dynamic = 'force-dynamic'
 
 interface CarteiraData {
   sementes: number

@@ -13,6 +13,9 @@ import {
   BanknotesIcon
 } from '@heroicons/react/24/outline'
 
+// Forçar renderização dinâmica para evitar erro de prerendering
+export const dynamic = 'force-dynamic'
+
 interface DadosPix {
   chavePix: string
   tipoChave: string

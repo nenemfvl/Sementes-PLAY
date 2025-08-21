@@ -14,6 +14,9 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 
+// Forçar renderização dinâmica para evitar erro de prerendering
+export const dynamic = 'force-dynamic'
+
 export default function Perfil() {
   const [usuario, setUsuario] = useState<any>(null)
   const [stats, setStats] = useState<any>(null)
