@@ -487,27 +487,27 @@ export default function CandidaturaCriadorPage() {
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                      <div>
                        <p className="text-gray-400">Nome:</p>
-                       <p className="text-white">{form.nome}</p>
+                       <p className="text-white break-words">{form.nome}</p>
                      </div>
                      <div>
                        <p className="text-gray-400">Email:</p>
-                       <p className="text-white">{form.email}</p>
+                       <p className="text-white break-all">{form.email}</p>
                      </div>
                      <div>
                        <p className="text-gray-400">Bio:</p>
-                       <p className="text-white">{form.bio}</p>
+                       <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.bio}</p>
                      </div>
                      <div>
                        <p className="text-gray-400">Experiência:</p>
-                       <p className="text-white">{form.experiencia}</p>
+                       <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.experiencia}</p>
                      </div>
                      <div>
                        <p className="text-gray-400">Motivação:</p>
-                       <p className="text-white">{form.motivacao}</p>
+                       <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.motivacao}</p>
                      </div>
                      <div>
                        <p className="text-gray-400">Metas:</p>
-                       <p className="text-white">{form.metas}</p>
+                       <p className="text-white break-words whitespace-pre-wrap max-w-full overflow-hidden">{form.metas}</p>
                      </div>
                    </div>
                  </div>
