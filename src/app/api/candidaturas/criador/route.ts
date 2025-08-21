@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verificar se já existe candidatura aprovada que não foi removida
+    // Verificar se já existe candidatura aprovada E se o usuário ainda é criador ativo
     const candidaturaAprovada = await prisma.candidaturaCriador.findFirst({
       where: {
         usuarioId: user.id,
@@ -99,10 +99,19 @@ export async function POST(request: NextRequest) {
     })
 
     if (candidaturaAprovada) {
-      return NextResponse.json(
-        { error: 'Você já possui uma candidatura aprovada' },
-        { status: 400 }
-      )
+      // Se tem candidatura aprovada, verificar se ainda é criador ativo
+      const criadorAtivo = await prisma.criador.findFirst({
+        where: { usuarioId: user.id }
+      })
+      
+      // Se ainda é criador ativo, não pode candidatar novamente
+      if (criadorAtivo) {
+        return NextResponse.json(
+          { error: 'Você já possui uma candidatura aprovada' },
+          { status: 400 }
+        )
+      }
+      // Se não é mais criador ativo, pode candidatar novamente (foi removido)
     }
 
     // Criar candidatura
