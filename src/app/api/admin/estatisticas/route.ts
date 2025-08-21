@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
       saquesRejeitados
     ] = await Promise.all([
       prisma.usuario.count(),
-      prisma.criador.count({ where: { aprovado: true } }),
-      prisma.parceiro.count({ where: { aprovado: true } }),
+             prisma.criador.count(),
+       prisma.parceiro.count(),
       prisma.usuario.count({ where: { nivel: { gte: 5 } } }),
       prisma.usuario.count({ where: { status: 'ativo' } }),
       prisma.usuario.count({ where: { status: 'banido' } }),
@@ -52,12 +52,11 @@ export async function GET(request: NextRequest) {
       prisma.usuario.count({
         where: { dataCriacao: { gte: trintaDiasAtras } }
       }),
-      prisma.criador.count({
-        where: { 
-          aprovado: true,
-          dataCriacao: { gte: trintaDiasAtras }
-        }
-      }),
+             prisma.criador.count({
+         where: { 
+           dataCriacao: { gte: trintaDiasAtras }
+         }
+       }),
       prisma.conteudo.count({
         where: { dataCriacao: { gte: trintaDiasAtras } }
       }),

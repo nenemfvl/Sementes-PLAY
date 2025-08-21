@@ -24,10 +24,9 @@ export async function GET(request: NextRequest) {
     }
 
     const parceiros = await prisma.parceiro.findMany({
-      where: {
-        ...where,
-        aprovado: true // Apenas parceiros aprovados
-      },
+             where: {
+         ...where
+       },
       include: {
         usuario: {
           select: {
