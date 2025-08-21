@@ -253,7 +253,7 @@ export default function Navbar() {
                   <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 z-50">
                     <div className="py-1">
                       <button
-                        onClick={() => handleMenuItemClick('/dashboard')}
+                        onClick={() => handleMenuItemClick('/perfil')}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-sementes-accent"
                       >
                         👤 Perfil
