@@ -38,6 +38,7 @@ export default function AdminCriadores() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [criadores, setCriadores] = useState<Criador[]>([])
+  const [criadoresLoading, setCriadoresLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('todos')
   const [filterCategoria, setFilterCategoria] = useState('todos')
@@ -79,13 +80,41 @@ export default function AdminCriadores() {
 
   const carregarCriadores = async () => {
     try {
-      // TODO: Implementar API para buscar criadores
-      setCriadores([])
+      setCriadoresLoading(true)
+      const response = await fetch('/api/criadores')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          // Mapear os dados da API para o formato esperado pela interface
+          const criadoresMapeados = data.dados.criadores.map((criador: any) => ({
+            id: criador.id,
+            nome: criador.nome,
+            email: criador.usuario.email,
+            avatarUrl: criador.usuario.avatarUrl,
+            nivel: parseInt(criador.nivel) || 1,
+            categoria: criador.categoria,
+            status: 'ativo', // Por padrão, criadores aprovados são ativos
+            dataCadastro: new Date(criador.dataCriacao),
+            ultimaAtividade: new Date(criador.dataCriacao), // Usar data de criação como última atividade por enquanto
+            totalConteudos: 0, // TODO: Implementar contagem de conteúdos
+            totalVisualizacoes: 0, // TODO: Implementar contagem de visualizações
+            totalGanhos: 0, // TODO: Implementar cálculo de ganhos
+            biografia: criador.bio || 'Sem biografia',
+            redesSociais: criador.redesSociais ? Object.keys(criador.redesSociais) : [],
+            especialidades: [criador.categoria] // Usar categoria como especialidade por enquanto
+          }))
+          setCriadores(criadoresMapeados)
+        } else {
+          setNotificacao({ tipo: 'erro', mensagem: 'Erro ao carregar dados dos criadores' })
+        }
+      } else {
+        setNotificacao({ tipo: 'erro', mensagem: 'Erro na resposta da API' })
+      }
     } catch (error) {
       console.error('Erro ao carregar criadores:', error)
       setNotificacao({ tipo: 'erro', mensagem: 'Erro ao carregar criadores' })
     } finally {
-      setLoading(false)
+      setCriadoresLoading(false)
     }
   }
 
@@ -285,6 +314,12 @@ export default function AdminCriadores() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="card"
           >
+            {criadoresLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sementes-primary mx-auto mb-4"></div>
+                <p className="text-gray-400">Carregando criadores...</p>
+              </div>
+            ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -302,7 +337,15 @@ export default function AdminCriadores() {
                     <tr>
                       <td colSpan={6} className="text-center text-gray-400 p-8">
                         <UserGroupIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                        <p>Nenhum criador encontrado</p>
+                        <p className="text-lg font-medium mb-2">
+                          {criadores.length === 0 ? 'Nenhum criador cadastrado' : 'Nenhum criador encontrado com os filtros aplicados'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {criadores.length === 0 
+                            ? 'Ainda não há criadores aprovados na plataforma. Os usuários precisam se candidatar e serem aprovados primeiro.'
+                            : 'Tente ajustar os filtros de busca para encontrar mais resultados.'
+                          }
+                        </p>
                       </td>
                     </tr>
                   ) : filtrarCriadores().map((criador) => (
@@ -368,6 +411,7 @@ export default function AdminCriadores() {
                 </tbody>
               </table>
             </div>
+            )}
           </motion.div>
         </div>
       </div>
