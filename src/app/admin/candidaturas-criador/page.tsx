@@ -63,6 +63,15 @@ export default function AdminCandidaturasCriadorPage() {
     if (!texto) return ''
     if (texto.length <= maxLength) return texto
     
+    // Se não há espaços, quebrar a cada maxLength caracteres
+    if (!texto.includes(' ')) {
+      const linhas = []
+      for (let i = 0; i < texto.length; i += maxLength) {
+        linhas.push(texto.slice(i, i + maxLength))
+      }
+      return linhas.join('\n')
+    }
+    
     // Quebrar em palavras e juntar com quebras de linha
     const palavras = texto.split(' ')
     let resultado = ''
@@ -479,15 +488,15 @@ export default function AdminCandidaturasCriadorPage() {
 
                                  <div>
                    <h4 className="text-lg font-medium text-white mb-2">Bio</h4>
-                   <p className="text-gray-300 text-sm break-words whitespace-pre-wrap leading-relaxed">
-                     {formatarTexto(selectedCandidatura.bio, 80)}
+                   <p className="text-gray-300 text-sm break-all whitespace-pre-wrap leading-relaxed max-w-full">
+                     {formatarTexto(selectedCandidatura.bio, 60)}
                    </p>
                  </div>
 
                  <div>
                    <h4 className="text-lg font-medium text-white mb-2">Experiência</h4>
-                   <p className="text-gray-300 text-sm break-words whitespace-pre-wrap leading-relaxed">
-                     {formatarTexto(selectedCandidatura.experiencia, 80)}
+                   <p className="text-gray-300 text-sm break-all whitespace-pre-wrap leading-relaxed max-w-full">
+                     {formatarTexto(selectedCandidatura.experiencia, 60)}
                    </p>
                  </div>
               </div>
@@ -512,8 +521,8 @@ export default function AdminCandidaturasCriadorPage() {
 
                                  <div>
                    <h4 className="text-lg font-medium text-white mb-2">Portfolio</h4>
-                   <p className="text-gray-300 text-sm mb-2 break-words whitespace-pre-wrap leading-relaxed">
-                     {formatarTexto(selectedCandidatura.portfolio.descricao, 80)}
+                   <p className="text-gray-300 text-sm mb-2 break-all whitespace-pre-wrap leading-relaxed max-w-full">
+                     {formatarTexto(selectedCandidatura.portfolio.descricao, 60)}
                    </p>
                    <div className="space-y-1">
                      {selectedCandidatura.portfolio.links.map((link, index) => (
@@ -526,18 +535,18 @@ export default function AdminCandidaturasCriadorPage() {
 
                  <div>
                    <h4 className="text-lg font-medium text-white mb-2">Motivação e Metas</h4>
-                   <p className="text-gray-300 text-sm mb-2 break-words whitespace-pre-wrap leading-relaxed">
-                     <strong>Motivação:</strong> {formatarTexto(selectedCandidatura.motivacao, 70)}
+                   <p className="text-gray-300 text-sm mb-2 break-all whitespace-pre-wrap leading-relaxed max-w-full">
+                     <strong>Motivação:</strong> {formatarTexto(selectedCandidatura.motivacao, 50)}
                    </p>
                    <p className="text-gray-300 text-sm break-words whitespace-pre-wrap leading-relaxed">
-                     <strong>Metas:</strong> {formatarTexto(selectedCandidatura.metas, 70)}
+                     <strong>Metas:</strong> {formatarTexto(selectedCandidatura.metas, 50)}
                    </p>
                  </div>
 
                  <div>
                    <h4 className="text-lg font-medium text-white mb-2">Disponibilidade</h4>
-                   <p className="text-gray-300 text-sm break-words whitespace-pre-wrap leading-relaxed">
-                     {formatarTexto(selectedCandidatura.disponibilidade, 80)}
+                   <p className="text-gray-300 text-sm break-all whitespace-pre-wrap leading-relaxed max-w-full">
+                     {formatarTexto(selectedCandidatura.disponibilidade, 60)}
                    </p>
                  </div>
               </div>
