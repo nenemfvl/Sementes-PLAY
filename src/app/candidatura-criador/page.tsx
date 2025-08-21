@@ -39,6 +39,13 @@ interface FormCandidatura {
   disponibilidade: string
 }
 
+interface CandidaturaExistente {
+  id: string
+  status: 'pendente' | 'aprovada' | 'rejeitada'
+  dataCandidatura: string
+  observacoes?: string
+}
+
 export default function CandidaturaCriadorPage() {
   const router = useRouter()
   const [usuario, setUsuario] = useState<any>(null)
@@ -68,6 +75,9 @@ export default function CandidaturaCriadorPage() {
     disponibilidade: ''
   })
   const [notificacao, setNotificacao] = useState<{ tipo: 'sucesso' | 'erro' | 'info', mensagem: string } | null>(null)
+  const [candidaturaExistente, setCandidaturaExistente] = useState<CandidaturaExistente | null>(null)
+  const [verificandoCandidatura, setVerificandoCandidatura] = useState(true)
+  const [candidaturaEnviada, setCandidaturaEnviada] = useState(false)
 
   useEffect(() => {
     const verificarAutenticacao = () => {
@@ -84,6 +94,9 @@ export default function CandidaturaCriadorPage() {
             nome: dadosUsuario.nome || '',
             email: dadosUsuario.email || ''
           }))
+
+          // Verificar se já existe candidatura
+          verificarCandidaturaExistente(dadosUsuario.id)
         } catch (error) {
           console.error('Erro ao ler dados do usuário:', error)
           localStorage.removeItem('usuario-dados')
@@ -93,6 +106,28 @@ export default function CandidaturaCriadorPage() {
     }
     verificarAutenticacao()
   }, [])
+
+  const verificarCandidaturaExistente = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/candidaturas/criador/status?usuarioId=${userId}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          if (data.dados.status === 'criador_aprovado') {
+            // Se já é criador, redirecionar para o painel
+            router.push('/painel-criador')
+            return
+          } else if (data.dados.candidatura) {
+            setCandidaturaExistente(data.dados.candidatura)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao verificar candidatura:', error)
+    } finally {
+      setVerificandoCandidatura(false)
+    }
+  }
 
   const handleInputChange = (field: string, value: any) => {
     if (field.includes('.')) {
@@ -180,6 +215,7 @@ export default function CandidaturaCriadorPage() {
       })
 
       if (response.ok) {
+        setCandidaturaEnviada(true)
         setNotificacao({
           tipo: 'sucesso',
           mensagem: 'Candidatura enviada com sucesso! Nossa equipe entrará em contato em breve.'
@@ -219,12 +255,133 @@ export default function CandidaturaCriadorPage() {
     }
   }
 
-  if (loading) {
+  // Renderizar status da candidatura existente
+  const renderStatusCandidatura = () => {
+    if (!candidaturaExistente) return null
+
+    const getStatusIcon = () => {
+      switch (candidaturaExistente.status) {
+        case 'pendente':
+          return <ClockIcon className="w-8 h-8 text-yellow-500" />
+        case 'aprovada':
+          return <CheckCircleIcon className="w-8 h-8 text-green-500" />
+        case 'rejeitada':
+          return <XCircleIcon className="w-8 h-8 text-red-500" />
+        default:
+          return <ClockIcon className="w-8 h-8 text-gray-500" />
+      }
+    }
+
+    const getStatusText = () => {
+      switch (candidaturaExistente.status) {
+        case 'pendente':
+          return 'Candidatura em Análise'
+        case 'aprovada':
+          return 'Candidatura Aprovada!'
+        case 'rejeitada':
+          return 'Candidatura Rejeitada'
+        default:
+          return 'Status Desconhecido'
+      }
+    }
+
+    const getStatusColor = () => {
+      switch (candidaturaExistente.status) {
+        case 'pendente':
+          return 'bg-yellow-500/20 border-yellow-500/30 text-yellow-400'
+        case 'aprovada':
+          return 'bg-green-500/20 border-green-500/30 text-green-400'
+        case 'rejeitada':
+          return 'bg-red-500/20 border-red-500/30 text-red-400'
+        default:
+          return 'bg-gray-500/20 border-gray-500/30 text-gray-400'
+      }
+    }
+
+    return (
+      <div className="bg-gray-800/50 rounded-2xl border border-gray-700/50 p-8">
+        <div className="text-center">
+          <div className="flex justify-center mb-6">
+            {getStatusIcon()}
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            {getStatusText()}
+          </h2>
+          <p className="text-gray-300 mb-6">
+            {candidaturaExistente.status === 'pendente' && 
+              'Sua candidatura está sendo analisada pela nossa equipe. Você receberá uma notificação em breve.'}
+            {candidaturaExistente.status === 'aprovada' && 
+              'Parabéns! Sua candidatura foi aprovada. Você agora é um criador oficial do SementesPLAY!'}
+            {candidaturaExistente.status === 'rejeitada' && 
+              candidaturaExistente.observacoes ? 
+              `Sua candidatura não foi aprovada. Motivo: ${candidaturaExistente.observacoes}` :
+              'Sua candidatura não foi aprovada. Entre em contato conosco para mais detalhes.'}
+          </p>
+          
+          {candidaturaExistente.status === 'pendente' && (
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
+              <div className="flex items-start space-x-3">
+                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500 mt-0.5" />
+                <div>
+                  <h4 className="text-yellow-400 font-semibold">Processo de Aprovação</h4>
+                  <p className="text-yellow-200 text-sm mt-1">
+                    Sua candidatura será revisada pela nossa equipe em até 7 dias úteis. 
+                    Você receberá uma notificação por email com o resultado.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div className="text-sm text-gray-400">
+              <span className="font-medium">Data da Candidatura:</span>{' '}
+              {new Date(candidaturaExistente.dataCandidatura).toLocaleDateString('pt-BR')}
+            </div>
+            
+            {candidaturaExistente.status === 'rejeitada' && (
+              <button
+                onClick={() => {
+                  setCandidaturaExistente(null)
+                  setCurrentStep(1)
+                }}
+                className="px-6 py-3 bg-sementes-primary hover:bg-sementes-accent text-white font-medium rounded-xl transition-colors"
+              >
+                Nova Candidatura
+              </button>
+            )}
+            
+            <Link
+              href="/criadores"
+              className="inline-block px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-xl transition-colors"
+            >
+              Voltar aos Criadores
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading || verificandoCandidatura) {
     return (
       <div className="min-h-screen bg-sss-dark flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sementes-primary mx-auto mb-4"></div>
           <p className="text-white">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Se já existe candidatura, mostrar status
+  if (candidaturaExistente) {
+    return (
+      <div className="min-h-screen bg-sss-dark">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            {renderStatusCandidatura()}
+          </div>
         </div>
       </div>
     )
@@ -258,7 +415,7 @@ export default function CandidaturaCriadorPage() {
                 </div>
               </div>
               <h1 className="text-4xl md:text-5xl font-black text-white mb-4 bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                Candidatura para Criador
+                Seja um Criador
               </h1>
               <p className="text-xl text-gray-300 max-w-2xl mx-auto">
                 Junte-se à nossa comunidade de criadores de conteúdo
