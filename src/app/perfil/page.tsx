@@ -27,27 +27,45 @@ export default function Perfil() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
   useEffect(() => {
+    console.log('🔍 [PERFIL] useEffect executado:', {
+      authLoading,
+      isAuthenticated,
+      usuario: usuario ? { id: usuario.id, tipo: usuario.tipo, nivel: usuario.nivel } : null
+    })
+    
     if (!authLoading) {
       if (isAuthenticated && usuario) {
+        console.log('✅ [PERFIL] Usuário autenticado, carregando dados...')
         setAvatarUrl(usuario.avatarUrl || null)
         carregarEstatisticas(usuario.id)
         setLoading(false)
       } else if (!isAuthenticated) {
+        console.log('❌ [PERFIL] Usuário não autenticado, redirecionando para login...')
         // Redirecionar para login se não estiver autenticado
         window.location.href = '/login'
+      } else {
+        console.log('⚠️ [PERFIL] Estado intermediário:', { authLoading, isAuthenticated, usuario: !!usuario })
       }
     }
   }, [authLoading, isAuthenticated, usuario])
 
   const carregarEstatisticas = async (userId: string) => {
+    console.log('📊 [PERFIL] Carregando estatísticas para usuário:', userId)
     try {
       const response = await fetch(`/api/perfil/stats?usuarioId=${userId}`)
+      console.log('📡 [PERFIL] Resposta da API:', response.status, response.statusText)
+      
       const data = await response.json()
+      console.log('📊 [PERFIL] Dados recebidos:', data)
+      
       if (response.ok) {
         setStats(data)
+        console.log('✅ [PERFIL] Estatísticas carregadas com sucesso')
+      } else {
+        console.error('❌ [PERFIL] Erro na API:', data.error)
       }
     } catch (error) {
-      console.error('Erro ao carregar estatísticas:', error)
+      console.error('💥 [PERFIL] Erro ao carregar estatísticas:', error)
     } finally {
       setLoading(false)
     }
@@ -165,9 +183,26 @@ export default function Perfil() {
     }
   }
 
+  // Debug: Mostrar estado atual
+  console.log('🔍 [PERFIL] Estado atual:', {
+    authLoading,
+    isAuthenticated,
+    usuario: usuario ? { id: usuario.id, tipo: usuario.tipo, nivel: usuario.nivel } : null,
+    loading,
+    stats: !!stats
+  })
+
   if (!usuario) {
+    console.log('❌ [PERFIL] Usuário não encontrado, retornando null')
     return null
   }
+
+  console.log('✅ [PERFIL] Usuário válido encontrado:', {
+    id: usuario.id,
+    tipo: usuario.tipo,
+    nivel: usuario.nivel,
+    temCriador: !!usuario.criador
+  })
 
   const tabs = [
     { id: 'overview', label: 'Visão Geral', icon: StarIcon },
