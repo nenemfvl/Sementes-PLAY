@@ -112,6 +112,7 @@ export default function CandidaturaCriadorPage() {
       const response = await fetch(`/api/candidaturas/criador/status?usuarioId=${userId}`)
       if (response.ok) {
         const data = await response.json()
+        console.log('API Response:', data) // Debug
         if (data.sucesso) {
           if (data.dados.status === 'criador_aprovado') {
             // Se já é criador, redirecionar para o painel
@@ -119,10 +120,15 @@ export default function CandidaturaCriadorPage() {
             return
           } else if (data.dados.status === 'pode_candidatar') {
             // Usuário pode fazer nova candidatura (foi removido anteriormente)
+            console.log('Usuário pode candidatar novamente') // Debug
             setCandidaturaExistente(null)
             setCandidaturaEnviada(false)
           } else if (data.dados.candidatura) {
+            console.log('Candidatura existente encontrada:', data.dados.candidatura) // Debug
             setCandidaturaExistente(data.dados.candidatura)
+          } else {
+            console.log('Nenhuma candidatura encontrada, pode candidatar') // Debug
+            setCandidaturaExistente(null)
           }
         }
       }
@@ -378,11 +384,12 @@ export default function CandidaturaCriadorPage() {
     )
   }
 
-  // Se já existe candidatura, mostrar status
-  if (candidaturaExistente) {
+  // Se já existe candidatura aprovada, mostrar status
+  if (candidaturaExistente && candidaturaExistente.status === 'aprovada') {
+    console.log('Renderizando status de candidatura aprovada') // Debug
     return (
       <div className="min-h-screen bg-sss-dark">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-8">
           <div className="max-w-4xl mx-auto">
             {renderStatusCandidatura()}
           </div>
@@ -390,6 +397,9 @@ export default function CandidaturaCriadorPage() {
       </div>
     )
   }
+
+  // Debug: mostrar o que está acontecendo
+  console.log('Estado atual:', { candidaturaExistente, candidaturaEnviada, loading, verificandoCandidatura })
 
   return (
     <div className="min-h-screen bg-sss-dark">
