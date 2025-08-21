@@ -64,11 +64,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { criadorId, titulo, descricao, tipo, categoria, url, thumbnail, tags } = body
+    const { criadorId, titulo, descricao, tipo, categoria, url, preview, plataforma } = body
 
-    if (!criadorId || !titulo || !tipo || !categoria || !url) {
+    if (!criadorId || !titulo || !tipo || !categoria || !url || !plataforma) {
       return NextResponse.json(
-        { error: 'Campos obrigatórios: criadorId, titulo, tipo, categoria, url' },
+        { error: 'Campos obrigatórios: criadorId, titulo, tipo, categoria, url, plataforma' },
         { status: 400 }
       )
     }
@@ -93,14 +93,13 @@ export async function POST(request: NextRequest) {
         tipo,
         categoria,
         url,
-        thumbnail: thumbnail || '',
-        tags: tags ? JSON.stringify(tags) : '[]',
+        preview: preview || '',
+        plataforma,
         fixado: false,
         visualizacoes: 0,
         curtidas: 0,
         dislikes: 0,
-        dataPublicacao: new Date(),
-        status: 'ativo'
+        compartilhamentos: 0
       }
     })
 
@@ -125,7 +124,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, titulo, descricao, tipo, categoria, url, thumbnail, tags } = body
+    const { id, titulo, descricao, tipo, categoria, url, preview, plataforma } = body
 
     if (!id) {
       return NextResponse.json(
@@ -142,9 +141,8 @@ export async function PUT(request: NextRequest) {
         tipo,
         categoria,
         url,
-        thumbnail,
-        tags: tags ? JSON.stringify(tags) : undefined,
-        dataAtualizacao: new Date()
+        preview,
+        plataforma
       }
     })
 

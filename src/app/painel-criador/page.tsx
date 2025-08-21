@@ -36,6 +36,7 @@ interface Conteudo {
   tipo: string
   categoria: string
   url: string
+  plataforma?: string
   dataPublicacao?: string
   fixado?: boolean
   visualizacoes?: number
@@ -90,7 +91,7 @@ export default function PainelCriador() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [form, setForm] = useState({ titulo: '', url: '', tipo: '', categoria: '' })
+  const [form, setForm] = useState({ titulo: '', url: '', tipo: '', categoria: '', plataforma: '' })
   const [saving, setSaving] = useState(false)
   const [editando, setEditando] = useState<Conteudo | null>(null)
   const [conteudos, setConteudos] = useState<Conteudo[]>([])
@@ -206,18 +207,19 @@ export default function PainelCriador() {
 
       if (editando) {
         // Atualizar conteúdo existente
-        const response = await fetch('/api/conteudos', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: editando.id,
-            titulo: form.titulo,
-            descricao: form.titulo, // Usar título como descrição por enquanto
-            tipo: form.tipo,
-            categoria: form.categoria,
-            url: form.url
-          })
-        })
+                 const response = await fetch('/api/conteudos', {
+           method: 'PUT',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             id: editando.id,
+             titulo: form.titulo,
+             descricao: form.titulo, // Usar título como descrição por enquanto
+             tipo: form.tipo,
+             categoria: form.categoria,
+             url: form.url,
+             plataforma: form.plataforma
+           })
+         })
 
         if (response.ok) {
           const data = await response.json()
@@ -228,18 +230,19 @@ export default function PainelCriador() {
         }
       } else {
         // Criar novo conteúdo
-        const response = await fetch('/api/conteudos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            criadorId: usuario.criador.id,
-            titulo: form.titulo,
-            descricao: form.titulo, // Usar título como descrição por enquanto
-            tipo: form.tipo,
-            categoria: form.categoria,
-            url: form.url
-          })
-        })
+                 const response = await fetch('/api/conteudos', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             criadorId: usuario.criador.id,
+             titulo: form.titulo,
+             descricao: form.titulo, // Usar título como descrição por enquanto
+             tipo: form.tipo,
+             categoria: form.categoria,
+             url: form.url,
+             plataforma: form.plataforma
+           })
+         })
 
         if (response.ok) {
           const data = await response.json()
@@ -250,9 +253,9 @@ export default function PainelCriador() {
         }
       }
       
-      setForm({ titulo: '', url: '', tipo: '', categoria: '' })
-      setEditando(null)
-      setShowModal(false)
+             setForm({ titulo: '', url: '', tipo: '', categoria: '', plataforma: '' })
+       setEditando(null)
+       setShowModal(false)
     } catch (error) {
       console.error('Erro ao salvar:', error)
     } finally {
@@ -530,11 +533,17 @@ export default function PainelCriador() {
                               <StarIcon className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => {
-                                setEditando(conteudo)
-                                setForm(conteudo)
-                                setShowModal(true)
-                              }}
+                                                             onClick={() => {
+                                 setEditando(conteudo)
+                                 setForm({
+                                   titulo: conteudo.titulo,
+                                   url: conteudo.url,
+                                   tipo: conteudo.tipo,
+                                   categoria: conteudo.categoria,
+                                   plataforma: conteudo.plataforma || ''
+                                 })
+                                 setShowModal(true)
+                               }}
                               className="p-1 bg-blue-500/20 text-blue-300 rounded hover:bg-blue-500/30"
                             >
                               <PencilIcon className="w-4 h-4" />
@@ -770,38 +779,55 @@ export default function PainelCriador() {
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Tipo</label>
-                  <select
-                    value={form.tipo}
-                    onChange={(e) => setForm({ ...form, tipo: e.target.value })}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                    required
-                  >
-                    <option value="">Selecione</option>
-                    <option value="video">Vídeo</option>
-                    <option value="live">Live</option>
-                    <option value="post">Post</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Categoria</label>
-                  <select
-                    value={form.categoria}
-                    onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                    required
-                  >
-                    <option value="">Selecione</option>
-                    <option value="gaming">Gaming</option>
-                    <option value="tecnologia">Tecnologia</option>
-                    <option value="entretenimento">Entretenimento</option>
-                    <option value="educacao">Educação</option>
-                  </select>
-                </div>
-              </div>
+                             <div className="grid grid-cols-2 gap-4">
+                 <div>
+                   <label className="block text-sm font-medium text-gray-300 mb-1">Tipo</label>
+                   <select
+                     value={form.tipo}
+                     onChange={(e) => setForm({ ...form, tipo: e.target.value })}
+                     className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
+                     required
+                   >
+                     <option value="">Selecione</option>
+                     <option value="video">Vídeo</option>
+                     <option value="live">Live</option>
+                     <option value="post">Post</option>
+                   </select>
+                 </div>
+                 
+                 <div>
+                   <label className="block text-sm font-medium text-gray-300 mb-1">Categoria</label>
+                   <select
+                     value={form.categoria}
+                     onChange={(e) => setForm({ ...form, categoria: e.target.value })}
+                     className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
+                     required
+                   >
+                     <option value="">Selecione</option>
+                     <option value="gaming">Gaming</option>
+                     <option value="tecnologia">Tecnologia</option>
+                     <option value="entretenimento">Entretenimento</option>
+                     <option value="educacao">Educação</option>
+                   </select>
+                 </div>
+               </div>
+               
+               <div>
+                 <label className="block text-sm font-medium text-gray-300 mb-1">Plataforma</label>
+                 <select
+                   value={form.plataforma}
+                   onChange={(e) => setForm({ ...form, plataforma: e.target.value })}
+                   className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
+                   required
+                 >
+                   <option value="">Selecione</option>
+                   <option value="youtube">YouTube</option>
+                   <option value="twitch">Twitch</option>
+                   <option value="instagram">Instagram</option>
+                   <option value="tiktok">TikTok</option>
+                   <option value="blog">Blog</option>
+                 </select>
+               </div>
               
               <div className="flex space-x-3">
                 <button
@@ -809,7 +835,7 @@ export default function PainelCriador() {
                   onClick={() => {
                     setShowModal(false)
                     setEditando(null)
-                    setForm({ titulo: '', url: '', tipo: '', categoria: '' })
+                    setForm({ titulo: '', url: '', tipo: '', categoria: '', plataforma: '' })
                   }}
                   className="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg transition-colors"
                 >
