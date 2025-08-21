@@ -129,6 +129,10 @@ export default function Perfil() {
         return <span className="text-2xl">🌱</span>
       case 'parceiro':
         return <span className="text-2xl">🏢</span>
+      case 'admin':
+        return <span className="text-2xl">👑</span>
+      case 'comum':
+        return <UserIcon className="w-6 h-6 text-gray-400" />
       default:
         return <UserIcon className="w-6 h-6 text-gray-400" />
     }
@@ -146,6 +150,10 @@ export default function Perfil() {
         return 'text-green-500'
       case 'parceiro':
         return 'text-purple-500'
+      case 'admin':
+        return 'text-red-500'
+      case 'comum':
+        return 'text-gray-400'
       default:
         return 'text-gray-400'
     }
