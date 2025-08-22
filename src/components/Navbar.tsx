@@ -11,15 +11,12 @@ import {
   ArrowLeftOnRectangleIcon,
   UserIcon
 } from '@heroicons/react/24/outline'
-import FriendsChat from './FriendsChat'
-
 export default function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const [showProfileMenu, setShowProfileMenu] = React.useState(false)
   const [showSocials, setShowSocials] = React.useState(false)
   const [showMobileMenu, setShowMobileMenu] = React.useState(false)
-  const [showFriendsChat, setShowFriendsChat] = React.useState(false)
 
   // Verificação direta no localStorage como no site antigo
   const [usuario, setUsuario] = React.useState<any>(null)
@@ -289,15 +286,7 @@ export default function Navbar() {
                       >
                         🏦 Carteira
                       </button>
-                      <button
-                        onClick={() => {
-                          setShowFriendsChat(true)
-                          setShowProfileMenu(false)
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
-                      >
-                        👥 Amigos
-                      </button>
+
                       <button
                         onClick={() => handleMenuItemClick('/notificacoes')}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
@@ -360,12 +349,6 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* FriendsChat Component */}
-      <FriendsChat 
-        isOpen={showFriendsChat}
-        onClose={() => setShowFriendsChat(false)}
-        usuario={usuario}
-      />
     </>
   )
 }

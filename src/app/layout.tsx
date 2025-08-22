@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import FriendsChat from '@/components/FriendsChat'
 import { AuthProvider } from '@/contexts/AuthContext'
 
 
@@ -30,6 +31,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <FriendsChat />
         </AuthProvider>
       </body>
     </html>
