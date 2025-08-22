@@ -713,18 +713,20 @@ export default function CriadoresPage() {
       <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40">
         <motion.button
           onClick={() => router.push('/candidatura-criador')}
-          className="group relative bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:shadow-sementes-primary/50 transition-all duration-300 hover:scale-105 transform"
+          className="group relative bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-sementes-primary/50 transition-all duration-300 hover:scale-105 transform"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           {/* Efeito de brilho */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
           
-          {/* Conteúdo do botão */}
-          <div className="relative flex flex-col items-center space-y-1">
-            <span className="text-lg">🌱</span>
-            <span className="text-xs font-bold">Seja um</span>
-            <span className="text-sm font-bold">Criador</span>
+          {/* Conteúdo do botão - Horizontal como na imagem */}
+          <div className="relative flex items-center space-x-3">
+            <UserGroupIcon className="w-5 h-5 text-white" />
+            <div className="flex flex-col">
+              <span className="text-xs font-bold">Seja um</span>
+              <span className="text-sm font-bold">Criador</span>
+            </div>
           </div>
           
           {/* Seta indicativa */}
