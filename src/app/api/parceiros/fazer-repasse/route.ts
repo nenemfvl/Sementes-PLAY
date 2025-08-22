@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
         status: 'aguardando_repasse'
       },
       include: {
-        usuario: true,
-        parceiro: true
+        parceiro: true,
+        usuario: true
       }
     })
 
@@ -47,38 +47,104 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Cria o repasse
+    // Cria o repasse com status pendente
     const repasse = await prisma.repasseParceiro.create({
       data: {
         parceiroId: parceiroId,
         compraId: compraId,
         valor: valor,
+        dataRepasse: new Date(),
         comprovanteUrl: comprovanteUrl,
-        status: 'pendente',
-        dataRepasse: new Date()
+        status: 'pendente' // Será atualizado quando o PIX for gerado
       }
     })
 
-    // A compra continua com status 'aguardando_repasse' até o admin aprovar
+    // Gera PIX via Mercado Pago
+    try {
+      const pixResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/mercadopago/pix`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          repasseId: repasse.id,
+          parceiroId: parceiroId,
+          usuarioId: compra.usuarioId,
+          valor: valor
+        })
+      })
 
-    // Cria notificação para o usuário
-    await prisma.notificacao.create({
-      data: {
-        usuarioId: compra.usuarioId,
-        titulo: 'Repasse Realizado!',
-        mensagem: `O parceiro ${compra.parceiro.nomeCidade} realizou o repasse de R$ ${valor.toFixed(2)} para sua compra. Aguarde a liberação do cashback.`,
-        tipo: 'repasse_realizado',
-        lida: false
+      if (!pixResponse.ok) {
+        const errorData = await pixResponse.json()
+        console.error('Erro ao gerar PIX:', errorData)
+        
+        // Remove o repasse se não conseguir gerar o PIX
+        await prisma.repasseParceiro.delete({
+          where: { id: repasse.id }
+        })
+
+        return NextResponse.json(
+          { error: 'Erro ao gerar PIX para o repasse', details: errorData },
+          { status: 400 }
+        )
       }
-    })
 
-    return NextResponse.json({
-      success: true,
-      message: 'Repasse criado com sucesso! Aguardando aprovação administrativa.',
-      repasse
-    })
+      const pixData = await pixResponse.json()
+
+      // Cria notificação para o usuário
+      await prisma.notificacao.create({
+        data: {
+          usuarioId: compra.usuarioId,
+          titulo: 'Repasse Iniciado!',
+          mensagem: `O parceiro ${compra.parceiro.nomeCidade} iniciou o repasse de R$ ${valor.toFixed(2)} para sua compra. Aguarde a confirmação do pagamento.`,
+          tipo: 'repasse_iniciado',
+          lida: false
+        }
+      })
+
+      // Log de auditoria
+      await prisma.logAuditoria.create({
+        data: {
+          usuarioId: parceiroId,
+          acao: 'INICIAR_REPASSE_MERCADOPAGO',
+          detalhes: `Repasse ${repasse.id} iniciado para compra ${compraId}. Parceiro: ${compra.parceiro.nomeCidade}, Valor: R$ ${valor.toFixed(2)}, PaymentId: ${pixData.paymentId}`,
+          ip: request.headers.get('x-forwarded-for') || '',
+          userAgent: request.headers.get('user-agent') || '',
+          nivel: 'info'
+        }
+      })
+
+      return NextResponse.json({ 
+        success: true,
+        message: 'Repasse iniciado com sucesso. PIX gerado via Mercado Pago.',
+        repasse: {
+          id: repasse.id,
+          status: repasse.status,
+          paymentId: pixData.paymentId
+        },
+        pix: {
+          qrCode: pixData.qrCode,
+          qrCodeBase64: pixData.qrCodeBase64,
+          status: pixData.status
+        }
+      })
+
+    } catch (error) {
+      console.error('Erro ao gerar PIX:', error)
+      
+      // Remove o repasse se não conseguir gerar o PIX
+      await prisma.repasseParceiro.delete({
+        where: { id: repasse.id }
+      })
+
+      return NextResponse.json(
+        { error: 'Erro ao gerar PIX para o repasse' },
+        { status: 500 }
+      )
+    }
+
   } catch (error) {
-    console.error('Erro ao criar repasse:', error)
+    console.error('Erro ao fazer repasse:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

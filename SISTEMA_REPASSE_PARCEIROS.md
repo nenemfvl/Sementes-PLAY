@@ -2,26 +2,44 @@
 
 ## Visão Geral
 
-O sistema de repasse dos parceiros permite que parceiros aprovem solicitações de compra e realizem repasses automaticamente, distribuindo cashback em sementes para os usuários sem necessidade de aprovação administrativa.
+O sistema de repasse dos parceiros permite que parceiros aprovem solicitações de compra e realizem repasses automaticamente via Mercado Pago, distribuindo cashback em sementes para os usuários sem necessidade de aprovação administrativa.
 
 ## Como Funciona
 
 ### 1. Fluxo de Solicitação e Aprovação
 - **Usuário faz solicitação** → Cria `SolicitacaoCompra` com status `pendente`
 - **Parceiro aprova/rejeita** → Atualiza status e cria `CompraParceiro` com status `aguardando_repasse`
-- **Parceiro faz repasse** → Cria `RepasseParceiro` com status `pendente`
+- **Parceiro inicia repasse** → Cria `RepasseParceiro` e gera PIX via Mercado Pago
 
-### 2. Confirmação e Distribuição Automática
-- **Parceiro confirma pagamento** → Executa `/api/parceiros/confirmar-pagamento`
-- **Sistema distribui automaticamente**:
+### 2. Processamento Automático via Mercado Pago
+- **Parceiro paga via PIX** → Mercado Pago confirma pagamento
+- **Webhook processa automaticamente** → Sistema distribui cashback imediatamente:
   - 5% do valor para o usuário em sementes
   - 2,5% para o fundo de distribuição
   - 2,5% para o sistema SementesPLAY
 
 ### 3. Status dos Repasses
-- `pendente`: Repasse criado, aguardando confirmação
+- `pendente`: Repasse criado, aguardando geração do PIX
+- `aguardando_pagamento`: PIX gerado, aguardando confirmação
 - `confirmado`: Pagamento confirmado, cashback distribuído
 - `rejeitado`: Repasse rejeitado pelo parceiro
+
+## Integração com Mercado Pago
+
+### 1. Geração de PIX
+- **API**: `/api/mercadopago/pix`
+- **Função**: Cria pagamento PIX no Mercado Pago para receber repasse
+- **Retorna**: QR Code, status e paymentId
+
+### 2. Webhook de Confirmação
+- **API**: `/api/mercadopago/webhook`
+- **Função**: Processa automaticamente pagamentos confirmados
+- **Ação**: Distribui cashback e atualiza status do repasse
+
+### 3. Verificação de Status
+- **API**: `/api/mercadopago/verificar-pagamento`
+- **Função**: Consulta status do pagamento no Mercado Pago
+- **Uso**: Verificação manual quando necessário
 
 ## APIs Implementadas
 
@@ -34,16 +52,15 @@ O sistema de repasse dos parceiros permite que parceiros aprovem solicitações 
 - **Ação**: Atualiza status e notifica usuário
 
 ### 3. `/api/parceiros/fazer-repasse`
-- **POST**: Parceiro cria repasse para uma compra
-- **Ação**: Cria `RepasseParceiro` com status `pendente`
+- **POST**: Parceiro inicia repasse e gera PIX automaticamente
+- **Ação**: Cria `RepasseParceiro` e integra com Mercado Pago
 
-### 4. `/api/parceiros/confirmar-pagamento`
-- **POST**: Parceiro confirma pagamento do repasse
-- **Ação**: Distribui cashback automaticamente
-
-### 5. `/api/parceiros/repasses-pendentes`
+### 4. `/api/parceiros/repasses-pendentes`
 - **GET**: Lista repasses pendentes do parceiro
 - **Retorna**: Solicitações, compras e repasses pendentes
+
+### 5. `/api/admin/repasses`
+- **GET**: Admin visualiza histórico de todos os repasses
 
 ## Estrutura do Banco de Dados
 
@@ -88,8 +105,8 @@ model RepasseParceiro {
   valor          Float
   dataRepasse    DateTime       @default(now())
   comprovanteUrl String?
-  status         String         @default("pendente") // pendente, confirmado, rejeitado
-  paymentId      String?
+  status         String         @default("pendente") // pendente, aguardando_pagamento, confirmado, rejeitado
+  paymentId      String?        // ID do pagamento no Mercado Pago
 }
 ```
 
@@ -98,24 +115,34 @@ model RepasseParceiro {
 ### Ciclo de Vida do Repasse
 1. **Solicitação**: Usuário solicita compra com parceiro
 2. **Aprovação**: Parceiro aprova ou rejeita a solicitação
-3. **Repasse**: Parceiro cria repasse com valor e comprovante
-4. **Confirmação**: Parceiro confirma pagamento
-5. **Distribuição**: Sistema distribui cashback automaticamente
+3. **Repasse**: Parceiro inicia repasse e sistema gera PIX
+4. **Pagamento**: Parceiro paga via PIX no Mercado Pago
+5. **Confirmação**: Webhook confirma pagamento automaticamente
+6. **Distribuição**: Sistema distribui cashback imediatamente
 
 ### Benefícios do Sistema
 - **Autonomia**: Parceiros gerenciam seus próprios repasses
-- **Agilidade**: Cashback liberado imediatamente após confirmação
+- **Agilidade**: Cashback liberado automaticamente após confirmação do pagamento
 - **Transparência**: Usuários veem status em tempo real
 - **Auditoria**: Log completo de todas as operações
+- **Integração**: Pagamentos processados via Mercado Pago (seguro e confiável)
 
 ## Configuração e Manutenção
 
-### Confirmação de Pagamento
+### Variáveis de Ambiente
 ```bash
-POST /api/parceiros/confirmar-pagamento
+MERCADOPAGO_ACCESS_TOKEN=your_access_token_here
+NEXT_PUBLIC_BASE_URL=https://sementesplay.com.br
+```
+
+### Iniciar Repasse
+```bash
+POST /api/parceiros/fazer-repasse
 {
-  "repasseId": "id_do_repasse",
-  "parceiroId": "id_do_parceiro"
+  "compraId": "id_da_compra",
+  "parceiroId": "id_do_parceiro",
+  "valor": 100.00,
+  "comprovanteUrl": "url_do_comprovante"
 }
 ```
 
@@ -123,10 +150,13 @@ POST /api/parceiros/confirmar-pagamento
 - Verificar repasses pendentes via `/api/parceiros/repasses-pendentes`
 - Acompanhar histórico de repasses via `/api/admin/repasses`
 - Revisar logs de auditoria para transparência
+- Monitorar webhooks do Mercado Pago
 
 ## Considerações de Segurança
 
-- **Validação**: Verificações de propriedade antes de confirmar pagamento
-- **Transações**: Todas as operações usam transações do banco
+- **Validação**: Verificações de propriedade antes de iniciar repasse
+- **Transações**: Todas as distribuições usam transações do banco
 - **Auditoria**: Log completo de todas as operações
-- **Permissões**: Apenas parceiros podem confirmar seus próprios repasses
+- **Permissões**: Apenas parceiros podem iniciar seus próprios repasses
+- **Integração**: Pagamentos processados via Mercado Pago (PCI compliant)
+- **Webhook**: Confirmação automática via webhook seguro
