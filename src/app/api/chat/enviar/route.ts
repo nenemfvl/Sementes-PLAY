@@ -1,0 +1,72 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+export async function POST(request: NextRequest) {
+  try {
+    const { conversaId, remetenteId, texto } = await request.json()
+
+    if (!conversaId || !remetenteId || !texto) {
+      return NextResponse.json(
+        { error: 'ConversaId, remetenteId e texto são obrigatórios' },
+        { status: 400 }
+      )
+    }
+
+    // Verificar se a conversa existe
+    const conversa = await prisma.conversa.findUnique({
+      where: { id: String(conversaId) }
+    })
+
+    if (!conversa) {
+      return NextResponse.json(
+        { error: 'Conversa não encontrada' },
+        { status: 404 }
+      )
+    }
+
+    // Criar nova mensagem
+    const novaMensagem = await prisma.mensagem.create({
+      data: {
+        conversaId: String(conversaId),
+        remetenteId: String(remetenteId),
+        texto: String(texto)
+      },
+      include: {
+        remetente: {
+          select: {
+            id: true,
+            nome: true
+          }
+        }
+      }
+    })
+
+    // Atualizar última mensagem da conversa
+    await prisma.conversa.update({
+      where: { id: String(conversaId) },
+      data: {
+        ultimaMensagem: novaMensagem.dataEnvio
+      }
+    })
+
+    const mensagemFormatada = {
+      id: novaMensagem.id,
+      remetenteId: novaMensagem.remetenteId,
+      remetenteNome: novaMensagem.remetente.nome,
+      conteudo: novaMensagem.texto,
+      timestamp: novaMensagem.dataEnvio,
+      tipo: 'texto',
+      lida: novaMensagem.lida
+    }
+
+    return NextResponse.json({ mensagem: mensagemFormatada }, { status: 201 })
+  } catch (error) {
+    console.error('Erro ao enviar mensagem:', error)
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    )
+  }
+}

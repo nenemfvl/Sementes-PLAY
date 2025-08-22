@@ -66,61 +66,51 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const conversas = await prisma.conversa.findMany({
+    // Buscar todos os amigos aceitos
+    const amizades = await prisma.amizade.findMany({
       where: {
         OR: [
-          { usuario1Id: usuarioId },
-          { usuario2Id: usuarioId }
+          { usuarioId: String(usuarioId), status: 'aceita' },
+          { amigoId: String(usuarioId), status: 'aceita' }
         ]
       },
       include: {
-        usuario1: {
-          select: {
-            id: true,
-            nome: true,
-            email: true
-          }
-        },
-        usuario2: {
-          select: {
-            id: true,
-            nome: true,
-            email: true
-          }
-        },
-                 mensagens: {
-           orderBy: {
-             dataEnvio: 'desc'
-           },
-           take: 1
-         }
-      },
-      orderBy: {
-        ultimaMensagem: 'desc'
+        usuario: { select: { id: true, nome: true, email: true } },
+        amigo: { select: { id: true, nome: true, email: true } }
       }
     })
 
-    const conversasFormatadas = conversas.map(conversa => {
-      const outroUsuario = conversa.usuario1Id === usuarioId 
-        ? conversa.usuario2 
-        : conversa.usuario1
-      
-      const ultimaMensagem = conversa.mensagens[0]?.texto || ''
-      const naoLidas = conversa.mensagens.filter(m => 
-        !m.lida && m.remetenteId !== usuarioId
-      ).length
-
+    // Para cada amigo, buscar conversa (se existir) e última mensagem
+    const conversas = await Promise.all(amizades.map(async amizade => {
+      const amigo = amizade.usuarioId === usuarioId ? amizade.amigo : amizade.usuario
+      // Buscar conversa (pode ser em qualquer direção)
+      const conversa = await prisma.conversa.findFirst({
+        where: {
+          OR: [
+            { usuario1Id: String(usuarioId), usuario2Id: amigo.id },
+            { usuario1Id: amigo.id, usuario2Id: String(usuarioId) }
+          ]
+        },
+        include: {
+          mensagens: {
+            orderBy: { dataEnvio: 'desc' },
+            take: 1
+          }
+        }
+      })
+      const ultimaMensagem = conversa?.mensagens[0]
       return {
-        id: conversa.id,
-        usuarioId: outroUsuario.id,
-        usuarioNome: outroUsuario.nome,
-        ultimaMensagem,
-        ultimaAtividade: conversa.ultimaMensagem || conversa.dataCriacao,
-        naoLidas
+        id: conversa?.id || null,
+        usuarioId: amigo.id,
+        usuarioNome: amigo.nome,
+        usuarioEmail: amigo.email,
+        ultimaMensagem: ultimaMensagem?.texto || 'Nenhuma mensagem',
+        ultimaAtividade: ultimaMensagem?.dataEnvio || null,
+        naoLidas: 0 // Por enquanto
       }
-    })
+    }))
 
-    return NextResponse.json({ conversas: conversasFormatadas })
+    return NextResponse.json({ conversas })
   } catch (error) {
     console.error('Erro ao buscar conversas:', error)
     return NextResponse.json(

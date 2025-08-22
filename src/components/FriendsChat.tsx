@@ -311,13 +311,13 @@ export default function FriendsChat() {
     setNovaMensagem('')
 
     try {
-      const response = await fetch(`/api/chat/conversas/${conversaAtiva.id}/mensagens`, {
+      const response = await fetch('/api/chat/enviar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          conteudo: conteudoMensagem,
-          tipo: 'texto',
-          usuarioId: user.id
+          conversaId: conversaAtiva.id,
+          remetenteId: user.id,
+          texto: conteudoMensagem
         })
       })
 
