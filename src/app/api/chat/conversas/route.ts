@@ -39,8 +39,7 @@ export async function POST(request: NextRequest) {
     const novaConversa = await prisma.conversa.create({
       data: {
         usuario1Id,
-        usuario2Id,
-        ultimaAtividade: new Date()
+        usuario2Id
       }
     })
 
@@ -97,7 +96,7 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: {
-        ultimaAtividade: 'desc'
+        ultimaMensagem: 'desc'
       }
     })
 
@@ -106,7 +105,7 @@ export async function GET(request: NextRequest) {
         ? conversa.usuario2 
         : conversa.usuario1
       
-      const ultimaMensagem = conversa.mensagens[0]?.conteudo || ''
+      const ultimaMensagem = conversa.mensagens[0]?.texto || ''
       const naoLidas = conversa.mensagens.filter(m => 
         !m.lida && m.remetenteId !== usuarioId
       ).length
@@ -116,7 +115,7 @@ export async function GET(request: NextRequest) {
         usuarioId: outroUsuario.id,
         usuarioNome: outroUsuario.nome,
         ultimaMensagem,
-        ultimaAtividade: conversa.ultimaAtividade,
+        ultimaAtividade: conversa.ultimaMensagem || conversa.dataCriacao,
         naoLidas
       }
     })

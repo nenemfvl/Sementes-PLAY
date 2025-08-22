@@ -63,9 +63,7 @@ export async function POST(
       data: {
         conversaId: id,
         remetenteId: usuarioId,
-        conteudo,
-        tipo,
-        timestamp: new Date(),
+        texto: conteudo,
         lida: false
       },
       include: {
@@ -78,10 +76,10 @@ export async function POST(
       }
     })
 
-    // Atualizar última atividade da conversa
+    // Atualizar última mensagem da conversa
     await prisma.conversa.update({
       where: { id },
-      data: { ultimaAtividade: new Date() }
+      data: { ultimaMensagem: new Date() }
     })
 
     return NextResponse.json({
@@ -89,8 +87,8 @@ export async function POST(
         id: novaMensagem.id,
         remetenteId: novaMensagem.remetenteId,
         remetenteNome: novaMensagem.remetente.nome,
-        conteudo: novaMensagem.conteudo,
-        timestamp: novaMensagem.timestamp,
+        conteudo: novaMensagem.texto,
+        timestamp: novaMensagem.dataEnvio,
         lida: novaMensagem.lida
       }
     })
@@ -168,8 +166,8 @@ export async function GET(
       id: msg.id,
       remetenteId: msg.remetenteId,
       remetenteNome: msg.remetente.nome,
-      conteudo: msg.conteudo,
-      timestamp: msg.timestamp,
+      conteudo: msg.texto,
+      timestamp: msg.dataEnvio,
       lida: msg.lida
     }))
 
