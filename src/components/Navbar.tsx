@@ -9,7 +9,8 @@ import {
   UserGroupIcon,
   ChevronDownIcon,
   ArrowLeftOnRectangleIcon,
-  UserIcon
+  UserIcon,
+  BellIcon
 } from '@heroicons/react/24/outline'
 export default function Navbar() {
   const router = useRouter()
@@ -227,6 +228,19 @@ export default function Navbar() {
         <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center space-x-4 px-6">
           {isAuthenticated && usuario ? (
             <>
+              {/* Sininho de notificações */}
+              <button 
+                onClick={() => handleMenuItemClick('/notificacoes')}
+                className="relative p-2 text-gray-300 hover:text-red-500 transition-colors"
+                title="Notificações"
+              >
+                <BellIcon className="w-6 h-6" />
+                {/* Badge para notificações não lidas */}
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  0
+                </span>
+              </button>
+
               {/* Menu dropdown do perfil */}
               <div className="relative profile-menu">
                 <button
@@ -287,12 +301,7 @@ export default function Navbar() {
                         🏦 Carteira
                       </button>
 
-                      <button
-                        onClick={() => handleMenuItemClick('/notificacoes')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
-                      >
-                        🔔 Notificações
-                      </button>
+
                       <button
                         onClick={() => handleMenuItemClick('/criadores-favoritos')}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-red-500"
