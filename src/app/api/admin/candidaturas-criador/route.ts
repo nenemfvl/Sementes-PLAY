@@ -149,10 +149,10 @@ export async function PUT(request: NextRequest) {
         }
       })
 
-      // Atualizar nível do usuário para criador
+      // Usuário sempre inicia como criador-iniciante
       await prisma.usuario.update({
         where: { id: candidatura.usuarioId },
-        data: { nivel: 'criador' }
+        data: { nivel: 'criador-iniciante' }
       })
     }
 
