@@ -126,12 +126,12 @@ export default function CriadoresPage() {
         }
       }
 
-      // Carregar total de sementes
-      const responseStats = await fetch('/api/admin/stats')
+      // Carregar total de sementes em circulação
+      const responseStats = await fetch('/api/admin/estatisticas')
       if (responseStats.ok) {
         const data = await responseStats.json()
-        if (typeof data.totalSementes === 'number') {
-          setTotalSementes(data.totalSementes)
+        if (data.sucesso && typeof data.dados.sistema.totalSementes === 'number') {
+          setTotalSementes(data.dados.sistema.totalSementes)
         }
       }
 
@@ -242,7 +242,7 @@ export default function CriadoresPage() {
                   <p className="text-6xl md:text-7xl font-black text-yellow-500 mb-4">
                     {(totalSementes / 1000).toFixed(0)}k
                   </p>
-                  <p className="text-gray-400 text-lg">Sementes distribuídas entre criadores e usuários</p>
+                  <p className="text-gray-400 text-lg">Fundo de distribuição em circulação para o ciclo atual</p>
                 </div>
 
                 {/* Informações do Ciclo Atual - Agora dentro da mesma seção */}

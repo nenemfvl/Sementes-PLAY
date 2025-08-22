@@ -15,7 +15,11 @@ export async function GET(request: NextRequest) {
       usuariosAtivos,
       usuariosBanidos,
       usuariosSuspensos,
-      totalSementes,
+      // Buscar fundo de sementes em circulação
+      prisma.fundoSementes.findFirst({
+        where: { distribuido: false },
+        orderBy: { ciclo: 'desc' }
+      }),
       totalConteudos,
       totalSaques,
       saquesPendentes,
@@ -90,7 +94,7 @@ export async function GET(request: NextRequest) {
         total: totalAdmins
       },
              sistema: {
-         totalSementes: totalSementes._sum.saldo || 0,
+        totalSementes: totalSementes?.valorTotal || 0,
         totalConteudos: totalConteudos,
         novosConteudosUltimos30Dias: novosConteudos
       },
