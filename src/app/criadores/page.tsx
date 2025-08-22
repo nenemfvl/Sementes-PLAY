@@ -710,25 +710,25 @@ export default function CriadoresPage() {
       </div>
 
       {/* Botão Flutuante "Seja um Criador" - Fixado na lateral direita */}
-      <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40">
+      <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40">
         <motion.button
           onClick={() => router.push('/candidatura-criador')}
-          className="group relative bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-6 py-4 rounded-2xl font-bold shadow-2xl hover:shadow-sementes-primary/50 transition-all duration-300 hover:scale-110 transform"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          className="group relative bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:shadow-sementes-primary/50 transition-all duration-300 hover:scale-105 transform"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           {/* Efeito de brilho */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
           
           {/* Conteúdo do botão */}
-          <div className="relative flex flex-col items-center space-y-2">
-            <span className="text-2xl">🌱</span>
-            <span className="text-sm font-bold">Seja um</span>
-            <span className="text-lg font-bold">Criador</span>
+          <div className="relative flex flex-col items-center space-y-1">
+            <span className="text-lg">🌱</span>
+            <span className="text-xs font-bold">Seja um</span>
+            <span className="text-sm font-bold">Criador</span>
           </div>
           
           {/* Seta indicativa */}
-          <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-8 border-t-transparent border-r-8 border-r-sementes-primary border-b-8 border-b-transparent"></div>
+          <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-0 h-0 border-t-6 border-t-transparent border-r-6 border-r-sementes-primary border-b-6 border-b-transparent"></div>
         </motion.button>
       </div>
     </div>
