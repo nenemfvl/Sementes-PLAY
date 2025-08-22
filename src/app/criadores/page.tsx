@@ -232,7 +232,7 @@ export default function CriadoresPage() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-amber-600/20 rounded-3xl blur-2xl"></div>
               <div className="relative bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-8">
-                <div className="text-center">
+                <div className="text-center mb-8">
                   <div className="flex items-center justify-center mb-6">
                     <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg">
                       <span className="text-4xl">🌱</span>
@@ -244,70 +244,65 @@ export default function CriadoresPage() {
                   </p>
                   <p className="text-gray-400 text-lg">Sementes distribuídas entre criadores e usuários</p>
                 </div>
+
+                {/* Informações do Ciclo Atual - Agora dentro da mesma seção */}
+                {dadosCiclo && (
+                  <div className="bg-gradient-to-r from-sementes-primary/20 to-sementes-accent/20 rounded-2xl border border-sementes-primary/30 p-6">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                      {/* Status do Ciclo */}
+                      <div className="flex items-center space-x-6">
+                        <div className="text-center">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <span className="text-2xl">🔄</span>
+                            <span className="text-gray-400 text-sm">Ciclo Atual</span>
+                          </div>
+                          <div className="text-4xl font-bold text-sementes-primary">
+                            {dadosCiclo.ciclo}
+                          </div>
+                        </div>
+                        
+                        <div className="text-center">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <span className="text-2xl">🏆</span>
+                            <span className="text-gray-400 text-sm">Season</span>
+                          </div>
+                          <div className="text-4xl font-bold text-sementes-accent">
+                            {dadosCiclo.season}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Status e Datas */}
+                      <div className="flex flex-col items-center lg:items-end space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <span className={`w-3 h-3 rounded-full ${dadosCiclo.pausado ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                          <span className="text-sm text-gray-300">
+                            {dadosCiclo.pausado ? 'Ciclo Pausado' : 'Ciclo Ativo'}
+                          </span>
+                        </div>
+                        
+                        <div className="text-center lg:text-right">
+                          <p className="text-gray-400 text-xs">Início do Ciclo</p>
+                          <p className="text-white text-sm">
+                            {new Date(dadosCiclo.dataInicioCiclo).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                        
+                        <div className="text-center lg:text-right">
+                          <p className="text-gray-400 text-xs">Início da Season</p>
+                          <p className="text-white text-sm">
+                            {new Date(dadosCiclo.dataInicioSeason).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
 
-          {/* Informações do Ciclo Atual */}
-          {dadosCiclo && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="mb-12"
-            >
-              <div className="bg-gradient-to-r from-sementes-primary/20 to-sementes-accent/20 rounded-2xl border border-sementes-primary/30 p-6">
-                <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-                  {/* Status do Ciclo */}
-                  <div className="flex items-center space-x-6">
-                    <div className="text-center">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className="text-2xl">🔄</span>
-                        <span className="text-gray-400 text-sm">Ciclo Atual</span>
-                      </div>
-                      <div className="text-4xl font-bold text-sementes-primary">
-                        {dadosCiclo.ciclo}
-                      </div>
-                    </div>
-                    
-                    <div className="text-center">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className="text-2xl">🏆</span>
-                        <span className="text-gray-400 text-sm">Season</span>
-                      </div>
-                      <div className="text-4xl font-bold text-sementes-accent">
-                        {dadosCiclo.season}
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Status e Datas */}
-                  <div className="flex flex-col items-center lg:items-end space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <span className={`w-3 h-3 rounded-full ${dadosCiclo.pausado ? 'bg-red-500' : 'bg-green-500'}`}></span>
-                      <span className="text-sm text-gray-300">
-                        {dadosCiclo.pausado ? 'Ciclo Pausado' : 'Ciclo Ativo'}
-                      </span>
-                    </div>
-                    
-                    <div className="text-center lg:text-right">
-                      <p className="text-gray-400 text-xs">Início do Ciclo</p>
-                      <p className="text-white text-sm">
-                        {new Date(dadosCiclo.dataInicioCiclo).toLocaleDateString('pt-BR')}
-                      </p>
-                    </div>
-                    
-                    <div className="text-center lg:text-right">
-                      <p className="text-gray-400 text-xs">Início da Season</p>
-                      <p className="text-white text-sm">
-                        {new Date(dadosCiclo.dataInicioSeason).toLocaleDateString('pt-BR')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
 
           {/* Estatísticas */}
           <motion.div
