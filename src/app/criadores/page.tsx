@@ -711,12 +711,12 @@ export default function CriadoresPage() {
 
       {/* Botão Flutuante "Seja um Criador" - Fixado na lateral direita */}
       <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40">
-        <motion.button
-          onClick={() => router.push('/candidatura-criador')}
-          className="group relative bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-sementes-primary/50 transition-all duration-300 hover:scale-105 transform"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+                 <motion.button
+           onClick={() => router.push('/candidatura-criador')}
+           className="group relative bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-sementes-primary/50 transition-all duration-300 hover:scale-105 transform overflow-hidden"
+           whileHover={{ scale: 1.02 }}
+           whileTap={{ scale: 0.98 }}
+         >
           {/* Efeito de brilho */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
           
