@@ -238,7 +238,7 @@ export default function CriadoresPage() {
                       <span className="text-4xl">🌱</span>
                     </div>
                   </div>
-                  <h2 className="text-3xl font-bold text-white mb-4">Total de Sementes na Plataforma</h2>
+                  <h2 className="text-3xl font-bold text-white mb-4">Sementes em Circulação</h2>
                   <p className="text-6xl md:text-7xl font-black text-yellow-500 mb-4">
                     {(totalSementes / 1000).toFixed(0)}k
                   </p>
