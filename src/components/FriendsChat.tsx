@@ -125,7 +125,7 @@ export default function FriendsChat() {
 
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`/api/chat/conversas/${conversaAtiva.id}/mensagens`)
+        const response = await fetch(`/api/chat/conversas/${conversaAtiva.id}/mensagens?usuarioId=${user.id}`)
         const data = await response.json()
         if (response.ok) {
           setMensagens(data.mensagens.map((m: any) => ({
@@ -280,7 +280,7 @@ export default function FriendsChat() {
       }
 
       // Carregar mensagens da conversa (EXATAMENTE como no site antigo)
-      const response = await fetch(`/api/chat/conversas/${conversa.id}/mensagens`)
+      const response = await fetch(`/api/chat/conversas/${conversa.id}/mensagens?usuarioId=${user.id}`)
       const data = await response.json()
       if (response.ok) {
         setMensagens(data.mensagens.map((m: any) => ({
@@ -316,7 +316,8 @@ export default function FriendsChat() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           conteudo: conteudoMensagem,
-          tipo: 'texto'
+          tipo: 'texto',
+          usuarioId: user.id
         })
       })
 
