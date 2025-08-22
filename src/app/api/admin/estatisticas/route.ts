@@ -4,9 +4,9 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 // GET - Buscar estatísticas do sistema
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // Buscar contagens em paralelo para melhor performance
+    // Buscar estatísticas básicas
     const [
       totalUsuarios,
       totalCriadores,
@@ -15,11 +15,7 @@ export async function GET(request: NextRequest) {
       usuariosAtivos,
       usuariosBanidos,
       usuariosSuspensos,
-      // Buscar fundo de sementes em circulação
-      prisma.fundoSementes.findFirst({
-        where: { distribuido: false },
-        orderBy: { ciclo: 'desc' }
-      }),
+      totalSementes,
       totalConteudos,
       totalSaques,
       saquesPendentes,
@@ -27,15 +23,17 @@ export async function GET(request: NextRequest) {
       saquesRejeitados
     ] = await Promise.all([
       prisma.usuario.count(),
-             prisma.criador.count(),
-       prisma.parceiro.count(),
-             prisma.usuario.count({ where: { nivel: { in: ['admin', 'moderador', 'supervisor'] } } }),
-             prisma.usuario.count({ where: { suspenso: false } }),
-       prisma.usuario.count({ where: { suspenso: true } }),
-       prisma.usuario.count({ where: { suspenso: true } }),
-             prisma.carteiraDigital.aggregate({
-         _sum: { saldo: true }
-       }),
+      prisma.criador.count(),
+      prisma.parceiro.count(),
+      prisma.usuario.count({ where: { nivel: { in: ['admin', 'moderador', 'supervisor'] } } }),
+      prisma.usuario.count({ where: { suspenso: false } }),
+      prisma.usuario.count({ where: { suspenso: true } }),
+      prisma.usuario.count({ where: { suspenso: true } }),
+      // Buscar fundo de sementes em circulação
+      prisma.fundoSementes.findFirst({
+        where: { distribuido: false },
+        orderBy: { ciclo: 'desc' }
+      }),
       prisma.conteudo.count(),
       prisma.saque.count(),
       prisma.saque.count({ where: { status: 'pendente' } }),
