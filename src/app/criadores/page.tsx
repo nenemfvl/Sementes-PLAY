@@ -710,7 +710,7 @@ export default function CriadoresPage() {
       </div>
 
       {/* Botão Flutuante "Seja um Criador" - Fixado na lateral direita */}
-      <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40">
+      <div className="fixed right-4 top-1/3 -translate-y-1/2 z-40">
                  <motion.button
            onClick={() => router.push('/candidatura-criador')}
            className="group relative bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-sementes-primary/50 transition-all duration-300 hover:scale-105 transform overflow-hidden"
