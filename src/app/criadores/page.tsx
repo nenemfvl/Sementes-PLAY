@@ -220,74 +220,7 @@ export default function CriadoresPage() {
     <div className="min-h-screen bg-sss-dark">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-sementes-primary/20 via-sementes-accent/20 to-sementes-primary/20 rounded-3xl blur-3xl"></div>
-              <div className="relative bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl border border-gray-700/50 p-12">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="w-20 h-20 bg-gradient-to-br from-sementes-primary to-sementes-accent rounded-2xl flex items-center justify-center shadow-2xl">
-                    <UserGroupIcon className="w-10 h-10 text-white" />
-                  </div>
-                </div>
-                <h1 className="text-5xl md:text-6xl font-black text-white mb-6 bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                  Criadores de Conteúdo
-                </h1>
-                <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                  Informações sobre ciclos, estatísticas e conteúdos dos parceiros
-                </p>
-                
-                {/* Botão Seja Criador */}
-                <div className="mt-8">
-                  {verificandoStatus ? (
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-sementes-primary mx-auto mb-4"></div>
-                  ) : statusCandidatura === 'criador_aprovado' ? (
-                    <Link
-                      href="/painel-criador"
-                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-green-600/25 transition-all duration-300 hover:scale-105 transform"
-                    >
-                      <UserGroupIcon className="w-6 h-6 mr-3" />
-                      Acessar Painel Criador
-                    </Link>
-                  ) : statusCandidatura === 'pendente' ? (
-                    <div className="inline-flex items-center justify-center px-8 py-4 bg-yellow-600 text-white font-bold text-lg rounded-2xl">
-                      <UserGroupIcon className="w-6 h-6 mr-3" />
-                      Candidatura em Análise
-                    </div>
-                  ) : statusCandidatura === 'aprovada' ? (
-                    <Link
-                      href="/painel-criador"
-                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-green-600/25 transition-all duration-300 hover:scale-105 transform"
-                    >
-                      <UserGroupIcon className="w-6 h-6 mr-3" />
-                      Acessar Painel Criador
-                    </Link>
-                  ) : statusCandidatura === 'rejeitada' ? (
-                    <button
-                      onClick={() => router.push('/candidatura-criador')}
-                      className="inline-flex items-center justify-center px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-red-600/25 transition-all duration-300 hover:scale-105 transform"
-                    >
-                      <UserGroupIcon className="w-6 h-6 mr-3" />
-                      Nova Candidatura
-                    </button>
-                  ) : (
-                    <Link
-                      href="/candidatura-criador"
-                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-sementes-primary to-sementes-accent text-white font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-sementes-primary/25 transition-all duration-300 hover:scale-105 transform"
-                    >
-                      <UserGroupIcon className="w-6 h-6 mr-3" />
-                      Seja um Criador
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-          </motion.div>
+
 
           {/* Contador de Sementes */}
           <motion.div
