@@ -148,7 +148,7 @@ export async function GET(
         }
       },
       orderBy: {
-        timestamp: 'asc'
+        dataEnvio: 'asc'
       }
     })
 

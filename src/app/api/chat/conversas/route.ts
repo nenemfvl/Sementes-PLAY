@@ -88,12 +88,12 @@ export async function GET(request: NextRequest) {
             email: true
           }
         },
-        mensagens: {
-          orderBy: {
-            timestamp: 'desc'
-          },
-          take: 1
-        }
+                 mensagens: {
+           orderBy: {
+             dataEnvio: 'desc'
+           },
+           take: 1
+         }
       },
       orderBy: {
         ultimaMensagem: 'desc'
