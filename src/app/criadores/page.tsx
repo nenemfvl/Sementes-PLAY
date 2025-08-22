@@ -81,11 +81,6 @@ export default function CriadoresPage() {
   const [verificandoStatus, setVerificandoStatus] = useState(true)
   const router = useRouter()
 
-  useEffect(() => {
-    verificarUsuario()
-    carregarDados()
-  }, [])
-
   const verificarUsuario = () => {
     const usuarioSalvo = localStorage.getItem('usuario-dados')
     if (usuarioSalvo) {
@@ -168,6 +163,11 @@ export default function CriadoresPage() {
       setCriadoresLoading(false)
     }
   }
+
+  useEffect(() => {
+    verificarUsuario()
+    carregarDados()
+  }, [])
 
   useEffect(() => {
     carregarCriadores()

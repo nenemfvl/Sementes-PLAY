@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { 
   WalletIcon,
@@ -640,9 +641,11 @@ export default function Carteira() {
                   {/* QR Code */}
                   <div className="text-center">
                     <div className="bg-white p-4 rounded-lg inline-block">
-                      <img 
+                      <Image 
                         src={pixData.pixCode} 
                         alt="QR Code PIX" 
+                        width={192}
+                        height={192}
                         className="w-48 h-48"
                       />
                     </div>

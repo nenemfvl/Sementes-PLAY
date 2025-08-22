@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
@@ -228,9 +229,11 @@ export default function Navbar() {
                   {/* Avatar do usuário */}
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-red-500 flex items-center justify-center">
                     {usuario.avatarUrl ? (
-                      <img 
+                      <Image 
                         src={usuario.avatarUrl} 
                         alt={`Avatar de ${usuario.nome}`}
+                        width={32}
+                        height={32}
                         className="w-full h-full object-cover"
                         onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                           // Fallback para ícone se a imagem falhar
