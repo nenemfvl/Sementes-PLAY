@@ -5,9 +5,13 @@ const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
-    const { conversaId, remetenteId, texto } = await request.json()
+    const body = await request.json()
+    console.log('API /api/chat/enviar - Body recebido:', body)
+    
+    const { conversaId, remetenteId, texto } = body
 
     if (!conversaId || !remetenteId || !texto) {
+      console.log('API /api/chat/enviar - Validação falhou:', { conversaId, remetenteId, texto })
       return NextResponse.json(
         { error: 'ConversaId, remetenteId e texto são obrigatórios' },
         { status: 400 }
