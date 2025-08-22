@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // Simulação simples de usuários online
 // Em produção, isso seria gerenciado por WebSockets ou Redis
-let usuariosOnline = new Set<string>()
+const usuariosOnline = new Set<string>()
 
 export async function GET() {
   try {
