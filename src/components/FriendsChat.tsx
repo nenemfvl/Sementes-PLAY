@@ -119,6 +119,28 @@ export default function FriendsChat() {
     return () => clearInterval(interval)
   }, [user])
 
+  // Polling para atualizar mensagens automaticamente (EXATAMENTE como no site antigo)
+  useEffect(() => {
+    if (!conversaAtiva || !conversaAtiva.id) return
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/chat/conversas/${conversaAtiva.id}/mensagens`)
+        const data = await response.json()
+        if (response.ok) {
+          setMensagens(data.mensagens.map((m: any) => ({
+            ...m,
+            timestamp: new Date(m.timestamp)
+          })))
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar mensagens:', error)
+      }
+    }, 2000) // Atualiza a cada 2 segundos (EXATAMENTE como no site antigo)
+
+    return () => clearInterval(interval)
+  }, [conversaAtiva])
+
   // Buscar usuários online
   useEffect(() => {
     const fetchOnline = async () => {
@@ -235,41 +257,89 @@ export default function FriendsChat() {
     setConversaAtiva(conversa)
     setActiveTab('chat')
     
-    // Simular mensagens para demonstração
-    setMensagens([
-      {
-        id: '1',
-        remetenteId: conversa.usuarioId,
-        remetenteNome: conversa.usuarioNome,
-        conteudo: 'Oi! Como você está?',
-        timestamp: new Date(Date.now() - 60000),
-        lida: true
-      },
-      {
-        id: '2',
-        remetenteId: user.id,
-        remetenteNome: user.nome,
-        conteudo: 'Oi! Tudo bem, e você?',
-        timestamp: new Date(Date.now() - 30000),
-        lida: true
+    try {
+      // Se a conversa não tem ID (nova conversa), criar primeiro (EXATAMENTE como no site antigo)
+      if (!conversa.id) {
+        const createResponse = await fetch('/api/chat/conversas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            usuario1Id: user?.id,
+            usuario2Id: conversa.usuarioId
+          })
+        })
+
+        if (createResponse.ok) {
+          const createData = await createResponse.json()
+          conversa.id = createData.id
+          setConversaAtiva({...conversa, id: createData.id})
+        } else {
+          console.error('Erro ao criar conversa')
+          return
+        }
       }
-    ])
+
+      // Carregar mensagens da conversa (EXATAMENTE como no site antigo)
+      const response = await fetch(`/api/chat/conversas/${conversa.id}/mensagens`)
+      const data = await response.json()
+      if (response.ok) {
+        setMensagens(data.mensagens.map((m: any) => ({
+          ...m,
+          timestamp: new Date(m.timestamp)
+        })))
+      }
+    } catch (error) {
+      console.error('Erro ao carregar mensagens:', error)
+    }
   }
 
   const enviarMensagem = async () => {
-    if (!novaMensagem.trim() || !conversaAtiva) return
+    if (!novaMensagem.trim() || !conversaAtiva || !user) return
 
-    const novaMsg: Mensagem = {
-      id: Date.now().toString(),
+    const conteudoMensagem = novaMensagem
+    const mensagemLocal: Mensagem = {
+      id: `temp-${Date.now()}`,
       remetenteId: user.id,
       remetenteNome: user.nome,
-      conteudo: novaMensagem,
+      conteudo: conteudoMensagem,
       timestamp: new Date(),
       lida: false
     }
 
-    setMensagens(prev => [...prev, novaMsg])
+    // Adiciona mensagem imediatamente ao estado local (EXATAMENTE como no site antigo)
+    setMensagens(prev => [...prev, mensagemLocal])
     setNovaMensagem('')
+
+    try {
+      const response = await fetch(`/api/chat/conversas/${conversaAtiva.id}/mensagens`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conteudo: conteudoMensagem,
+          tipo: 'texto'
+        })
+      })
+
+      if (response.ok) {
+        const responseData = await response.json()
+        // Substitui a mensagem temporária pela mensagem real do servidor (EXATAMENTE como no site antigo)
+        setMensagens(prev => {
+          const semTemporaria = prev.filter(m => m.id !== mensagemLocal.id)
+          return [...semTemporaria, {
+            ...responseData.mensagem,
+            timestamp: new Date(responseData.mensagem.timestamp)
+          }]
+        })
+      } else {
+        // Remove a mensagem se houve erro (EXATAMENTE como no site antigo)
+        setMensagens(prev => prev.filter(m => m.id !== mensagemLocal.id))
+        console.error('Erro ao enviar mensagem')
+      }
+    } catch (error) {
+      // Remove a mensagem se houve erro (EXATAMENTE como no site antigo)
+      setMensagens(prev => prev.filter(m => m.id !== mensagemLocal.id))
+      console.error('Erro ao enviar mensagem:', error)
+    }
   }
 
   const formatarTempo = (data: Date) => {
