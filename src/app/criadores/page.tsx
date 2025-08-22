@@ -723,10 +723,7 @@ export default function CriadoresPage() {
           {/* Conteúdo do botão - Horizontal como na imagem */}
           <div className="relative flex items-center space-x-3">
             <UserGroupIcon className="w-5 h-5 text-white" />
-            <div className="flex flex-col">
-              <span className="text-xs font-bold">Seja um</span>
-              <span className="text-sm font-bold">Criador</span>
-            </div>
+            <span className="text-sm font-bold">Seja um Criador</span>
           </div>
           
           {/* Seta indicativa */}
