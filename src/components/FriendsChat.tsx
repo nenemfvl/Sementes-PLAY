@@ -490,23 +490,42 @@ export default function FriendsChat() {
                             key={amigo.id}
                             whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
                             className="flex items-center justify-between p-3 hover:bg-gray-700 cursor-pointer"
-                            onClick={() => {
-                              const conversa = conversas.find(c => c.usuarioId === amigo.id)
-                              if (conversa) {
-                                abrirConversa(conversa)
-                              } else {
-                                const novaConversa: Conversa = {
-                                  id: '',
-                                  usuarioId: amigo.id,
-                                  usuarioNome: amigo.nome,
-                                  ultimaMensagem: '',
-                                  ultimaAtividade: new Date(),
-                                  naoLidas: 0
-                                }
-                                setConversaAtiva(novaConversa)
-                                setActiveTab('chat')
-                              }
-                            }}
+                                                           onClick={async () => {
+                                 const conversa = conversas.find(c => c.usuarioId === amigo.id)
+                                 if (conversa) {
+                                   abrirConversa(conversa)
+                                 } else {
+                                   // Criar conversa imediatamente quando clicar no amigo
+                                   try {
+                                     const createResponse = await fetch('/api/chat/conversas', {
+                                       method: 'POST',
+                                       headers: { 'Content-Type': 'application/json' },
+                                       body: JSON.stringify({
+                                         usuario1Id: user.id,
+                                         usuario2Id: amigo.id
+                                       })
+                                     })
+                                     
+                                     if (createResponse.ok) {
+                                       const createData = await createResponse.json()
+                                       const novaConversa: Conversa = {
+                                         id: createData.id, // ✅ ID real da conversa criada
+                                         usuarioId: amigo.id,
+                                         usuarioNome: amigo.nome,
+                                         ultimaMensagem: '',
+                                         ultimaAtividade: new Date(),
+                                         naoLidas: 0
+                                       }
+                                       setConversaAtiva(novaConversa)
+                                       setActiveTab('chat')
+                                     } else {
+                                       console.error('Erro ao criar conversa')
+                                     }
+                                   } catch (error) {
+                                     console.error('Erro ao criar conversa:', error)
+                                   }
+                                 }
+                               }}
                           >
                             <div className="flex items-center space-x-3">
                               <div className="relative">
