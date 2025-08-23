@@ -19,7 +19,7 @@ export async function GET(
     }
 
     // Primeiro, verificar se é um conteúdo normal ou de parceiro
-    let conteudo = await prisma.conteudo.findUnique({
+    const conteudo = await prisma.conteudo.findUnique({
       where: { id: String(id) }
     })
 
