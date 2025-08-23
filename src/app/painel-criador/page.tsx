@@ -135,16 +135,33 @@ export default function PainelCriador() {
       if (usuarioSalvo) {
         try {
           const dadosUsuario = JSON.parse(usuarioSalvo)
-          setUsuario(dadosUsuario)
           
           // Verificar se é realmente um criador aprovado usando a API
           const response = await fetch(`/api/candidaturas/criador/status?usuarioId=${dadosUsuario.id}`)
           if (response.ok) {
             const data = await response.json()
             if (data.sucesso && (data.dados.status === 'criador_aprovado' || data.dados.status === 'aprovada')) {
-              setIsAuthenticated(true)
-              // Carregar dados após autenticação
-              carregarDados()
+              // Buscar dados completos do usuário incluindo o campo criador
+              const userResponse = await fetch(`/api/usuarios/${dadosUsuario.id}`)
+              if (userResponse.ok) {
+                const userData = await userResponse.json()
+                if (userData.usuario) {
+                  setUsuario(userData.usuario)
+                  setIsAuthenticated(true)
+                  // Carregar dados após autenticação
+                  carregarDados()
+                } else {
+                  // Fallback para dados do localStorage
+                  setUsuario(dadosUsuario)
+                  setIsAuthenticated(true)
+                  carregarDados()
+                }
+              } else {
+                // Fallback para dados do localStorage
+                setUsuario(dadosUsuario)
+                setIsAuthenticated(true)
+                carregarDados()
+              }
             } else {
               // Não é criador aprovado, redirecionar
               router.push('/candidatura-criador')
@@ -176,6 +193,13 @@ export default function PainelCriador() {
       carregarConteudos()
     }
   }, [usuario?.id, isAuthenticated])
+
+  // Recarregar redes sociais sempre que o usuário mudar
+  useEffect(() => {
+    if (usuario?.criador?.id && isAuthenticated) {
+      carregarRedesSociais()
+    }
+  }, [usuario?.criador?.id, isAuthenticated])
 
   const carregarDados = async () => {
     try {
@@ -423,34 +447,71 @@ export default function PainelCriador() {
 
   const carregarRedesSociais = async () => {
     try {
-      // TODO: Implementar API real para carregar redes sociais
-      // Por enquanto, usar dados mockados
-      setRedesSociais({
-        youtube: 'https://youtube.com/@meucanal',
-        twitch: 'https://twitch.tv/meucanal',
-        tiktok: 'https://tiktok.com/@meucanal',
-        instagram: 'https://instagram.com/meucanal',
-        discord: 'https://discord.gg/meuservidor'
-      })
+      if (!usuario?.criador?.id) return
+      
+      const response = await fetch(`/api/criadores/redes-sociais?criadorId=${usuario.criador.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setRedesSociais(data.redesSociais || {
+          youtube: '',
+          twitch: '',
+          tiktok: '',
+          instagram: '',
+          discord: ''
+        })
+      } else {
+        console.error('Erro ao carregar redes sociais:', response.statusText)
+        // Fallback para dados vazios
+        setRedesSociais({
+          youtube: '',
+          twitch: '',
+          tiktok: '',
+          instagram: '',
+          discord: ''
+        })
+      }
     } catch (error) {
       console.error('Erro ao carregar redes sociais:', error)
+      // Fallback para dados vazios
+      setRedesSociais({
+        youtube: '',
+        twitch: '',
+        tiktok: '',
+        instagram: '',
+        discord: ''
+      })
     }
   }
 
   const salvarRedesSociais = async () => {
     setSalvandoRedes(true)
     try {
-      // TODO: Implementar API real para salvar redes sociais
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Simular sucesso
-      setShowRedesSociaisModal(false)
-      
-      // Mostrar toast de sucesso
-      alert('Redes sociais salvas com sucesso!')
+      if (!usuario?.criador?.id) {
+        throw new Error('ID do criador não encontrado')
+      }
+
+      const response = await fetch(`/api/criadores/redes-sociais?criadorId=${usuario.criador.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ redesSociais })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setRedesSociais(data.redesSociais)
+        setShowRedesSociaisModal(false)
+        
+        // Mostrar toast de sucesso
+        alert('Redes sociais salvas com sucesso!')
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Erro ao salvar redes sociais')
+      }
     } catch (error) {
       console.error('Erro ao salvar redes sociais:', error)
-      alert('Erro ao salvar redes sociais')
+      alert(`Erro ao salvar redes sociais: ${error instanceof Error ? error.message : 'Erro desconhecido'}`)
     } finally {
       setSalvandoRedes(false)
     }
