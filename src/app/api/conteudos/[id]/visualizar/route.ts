@@ -17,7 +17,7 @@ export async function POST(
     }
 
     // Primeiro, verificar se é um conteúdo normal ou de parceiro
-    const conteudo = await prisma.conteudo.findUnique({
+    let conteudo = await prisma.conteudo.findUnique({
       where: { id: String(id) }
     })
 
