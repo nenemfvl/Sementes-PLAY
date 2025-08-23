@@ -13,6 +13,7 @@ import {
 import { FaTwitch, FaYoutube, FaTiktok, FaInstagram } from 'react-icons/fa'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import ConteudoInteracoes from '@/components/ConteudoInteracoes'
 
 // Forçar renderização dinâmica para evitar erro de prerendering
 export const dynamic = 'force-dynamic'
@@ -39,6 +40,7 @@ interface ConteudoParceiro {
   thumbnail?: string
   visualizacoes: number
   curtidas: number
+  dislikes?: number
   dataPublicacao: string
   parceiro: {
     nome: string
@@ -697,23 +699,45 @@ export default function CriadoresPage() {
                       </div>
                     </div>
 
-                    {/* Data e Botão */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 text-gray-400 text-sm">
-                        <CalendarIcon className="w-4 h-4" />
-                        <span>{new Date(conteudo.dataPublicacao).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                      
-                      <a
-                        href={conteudo.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-2 bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-4 py-2 rounded-xl font-bold hover:shadow-lg hover:shadow-sementes-primary/25 transition-all duration-300 hover:scale-105"
-                      >
-                        <PlayIcon className="w-4 h-4" />
-                        <span>Ver</span>
-                      </a>
-                    </div>
+                                         {/* Sistema de Interações */}
+                     <div className="mb-4">
+                       <ConteudoInteracoes
+                         conteudoId={conteudo.id}
+                         conteudoParceiroId={conteudo.id}
+                         tituloConteudo={conteudo.titulo}
+                         tipoConteudo="parceiro"
+                         visualizacoes={conteudo.visualizacoes}
+                         curtidas={conteudo.curtidas}
+                         dislikes={conteudo.dislikes || 0}
+                         onVisualizacaoChange={(novasVisualizacoes: number) => {
+                           // Atualizar visualizações localmente se necessário
+                         }}
+                         onCurtidaChange={(novasCurtidas: number, curtido: boolean) => {
+                           // Atualizar curtidas localmente se necessário
+                         }}
+                         onDislikeChange={(novosDislikes: number, disliked: boolean) => {
+                           // Atualizar dislikes localmente se necessário
+                         }}
+                       />
+                     </div>
+
+                     {/* Data e Botão */}
+                     <div className="flex items-center justify-between">
+                       <div className="flex items-center space-x-2 text-gray-400 text-sm">
+                         <CalendarIcon className="w-4 h-4" />
+                         <span>{new Date(conteudo.dataPublicacao).toLocaleDateString('pt-BR')}</span>
+                       </div>
+                       
+                       <a
+                         href={conteudo.url}
+                         target="_blank"
+                         rel="noopener noreferrer"
+                         className="inline-flex items-center space-x-2 bg-gradient-to-r from-sementes-primary to-sementes-accent text-white px-4 py-2 rounded-xl font-bold hover:shadow-lg hover:shadow-sementes-primary/25 transition-all duration-300 hover:scale-105"
+                       >
+                         <PlayIcon className="w-4 h-4" />
+                         <span>Ver</span>
+                       </a>
+                     </div>
                   </div>
                 </motion.div>
               ))}
