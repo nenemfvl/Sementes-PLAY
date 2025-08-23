@@ -11,12 +11,23 @@ export async function middleware(request: NextRequest) {
     '/configuracoes'
   ]
 
+  // Rotas que precisam de nível de criador
+  const criadorRoutes = [
+    '/painel-criador',
+    '/criador'
+  ]
+
   // Verificar se a rota atual precisa de autenticação
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )
 
-  if (isProtectedRoute) {
+  // Verificar se a rota atual precisa de nível de criador
+  const isCriadorRoute = criadorRoutes.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  )
+
+  if (isProtectedRoute || isCriadorRoute) {
     // Verificar token nos cookies
     const token = request.cookies.get('auth-token')?.value
 
@@ -33,9 +44,20 @@ export async function middleware(request: NextRequest) {
       
       // Verificação mais robusta para Edge
       try {
-        await jwtVerify(token, secret)
+        const { payload } = await jwtVerify(token, secret)
         
-        // Token válido, continuar
+        // Se for rota de criador, verificar nível
+        if (isCriadorRoute) {
+          const userLevel = (payload as any).nivel
+          const validCriadorLevels = ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
+          
+          if (!validCriadorLevels.includes(userLevel)) {
+            // Usuário não tem nível de criador, redirecionar para perfil
+            return NextResponse.redirect(new URL('/perfil', request.url))
+          }
+        }
+        
+        // Token válido e autorizado, continuar
         return NextResponse.next()
       } catch (jwtError) {
         // Verificação manual para Edge
@@ -49,6 +71,17 @@ export async function middleware(request: NextRequest) {
             // Verificar se não expirou
             const agora = Math.floor(Date.now() / 1000)
             if (payload.exp && payload.exp > agora) {
+              // Se for rota de criador, verificar nível
+              if (isCriadorRoute) {
+                const userLevel = payload.nivel
+                const validCriadorLevels = ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
+                
+                if (!validCriadorLevels.includes(userLevel)) {
+                  // Usuário não tem nível de criador, redirecionar para perfil
+                  return NextResponse.redirect(new URL('/perfil', request.url))
+                }
+              }
+              
               return NextResponse.next()
             }
           }
@@ -74,6 +107,8 @@ export const config = {
     '/perfil/:path*',
     '/doacoes/:path*',
     '/relatorios/:path*',
-    '/configuracoes/:path*'
+    '/configuracoes/:path*',
+    '/painel-criador/:path*',
+    '/criador/:path*'
   ]
 }

@@ -146,10 +146,28 @@ export default function PainelCriador() {
               if (userResponse.ok) {
                 const userData = await userResponse.json()
                 if (userData.usuario) {
-                  setUsuario(userData.usuario)
-                  setIsAuthenticated(true)
-                  // Carregar dados após autenticação
-                  carregarDados()
+                  // VERIFICAÇÃO CRÍTICA: Confirmar se o usuário ainda tem nível de criador
+                  if (userData.usuario.criador && userData.usuario.criador.nivel) {
+                    const nivelCriador = userData.usuario.criador.nivel
+                    const niveisValidos = ['iniciante', 'comum', 'parceiro', 'supremo']
+                    
+                    if (niveisValidos.includes(nivelCriador)) {
+                      setUsuario(userData.usuario)
+                      setIsAuthenticated(true)
+                      // Carregar dados após autenticação
+                      carregarDados()
+                    } else {
+                      // Usuário perdeu nível de criador, redirecionar
+                      alert('Acesso negado. Seu nível de criador foi removido.')
+                      router.push('/perfil')
+                      return
+                    }
+                  } else {
+                    // Usuário não tem mais criador, redirecionar
+                    alert('Acesso negado. Você não é mais um criador.')
+                    router.push('/perfil')
+                    return
+                  }
                 } else {
                   // Fallback para dados do localStorage
                   setUsuario(dadosUsuario)

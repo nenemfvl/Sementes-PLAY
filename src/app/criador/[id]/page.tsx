@@ -117,7 +117,27 @@ export default function CriadorPage() {
       if (responseCriador.ok) {
         const data = await responseCriador.json()
         if (data.sucesso) {
-          setCriador(data.dados)
+          // VERIFICAÇÃO CRÍTICA: Confirmar se o criador ainda é válido
+          if (data.dados && data.dados.nivel) {
+            const nivelCriador = data.dados.nivel
+            const niveisValidos = ['iniciante', 'comum', 'parceiro', 'supremo']
+            
+            if (niveisValidos.includes(nivelCriador)) {
+              setCriador(data.dados)
+            } else {
+              // Criador não tem mais nível válido
+              setCriador(null)
+              alert('Este criador não está mais ativo.')
+              router.push('/criadores')
+              return
+            }
+          } else {
+            // Criador não tem nível definido
+            setCriador(null)
+            alert('Este criador não está mais ativo.')
+            router.push('/criadores')
+            return
+          }
         }
       }
 
