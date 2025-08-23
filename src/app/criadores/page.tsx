@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import {
   UserGroupIcon,
@@ -180,7 +180,7 @@ export default function CriadoresPage() {
     carregarDados()
   }, [])
 
-  const carregarConteudosParceiros = async () => {
+  const carregarConteudosParceiros = useCallback(async () => {
     try {
       const response = await fetch('/api/conteudos/todos?limit=20')
       if (response.ok) {
@@ -199,7 +199,7 @@ export default function CriadoresPage() {
       console.error('Erro ao carregar conteúdos dos parceiros:', error)
       setConteudosParceiros([])
     }
-  }
+  }, [])
 
   const getTipoIcon = (tipo: string) => {
     switch (tipo) {

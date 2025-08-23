@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { FaHeart, FaRegHeart, FaThumbsDown, FaRegThumbsDown, FaEye, FaFlag } from 'react-icons/fa'
 import DenunciaModal from './DenunciaModal'
 
@@ -53,16 +53,16 @@ export default function ConteudoInteracoes({
     if (usuario?.id) {
       verificarInteracoesUsuario()
     }
-  }, [usuario, conteudoId, conteudoParceiroId])
+  }, [usuario, conteudoId, conteudoParceiroId, verificarInteracoesUsuario])
 
   // Registrar visualização quando o componente é montado
   useEffect(() => {
     if (usuario?.id) {
       registrarVisualizacao()
     }
-  }, [usuario, conteudoId, conteudoParceiroId])
+  }, [usuario, conteudoId, conteudoParceiroId, registrarVisualizacao])
 
-  const verificarInteracoesUsuario = async () => {
+  const verificarInteracoesUsuario = useCallback(async () => {
     if (!usuario?.id) return
     
     try {
@@ -84,9 +84,9 @@ export default function ConteudoInteracoes({
     } catch (error) {
       console.error('Erro ao verificar interações do usuário:', error)
     }
-  }
+  }, [usuario?.id, tipoConteudo, conteudoParceiroId, conteudoId])
 
-  const registrarVisualizacao = async () => {
+  const registrarVisualizacao = useCallback(async () => {
     try {
       // Usar o ID correto baseado no tipo de conteúdo
       const idParaUsar = tipoConteudo === 'parceiro' ? (conteudoParceiroId || conteudoId) : conteudoId
@@ -110,7 +110,7 @@ export default function ConteudoInteracoes({
     } catch (error) {
       console.error('Erro ao registrar visualização:', error)
     }
-  }
+  }, [tipoConteudo, conteudoParceiroId, conteudoId, usuario?.id, onVisualizacaoChange])
 
   const handleCurtir = async () => {
     if (!usuario?.id) {
