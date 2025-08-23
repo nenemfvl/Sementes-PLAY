@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    let where: any = {}
+    const where: any = {}
     
     if (criadorId) {
       where.criadorId = criadorId
