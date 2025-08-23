@@ -41,10 +41,12 @@ export async function POST(request: NextRequest) {
 
     // Remover o criador e reverter para usuário comum
     await prisma.$transaction(async (tx) => {
-      // 1. Remover o criador
-      await tx.criador.delete({
-        where: { id: usuario.criador.id }
-      })
+      // 1. Remover o criador (com verificação de null)
+      if (usuario.criador) {
+        await tx.criador.delete({
+          where: { id: usuario.criador.id }
+        })
+      }
 
       // 2. Atualizar o usuário para nível comum
       await tx.usuario.update({
