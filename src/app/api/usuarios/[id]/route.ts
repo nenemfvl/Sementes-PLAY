@@ -25,11 +25,6 @@ export async function GET(
             categoria: true,
             redesSociais: true
           }
-        },
-        carteiraDigital: {
-          select: {
-            saldo: true
-          }
         }
       }
     })
