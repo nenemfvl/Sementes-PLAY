@@ -48,20 +48,6 @@ export default function ConteudoInteracoes({
     }
   }, [])
 
-  // Verificar estado inicial das interações do usuário
-  useEffect(() => {
-    if (usuario?.id) {
-      verificarInteracoesUsuario()
-    }
-  }, [usuario, conteudoId, conteudoParceiroId, verificarInteracoesUsuario])
-
-  // Registrar visualização quando o componente é montado
-  useEffect(() => {
-    if (usuario?.id) {
-      registrarVisualizacao()
-    }
-  }, [usuario, conteudoId, conteudoParceiroId, registrarVisualizacao])
-
   const verificarInteracoesUsuario = useCallback(async () => {
     if (!usuario?.id) return
     
@@ -111,6 +97,20 @@ export default function ConteudoInteracoes({
       console.error('Erro ao registrar visualização:', error)
     }
   }, [tipoConteudo, conteudoParceiroId, conteudoId, usuario?.id, onVisualizacaoChange])
+
+  // Verificar estado inicial das interações do usuário
+  useEffect(() => {
+    if (usuario?.id) {
+      verificarInteracoesUsuario()
+    }
+  }, [usuario, conteudoId, conteudoParceiroId, verificarInteracoesUsuario])
+
+  // Registrar visualização quando o componente é montado
+  useEffect(() => {
+    if (usuario?.id) {
+      registrarVisualizacao()
+    }
+  }, [usuario, conteudoId, conteudoParceiroId, registrarVisualizacao])
 
   const handleCurtir = async () => {
     if (!usuario?.id) {
