@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
           usuarioId: usuarioId,
           acao: 'remover_criador',
           detalhes: `Usuário removido do nível de criador. Motivo: ${motivo || 'Não especificado'}`,
-          dataAcao: new Date(),
           ip: request.headers.get('x-forwarded-for') || 'desconhecido'
         }
       })
