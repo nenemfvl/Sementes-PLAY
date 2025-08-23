@@ -149,8 +149,11 @@ export default function CriadoresPage() {
         const responseCriadores = await fetch('/api/criadores')
         if (responseCriadores.ok) {
           const dataCriadores = await responseCriadores.json()
+          console.log('Resposta da API de criadores:', dataCriadores)
           if (dataCriadores.sucesso) {
-            setCriadores(dataCriadores.dados.criadores || [])
+            const criadoresData = dataCriadores.dados.criadores || []
+            console.log('Criadores encontrados:', criadoresData.length, criadoresData)
+            setCriadores(criadoresData)
           } else {
             console.error('Erro na API de criadores:', dataCriadores.error)
             setCriadores([])
@@ -159,6 +162,9 @@ export default function CriadoresPage() {
           console.error('Erro na resposta da API de criadores:', responseCriadores.status)
           setCriadores([])
         }
+        
+        // Definir criadoresLoading como false após carregar
+        setCriadoresLoading(false)
 
         // Carregar conteúdos
         await carregarConteudosParceiros()
