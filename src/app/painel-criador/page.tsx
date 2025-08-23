@@ -237,10 +237,14 @@ export default function PainelCriador() {
     try {
       if (!usuario?.id) return
       
+      console.log('Carregando conteúdos para usuário:', usuario)
+      console.log('Usuario criador:', usuario.criador)
+      
       // Buscar conteúdos pelo ID do usuário
       const response = await fetch(`/api/conteudos?usuarioId=${usuario.id}`)
       if (response.ok) {
         const data = await response.json()
+        console.log('Resposta da API de conteúdos:', data)
         if (data.sucesso) {
           setConteudos(data.dados || [])
         } else {
@@ -291,26 +295,41 @@ export default function PainelCriador() {
         }
       } else {
         // Criar novo conteúdo
-                 const response = await fetch('/api/conteudos', {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({
-             criadorId: usuario.id,
-             titulo: form.titulo,
-             descricao: form.titulo, // Usar título como descrição por enquanto
-             tipo: form.tipo,
-             categoria: form.categoria,
-             url: form.url,
-             plataforma: form.plataforma
-           })
-         })
+        console.log('Criando novo conteúdo com dados:', {
+          criadorId: usuario.id,
+          titulo: form.titulo,
+          tipo: form.tipo,
+          categoria: form.categoria,
+          url: form.url,
+          plataforma: form.plataforma
+        })
+        
+        const response = await fetch('/api/conteudos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            criadorId: usuario.id,
+            titulo: form.titulo,
+            descricao: form.titulo, // Usar título como descrição por enquanto
+            tipo: form.tipo,
+            categoria: form.categoria,
+            url: form.url,
+            plataforma: form.plataforma
+          })
+        })
 
+        console.log('Resposta da criação:', response.status)
+        
         if (response.ok) {
           const data = await response.json()
+          console.log('Dados da criação:', data)
           if (data.sucesso) {
             // Recarregar conteúdos para obter dados atualizados
             await carregarConteudos()
           }
+        } else {
+          const errorData = await response.json()
+          console.error('Erro na criação:', errorData)
         }
       }
       
