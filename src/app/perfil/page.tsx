@@ -182,7 +182,10 @@ export default function Perfil() {
   }
 
   const getNivelIcon = (nivel: string) => {
-    switch (nivel.toLowerCase()) {
+    // Normalizar o nível para aceitar tanto hífens quanto espaços
+    const nivelNormalizado = nivel?.toLowerCase().replace(/[-_]/g, ' ')
+    
+    switch (nivelNormalizado) {
       case 'criador supremo':
         return <span className="text-2xl">👑</span>
       case 'criador parceiro':
@@ -203,7 +206,10 @@ export default function Perfil() {
   }
 
   const getNivelColor = (nivel: string) => {
-    switch (nivel.toLowerCase()) {
+    // Normalizar o nível para aceitar tanto hífens quanto espaços
+    const nivelNormalizado = nivel?.toLowerCase().replace(/[-_]/g, ' ')
+    
+    switch (nivelNormalizado) {
       case 'criador supremo':
         return 'text-yellow-500'
       case 'criador parceiro':
@@ -221,6 +227,17 @@ export default function Perfil() {
       default:
         return 'text-gray-400'
     }
+  }
+
+  // Função para formatar o texto do nível
+  const formatarNivel = (nivel: string) => {
+    if (!nivel) return 'Comum'
+    
+    // Normalizar e formatar o nível
+    const nivelNormalizado = nivel.toLowerCase().replace(/[-_]/g, ' ')
+    return nivelNormalizado.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ')
   }
 
   if (!usuario) {
@@ -292,7 +309,7 @@ export default function Perfil() {
                   <h2 className="text-2xl font-bold text-white">{usuario.nome}</h2>
                   {getNivelIcon((usuarioCompleto?.criador?.nivel || usuario.nivel))}
                   <span className={`text-sm font-medium ${getNivelColor((usuarioCompleto?.criador?.nivel || usuario.nivel))}`}>
-                    Nível {usuarioCompleto?.criador?.nivel || usuario.nivel}
+                    {formatarNivel(usuarioCompleto?.criador?.nivel || usuario.nivel)}
                   </span>
                 </div>
                 

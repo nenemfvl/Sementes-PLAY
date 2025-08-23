@@ -23,7 +23,8 @@ export async function GET(
             id: true,
             bio: true,
             categoria: true,
-            redesSociais: true
+            redesSociais: true,
+            nivel: true // Adicionando o campo nivel do criador
           }
         }
       }
