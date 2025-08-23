@@ -15,7 +15,7 @@ export async function GET() {
       usuariosAtivos,
       usuariosBanidos,
       usuariosSuspensos,
-      totalSementes,
+      fundoSementes,
       totalConteudos,
       totalSaques,
       saquesPendentes,
@@ -92,7 +92,7 @@ export async function GET() {
         total: totalAdmins
       },
              sistema: {
-        totalSementes: totalSementes?.valorTotal || 0,
+        totalSementes: fundoSementes?.valorTotal || 0,
         totalConteudos: totalConteudos,
         novosConteudosUltimos30Dias: novosConteudos
       },

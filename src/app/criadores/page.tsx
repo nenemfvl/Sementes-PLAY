@@ -125,7 +125,9 @@ export default function CriadoresPage() {
         const responseStats = await fetch('/api/admin/estatisticas')
         if (responseStats.ok) {
           const dataStats = await responseStats.json()
-          setTotalSementes(dataStats.totalSementes || 0)
+          if (dataStats.sucesso) {
+            setTotalSementes(dataStats.dados.sistema.totalSementes || 0)
+          }
         }
 
         // Carregar informações dos ciclos
