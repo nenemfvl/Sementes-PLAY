@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
 
     const offset = (pagina - 1) * limite
 
+    console.log('Buscando criadores com filtros:', { where, pagina, limite, offset })
+
     const [criadores, total] = await Promise.all([
       prisma.criador.findMany({
         where,
@@ -54,6 +56,8 @@ export async function GET(request: NextRequest) {
       prisma.criador.count({ where })
     ])
 
+    console.log(`Encontrados ${criadores.length} criadores de ${total} total`)
+
     const totalPaginas = Math.ceil(total / limite)
 
     // Formatar dados dos criadores
@@ -80,8 +84,9 @@ export async function GET(request: NextRequest) {
       }
     }))
 
-    return NextResponse.json({
+    const response = {
       sucesso: true,
+      criadores: criadoresFormatados, // Mantendo compatibilidade
       dados: {
         criadores: criadoresFormatados,
         paginacao: {
@@ -91,7 +96,11 @@ export async function GET(request: NextRequest) {
           totalPaginas
         }
       }
-    })
+    }
+
+    console.log('Resposta da API:', { sucesso: response.sucesso, totalCriadores: response.criadores.length })
+
+    return NextResponse.json(response)
 
   } catch (error) {
     console.error('Erro ao listar criadores:', error)
