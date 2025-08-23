@@ -458,8 +458,16 @@ export default function CriadoresPage() {
                       {/* Header do Card */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-sementes-primary to-sementes-accent rounded-xl flex items-center justify-center shadow-lg">
-                            <UserGroupIcon className="w-6 h-6 text-white" />
+                          <div className="w-12 h-12 bg-gradient-to-br from-sementes-primary to-sementes-accent rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
+                            {criador.usuario?.avatarUrl ? (
+                              <img 
+                                src={criador.usuario.avatarUrl} 
+                                alt={`Avatar de ${criador.nome}`}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <UserGroupIcon className="w-6 h-6 text-white" />
+                            )}
                           </div>
                           <div>
                             <h3 className="text-lg font-bold text-white group-hover:text-sementes-primary transition-colors mb-1">
