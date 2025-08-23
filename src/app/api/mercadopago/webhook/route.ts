@@ -72,11 +72,21 @@ export async function POST(request: NextRequest) {
 
         console.log(`Processando repasse: ${repasse.id}`)
 
-        // Calcular as porcentagens - NOVO FLUXO
+        // Calcular as porcentagens - FLUXO CORRETO
         const valor = repasse.valor
-        const pctUsuario = Math.round(valor * 0.05)    // 5% para jogador
-        const pctSistema = valor * 0.025               // 2,5% para sistema SementesPLAY
-        const pctFundo = valor * 0.025                 // 2,5% para fundo de distribuição
+        const pctUsuario = Math.round(valor * 0.05)    // 5% para jogador em sementes
+        const pctSistema = valor * 0.025               // 2,5% para sistema SementesPLAY em dinheiro
+        const pctFundo = valor * 0.025                 // 2,5% para fundo de distribuição em sementes
+
+        // Buscar ciclo atual para o fundo de sementes
+        const configCiclos = await prisma.configuracaoCiclos.findFirst()
+        if (!configCiclos) {
+          console.error('Configuração de ciclos não encontrada')
+          return NextResponse.json(
+            { error: 'Configuração de ciclos não disponível' },
+            { status: 500 }
+          )
+        }
 
         // Transação: processar tudo de uma vez
         await prisma.$transaction(async (tx) => {
@@ -98,29 +108,37 @@ export async function POST(request: NextRequest) {
             data: { saldoDevedor: { decrement: valor } }
           })
 
-          // 4. Creditar sementes para usuário
+          // 4. Creditar sementes para usuário (5% da compra)
           await tx.usuario.update({
             where: { id: repasse.compra.usuarioId },
             data: { sementes: { increment: pctUsuario } }
           })
           
-          // 5. Registra fundo de sementes
+          // 5. Criar/atualizar fundo de sementes com 2,5% da compra
           const fundoExistente = await tx.fundoSementes.findFirst({
-            where: { distribuido: false }
+            where: { 
+              ciclo: configCiclos.numeroCiclo,
+              distribuido: false 
+            }
           })
 
           if (fundoExistente) {
+            // Atualizar fundo existente do ciclo atual
             await tx.fundoSementes.update({
               where: { id: fundoExistente.id },
-              data: { valorTotal: { increment: pctFundo } }
+              data: { 
+                valorTotal: { increment: pctFundo },
+                dataFim: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000) // 15 dias a partir de agora
+              }
             })
           } else {
+            // Criar novo fundo para o ciclo atual
             await tx.fundoSementes.create({
               data: {
-                ciclo: 1, // lógica de ciclo a ser implementada
+                ciclo: configCiclos.numeroCiclo,
                 valorTotal: pctFundo,
                 dataInicio: new Date(),
-                dataFim: new Date(),
+                dataFim: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 dias
                 distribuido: false
               }
             })
@@ -144,7 +162,7 @@ export async function POST(request: NextRequest) {
           data: {
             usuarioId: 'system', // Sistema
             acao: 'WEBHOOK_MERCADOPAGO_REPASSE',
-            detalhes: `Repasse ${repasse.id} confirmado via webhook Mercado Pago. Parceiro: ${repasse.compra.parceiro.nomeCidade}, Compra: ${repasse.compra.id}, Valor: R$ ${valor.toFixed(2)}, Cashback usuário: ${pctUsuario} sementes, Fundo: R$ ${pctFundo.toFixed(2)}`,
+            detalhes: `Repasse ${repasse.id} confirmado via webhook Mercado Pago. Parceiro: ${repasse.compra.parceiro.nomeCidade}, Compra: ${repasse.compra.id}, Valor: R$ ${valor.toFixed(2)}, Cashback usuário: ${pctUsuario} sementes, Fundo ciclo ${configCiclos.numeroCiclo}: ${pctFundo} sementes`,
             ip: request.headers.get('x-forwarded-for') || '',
             userAgent: request.headers.get('user-agent') || '',
             nivel: 'info'
@@ -163,11 +181,15 @@ export async function POST(request: NextRequest) {
         })
 
         console.log(`Repasse ${repasse.id} processado com sucesso via webhook`)
+        console.log(`Fundo de sementes atualizado: +${pctFundo} sementes para o ciclo ${configCiclos.numeroCiclo}`)
+        
         return NextResponse.json({ 
           success: true,
           message: 'Repasse processado com sucesso',
           repasseId: repasse.id,
-          paymentId: payment.id
+          paymentId: payment.id,
+          fundoAtualizado: pctFundo,
+          ciclo: configCiclos.numeroCiclo
         })
       } else {
         console.log(`Pagamento não aprovado. Status: ${payment.status}`)

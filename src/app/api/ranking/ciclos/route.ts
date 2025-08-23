@@ -87,16 +87,8 @@ export async function GET() {
         await prisma.conteudo.deleteMany()
         await prisma.conteudoParceiro.deleteMany()
         
-        // Criar novo fundo de sementes para o próximo ciclo
-        const novoFundo = await prisma.fundoSementes.create({
-          data: {
-            ciclo: configCiclos!.numeroCiclo,
-            valorTotal: 1000000, // 1 milhão de sementes por padrão
-            dataInicio: agora,
-            dataFim: new Date(agora.getTime() + 15 * 24 * 60 * 60 * 1000), // 15 dias
-            distribuido: false
-          }
-        })
+        // NOTA: Fundo de sementes NÃO é criado automaticamente aqui
+        // Ele será criado/atualizado automaticamente pelas compras dos parceiros (2,5% de cada compra)
         
         configCiclos = await prisma.configuracaoCiclos.findFirst()
       } else if (precisaResetarCiclo) {
@@ -128,16 +120,8 @@ export async function GET() {
         await prisma.conteudo.deleteMany()
         await prisma.conteudoParceiro.deleteMany()
         
-        // Criar novo fundo de sementes para o próximo ciclo
-        const novoFundo = await prisma.fundoSementes.create({
-          data: {
-            ciclo: configCiclos!.numeroCiclo,
-            valorTotal: 1000000, // 1 milhão de sementes por padrão
-            dataInicio: agora,
-            dataFim: new Date(agora.getTime() + 15 * 24 * 60 * 60 * 1000), // 15 dias
-            distribuido: false
-          }
-        })
+        // NOTA: Fundo de sementes NÃO é criado automaticamente aqui
+        // Ele será criado/atualizado automaticamente pelas compras dos parceiros (2,5% de cada compra)
         
         configCiclos = await prisma.configuracaoCiclos.findFirst()
       }

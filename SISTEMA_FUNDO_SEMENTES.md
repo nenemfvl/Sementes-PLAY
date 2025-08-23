@@ -2,120 +2,100 @@
 
 ## Visão Geral
 
-O sistema de fundo de sementes é o mecanismo principal de contabilidade e distribuição de sementes na plataforma SementesPLAY. Ele funciona como um "banco central" que gerencia o fluxo de sementes entre usuários e criadores.
+O sistema de fundo de sementes é o mecanismo principal de distribuição de recompensas na plataforma SementesPLAY. Ele funciona de forma automática e transparente, coletando uma porcentagem das compras dos parceiros e distribuindo para criadores e usuários ativos.
 
 ## Como Funciona
 
-### 1. Criação do Fundo
-- **Por Ciclo**: Um novo fundo é criado a cada ciclo (geralmente mensal)
-- **Valor Total**: O fundo recebe um valor total de sementes para distribuição
-- **Período**: Define data de início e fim do ciclo de distribuição
+### 1. Criação Automática do Fundo
+
+**O fundo NÃO é mais criado manualmente com valor fixo.** Em vez disso, ele é criado e atualizado automaticamente a cada compra confirmada dos parceiros:
+
+- **2,5%** de cada compra dos parceiros vai para o fundo de sementes
+- **5%** da compra vai para o usuário em sementes (cashback)
+- **2,5%** da compra vai para o sistema SementesPLAY em dinheiro
 
 ### 2. Distribuição Automática
-O fundo é distribuído automaticamente seguindo a regra **50/50**:
 
-#### 50% para Criadores
-- **Critério**: Proporcional à quantidade de conteúdo ativo
-- **Cálculo**: `(conteúdos do criador / total de conteúdos) × 50% do fundo`
-- **Benefício**: Recompensa criadores por produtividade
+O fundo é distribuído automaticamente no final de cada ciclo (15 dias) ou quando o admin decide distribuir:
 
-#### 50% para Usuários
-- **Critério**: Proporcional ao valor gasto em compras de parceiros
-- **Cálculo**: `(gasto do usuário / total gasto) × 50% do fundo`
-- **Benefício**: Recompensa usuários por engajamento
+- **50%** para criadores de conteúdo (proporcional à quantidade de conteúdo)
+- **50%** para usuários que fizeram compras (proporcional ao valor gasto)
 
-### 3. Contabilidade em Tempo Real
+### 3. Ciclos e Seasons
 
-#### Sementes em Circulação
-- **Definição**: Valor do fundo atual não distribuído
-- **Exibição**: Mostrado na página principal como "Sementes em Circulação"
-- **Atualização**: Atualiza automaticamente após distribuições
+- **Ciclo**: 15 dias - reset de ranking e níveis de criadores
+- **Season**: 3 meses - reset completo (ranking, níveis, conteúdos)
+- **Fundo**: Criado automaticamente a cada compra, não mais manualmente
 
-#### Histórico de Distribuições
-- **Rastreamento**: Todas as distribuições são registradas
-- **Transparência**: Usuários podem ver quanto receberam e quando
-- **Auditoria**: Log completo para fins administrativos
+## Fluxo Detalhado
 
-## APIs Implementadas
+```
+1. Usuário faz compra no parceiro
+   ↓
+2. Parceiro confirma pagamento (PIX aprovado)
+   ↓
+3. Sistema automaticamente:
+   - Cria/atualiza fundo de sementes com 2,5% da compra
+   - Credita 5% em sementes para o usuário
+   - Sistema recebe 2,5% em dinheiro
+   ↓
+4. No final do ciclo ou quando admin distribuir:
+   - 50% do fundo vai para criadores
+   - 50% do fundo vai para usuários
+```
 
-### 1. `/api/admin/fundo-sementes`
-- **POST**: Criar novo fundo de sementes
-- **GET**: Consultar fundo atual e histórico
+## APIs Principais
 
-### 2. `/api/admin/distribuir-fundo`
-- **POST**: Executar distribuição automática do fundo
+### `/api/mercadopago/webhook`
+- **Função**: Processa pagamentos aprovados do Mercado Pago
+- **Ação**: Cria/atualiza fundo de sementes automaticamente
+- **Porcentagens**: 
+  - 5% para usuário (sementes)
+  - 2,5% para sistema (dinheiro)
+  - 2,5% para fundo (sementes)
 
-### 3. `/api/admin/estatisticas`
-- **GET**: Estatísticas incluindo sementes em circulação
+### `/api/admin/distribuir-fundo`
+- **Função**: Distribui o fundo acumulado para criadores e usuários
+- **Distribuição**: 50% criadores, 50% usuários
+- **Critérios**: Proporcional à atividade (conteúdo para criadores, gastos para usuários)
 
-## Estrutura do Banco de Dados
+### `/api/ranking/ciclos`
+- **Função**: Gerencia ciclos e seasons
+- **Reset**: Ranking, níveis de criadores, conteúdos
+- **NOTA**: NÃO cria mais fundo automaticamente
 
-### Modelo `FundoSementes`
+## Modelo `FundoSementes`
+
 ```prisma
 model FundoSementes {
-  id            String              @id @default(cuid())
-  ciclo         Int                 // Número do ciclo
-  valorTotal    Float               // Valor total do fundo
-  dataInicio    DateTime            // Início do ciclo
-  dataFim       DateTime            // Fim do ciclo
-  distribuido   Boolean             @default(false) // Status de distribuição
-  distribuicoes DistribuicaoFundo[] // Histórico de distribuições
+  id          String   @id @default(cuid())
+  ciclo       Int      // Número do ciclo atual
+  valorTotal  Float    // Total acumulado (2,5% das compras)
+  dataInicio  DateTime // Data de início do fundo
+  dataFim     DateTime // Data de fim (15 dias)
+  distribuido Boolean  @default(false) // Se já foi distribuído
+  
+  // Relacionamentos
+  distribuicoes DistribuicaoFundo[]
+  
+  @@map("fundo_sementes")
 }
 ```
 
-### Modelo `DistribuicaoFundo`
-```prisma
-model DistribuicaoFundo {
-  id        String        @id @default(cuid())
-  fundoId   String        // Referência ao fundo
-  usuarioId String?       // Usuário beneficiado (se aplicável)
-  criadorId String?       // Criador beneficiado (se aplicável)
-  valor     Float         // Valor distribuído
-  tipo      String        // 'criador' ou 'usuario'
-  data      DateTime      @default(now()) // Data da distribuição
-}
-```
+## Vantagens do Novo Sistema
 
-## Fluxo de Funcionamento
+1. **Transparência**: Fundo é criado automaticamente pelas compras reais
+2. **Sustentabilidade**: Sistema se auto-financia através das transações
+3. **Justiça**: Distribuição proporcional à atividade real dos usuários
+4. **Automação**: Sem necessidade de intervenção manual para criar fundos
+5. **Escalabilidade**: Fundo cresce naturalmente com o crescimento da plataforma
 
-### Ciclo de Vida do Fundo
-1. **Criação**: Admin cria fundo com valor e período
-2. **Acumulação**: Sementes ficam em "circulação" durante o ciclo
-3. **Distribuição**: Sistema distribui automaticamente ao final do ciclo
-4. **Histórico**: Registro completo para auditoria
+## Configuração
 
-### Benefícios do Sistema
-- **Transparência**: Usuários veem exatamente quantas sementes estão em circulação
-- **Justiça**: Distribuição proporcional baseada em mérito real
-- **Sustentabilidade**: Sistema auto-gerenciado que recompensa engajamento
-- **Escalabilidade**: Funciona independentemente do número de usuários
+O sistema funciona automaticamente após a configuração do Mercado Pago. Não é necessário configurar valores fixos ou criar fundos manualmente.
 
-## Configuração e Manutenção
+## Monitoramento
 
-### Criação de Fundo
-```bash
-POST /api/admin/fundo-sementes
-{
-  "ciclo": 1,
-  "valorTotal": 1000000,
-  "dataInicio": "2024-01-01T00:00:00Z",
-  "dataFim": "2024-01-31T23:59:59Z"
-}
-```
-
-### Distribuição Automática
-```bash
-POST /api/admin/distribuir-fundo
-```
-
-### Monitoramento
-- Verificar sementes em circulação via `/api/admin/fundo-sementes`
-- Acompanhar estatísticas via `/api/admin/estatisticas`
-- Revisar histórico de distribuições
-
-## Considerações de Segurança
-
-- **Transações**: Todas as distribuições usam transações do banco
-- **Validação**: Verificações de integridade antes da distribuição
-- **Auditoria**: Log completo de todas as operações
-- **Permissões**: Apenas administradores podem criar/distribuir fundos
+- **Logs**: Todas as transações são registradas em `logAuditoria`
+- **Notificações**: Usuários recebem notificações quando recebem cashback
+- **Dashboard**: Admin pode monitorar fundos em `/admin/fundo`
