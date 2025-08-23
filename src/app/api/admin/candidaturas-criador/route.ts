@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+// Forçar renderização dinâmica
+export const dynamic = 'force-dynamic'
 
 // GET - Buscar todas as candidaturas de criador (para admin)
 export async function GET(request: NextRequest) {
@@ -76,9 +77,7 @@ export async function GET(request: NextRequest) {
       { error: 'Erro interno do servidor. Tente novamente.' },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
-  }
+
 }
 
 // PUT - Atualizar status de candidatura (aprovar/rejeitar)

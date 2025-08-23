@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+// Forçar renderização dinâmica
+export const dynamic = 'force-dynamic'
 
 // GET - Verificar status da candidatura do usuário
 export async function GET(request: NextRequest) {
@@ -84,7 +85,5 @@ export async function GET(request: NextRequest) {
       { error: 'Erro interno do servidor' },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect()
-  }
+
 }
