@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+// Forçar renderização dinâmica
+export const dynamic = 'force-dynamic'
 
 // GET - Listar todos os conteúdos dos parceiros/criadores
 export async function GET(request: NextRequest) {
