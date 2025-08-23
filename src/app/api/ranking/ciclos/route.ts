@@ -72,20 +72,14 @@ export async function GET() {
         await prisma.rankingSeason.deleteMany()
         
         // Resetar APENAS níveis de criadores para 'criador-iniciante'
-        await prisma.usuario.updateMany({
+        await prisma.criador.updateMany({
           where: {
-            criador: {
-              nivel: {
-                in: ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
-              }
+            nivel: {
+              in: ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
             }
           },
           data: {
-            criador: {
-              update: {
-                nivel: 'criador-iniciante'
-              }
-            }
+            nivel: 'criador-iniciante'
           }
         })
         
@@ -108,20 +102,14 @@ export async function GET() {
         await prisma.rankingCiclo.deleteMany()
         
         // Resetar APENAS níveis de criadores para 'criador-iniciante'
-        await prisma.usuario.updateMany({
+        await prisma.criador.updateMany({
           where: {
-            criador: {
-              nivel: {
-                in: ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
-              }
+            nivel: {
+              in: ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
             }
           },
           data: {
-            criador: {
-              update: {
-                nivel: 'criador-iniciante'
-              }
-            }
+            nivel: 'criador-iniciante'
           }
         })
         
