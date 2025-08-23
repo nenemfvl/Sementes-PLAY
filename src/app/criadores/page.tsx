@@ -138,8 +138,8 @@ export default function CriadoresPage() {
       // Carregar criadores
       await carregarCriadores()
 
-      // TODO: Implementar API para carregar conteúdos dos parceiros
-      setConteudosParceiros([])
+      // Carregar conteúdos dos parceiros
+      await carregarConteudosParceiros()
       setLoading(false)
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
@@ -161,6 +161,27 @@ export default function CriadoresPage() {
       console.error('Erro ao carregar criadores:', error)
     } finally {
       setCriadoresLoading(false)
+    }
+  }
+
+  const carregarConteudosParceiros = async () => {
+    try {
+      const response = await fetch('/api/conteudos/todos?limit=20')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.sucesso) {
+          setConteudosParceiros(data.dados)
+        } else {
+          console.error('Erro na API de conteúdos:', data.error)
+          setConteudosParceiros([])
+        }
+      } else {
+        console.error('Erro na resposta da API:', response.status)
+        setConteudosParceiros([])
+      }
+    } catch (error) {
+      console.error('Erro ao carregar conteúdos dos parceiros:', error)
+      setConteudosParceiros([])
     }
   }
 
