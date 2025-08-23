@@ -8,17 +8,27 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const criadorId = searchParams.get('criadorId')
+    const usuarioId = searchParams.get('usuarioId')
     const categoria = searchParams.get('categoria')
     const tipo = searchParams.get('tipo')
 
-    if (!criadorId) {
+    if (!criadorId && !usuarioId) {
       return NextResponse.json(
-        { error: 'ID do criador é obrigatório' },
+        { error: 'ID do criador ou usuário é obrigatório' },
         { status: 400 }
       )
     }
 
-    const where: any = { criadorId }
+    let where: any = {}
+    
+    if (criadorId) {
+      where.criadorId = criadorId
+    } else if (usuarioId) {
+      // Buscar pelo ID do usuário através da tabela Criador
+      where.criador = {
+        usuarioId: usuarioId
+      }
+    }
     
     if (categoria && categoria !== 'todas') {
       where.categoria = categoria

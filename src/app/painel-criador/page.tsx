@@ -161,6 +161,13 @@ export default function PainelCriador() {
     verificarAutenticacao()
   }, [router])
 
+  // Recarregar conteúdos sempre que o usuário mudar
+  useEffect(() => {
+    if (usuario?.id && isAuthenticated) {
+      carregarConteudos()
+    }
+  }, [usuario?.id, isAuthenticated])
+
   const carregarDados = async () => {
     try {
       // Carregar conteúdos do criador
@@ -192,17 +199,25 @@ export default function PainelCriador() {
 
   const carregarConteudos = async () => {
     try {
-      if (!usuario?.criador?.id) return
+      if (!usuario?.id) return
       
-      const response = await fetch(`/api/conteudos?criadorId=${usuario.criador.id}`)
+      // Buscar conteúdos pelo ID do usuário
+      const response = await fetch(`/api/conteudos?usuarioId=${usuario.id}`)
       if (response.ok) {
         const data = await response.json()
         if (data.sucesso) {
-          setConteudos(data.dados)
+          setConteudos(data.dados || [])
+        } else {
+          console.error('Erro na API:', data.error)
+          setConteudos([])
         }
+      } else {
+        console.error('Erro na resposta da API:', response.status)
+        setConteudos([])
       }
     } catch (error) {
       console.error('Erro ao carregar conteúdos:', error)
+      setConteudos([])
     }
   }
 
@@ -211,8 +226,8 @@ export default function PainelCriador() {
     setSaving(true)
     
     try {
-      if (!usuario?.criador?.id) {
-        throw new Error('Usuário não é um criador válido')
+      if (!usuario?.id) {
+        throw new Error('Usuário não é válido')
       }
 
       if (editando) {
@@ -244,7 +259,7 @@ export default function PainelCriador() {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify({
-             criadorId: usuario.criador.id,
+             criadorId: usuario.id,
              titulo: form.titulo,
              descricao: form.titulo, // Usar título como descrição por enquanto
              tipo: form.tipo,
