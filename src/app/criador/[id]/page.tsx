@@ -289,10 +289,26 @@ export default function CriadorPage() {
 
                   {/* Informações Detalhadas */}
                   <div className="flex-1">
-                    <div className="mb-6">
-                      <h2 className="text-4xl font-bold text-white mb-2">{criador.nome}</h2>
-                      <p className="text-gray-300 text-lg">{criador.bio}</p>
-                    </div>
+                                         <div className="mb-6">
+                       <h2 className="text-4xl font-bold text-white mb-2">{criador.nome}</h2>
+                       <p id="bio-completa" className="text-gray-300 text-lg line-clamp-3 max-w-4xl">
+                         {criador.bio}
+                       </p>
+                       {criador.bio && criador.bio.length > 200 && (
+                         <button
+                           onClick={() => {
+                             const bioElement = document.getElementById('bio-completa')
+                             if (bioElement) {
+                               bioElement.classList.toggle('line-clamp-3')
+                               bioElement.classList.toggle('line-clamp-none')
+                             }
+                           }}
+                           className="text-sementes-primary hover:text-sementes-accent text-sm font-medium mt-2 transition-colors"
+                         >
+                           Ver mais
+                         </button>
+                       )}
+                     </div>
 
                     {/* Estatísticas */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
