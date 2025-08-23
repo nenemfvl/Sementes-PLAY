@@ -95,6 +95,7 @@ export default function CriadorPage() {
   const [loadingEnquetes, setLoadingEnquetes] = useState(true)
   const [loadingDoacoes, setLoadingDoacoes] = useState(true)
   const [activeTab, setActiveTab] = useState<'conteudos' | 'enquetes' | 'doacoes'>('conteudos')
+  const [bioExpandida, setBioExpandida] = useState(false)
 
   useEffect(() => {
     if (criadorId) {
@@ -291,21 +292,15 @@ export default function CriadorPage() {
                   <div className="flex-1">
                                          <div className="mb-6">
                        <h2 className="text-4xl font-bold text-white mb-2">{criador.nome}</h2>
-                       <p id="bio-completa" className="text-gray-300 text-lg line-clamp-3 max-w-4xl">
+                       <p className={`text-gray-300 text-lg max-w-4xl ${bioExpandida ? '' : 'line-clamp-3'}`}>
                          {criador.bio}
                        </p>
                        {criador.bio && criador.bio.length > 200 && (
                          <button
-                           onClick={() => {
-                             const bioElement = document.getElementById('bio-completa')
-                             if (bioElement) {
-                               bioElement.classList.toggle('line-clamp-3')
-                               bioElement.classList.toggle('line-clamp-none')
-                             }
-                           }}
+                           onClick={() => setBioExpandida(!bioExpandida)}
                            className="text-sementes-primary hover:text-sementes-accent text-sm font-medium mt-2 transition-colors"
                          >
-                           Ver mais
+                           {bioExpandida ? 'Ver menos' : 'Ver mais'}
                          </button>
                        )}
                      </div>
