@@ -72,8 +72,10 @@ interface Criador {
 
 export default function CriadoresPage() {
   const [loading, setLoading] = useState(true)
-  const [totalSementes, setTotalSementes] = useState(0)
-  const [dadosCiclo, setDadosCiclo] = useState<DadosCiclo | null>(null)
+  const [totalSementes, setTotalSementes] = useState<number | null>(null)
+  const [ciclosInfo, setCiclosInfo] = useState<any>(null)
+  const [progressWidthCiclo, setProgressWidthCiclo] = useState(0)
+  const [progressWidthSeason, setProgressWidthSeason] = useState(0)
   const [conteudosParceiros, setConteudosParceiros] = useState<ConteudoParceiro[]>([])
   const [criadores, setCriadores] = useState<Criador[]>([])
   const [criadoresLoading, setCriadoresLoading] = useState(true)
@@ -116,54 +118,49 @@ export default function CriadoresPage() {
     }
   }
 
-  const carregarDados = async () => {
-    try {
-      // Carregar dados do ciclo
-      const responseCiclos = await fetch('/api/ciclos')
-      if (responseCiclos.ok) {
-        const data = await responseCiclos.json()
-        if (data.sucesso) {
-          setDadosCiclo(data.dados)
+  useEffect(() => {
+    const carregarDados = async () => {
+      try {
+        // Carregar estatísticas
+        const responseStats = await fetch('/api/admin/estatisticas')
+        if (responseStats.ok) {
+          const dataStats = await responseStats.json()
+          setTotalSementes(dataStats.totalSementes || 0)
         }
-      }
 
-      // Carregar total de sementes em circulação
-      const responseStats = await fetch('/api/admin/estatisticas')
-      if (responseStats.ok) {
-        const data = await responseStats.json()
-        if (data.sucesso && typeof data.dados.sistema.totalSementes === 'number') {
-          setTotalSementes(data.dados.sistema.totalSementes)
+        // Carregar informações dos ciclos
+        const responseCiclos = await fetch('/api/ranking/ciclos')
+        if (responseCiclos.ok) {
+          const dataCiclos = await responseCiclos.json()
+          setCiclosInfo(dataCiclos)
+          
+          // Calcular larguras das barras de progresso
+          if (dataCiclos) {
+            const cicloWidth = Math.max(0, Math.min(100, ((15 - dataCiclos.diasRestantesCiclo) / 15) * 100))
+            const seasonWidth = Math.max(0, Math.min(100, ((90 - dataCiclos.diasRestantesSeason) / 90) * 100))
+            setProgressWidthCiclo(cicloWidth)
+            setProgressWidthSeason(seasonWidth)
+          }
         }
+
+        // Carregar criadores
+        const responseCriadores = await fetch('/api/criadores')
+        if (responseCriadores.ok) {
+          const dataCriadores = await responseCriadores.json()
+          setCriadores(dataCriadores.criadores || [])
+        }
+
+        // Carregar conteúdos
+        await carregarConteudosParceiros()
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error)
+      } finally {
+        setLoading(false)
       }
-
-      // Carregar criadores
-      await carregarCriadores()
-
-      // Carregar conteúdos dos parceiros
-      await carregarConteudosParceiros()
-      setLoading(false)
-    } catch (error) {
-      console.error('Erro ao carregar dados:', error)
-      setLoading(false)
     }
-  }
 
-  const carregarCriadores = async () => {
-    try {
-      setCriadoresLoading(true)
-      const response = await fetch('/api/criadores')
-      if (response.ok) {
-        const data = await response.json()
-        if (data.sucesso) {
-          setCriadores(data.dados.criadores)
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao carregar criadores:', error)
-    } finally {
-      setCriadoresLoading(false)
-    }
-  }
+    carregarDados()
+  }, [])
 
   const carregarConteudosParceiros = async () => {
     try {
@@ -185,15 +182,6 @@ export default function CriadoresPage() {
       setConteudosParceiros([])
     }
   }
-
-  useEffect(() => {
-    verificarUsuario()
-    carregarDados()
-  }, [])
-
-  useEffect(() => {
-    carregarCriadores()
-  }, [])
 
   const getTipoIcon = (tipo: string) => {
     switch (tipo) {
@@ -359,13 +347,13 @@ export default function CriadoresPage() {
                   </div>
                   <h2 className="text-3xl font-bold text-white mb-4">Sementes em Circulação</h2>
                   <p className="text-6xl md:text-7xl font-black text-yellow-500 mb-4">
-                    {(totalSementes / 1000).toFixed(0)}k
+                    {totalSementes ? (totalSementes / 1000).toFixed(0) + 'k' : '0k'}
                   </p>
                   <p className="text-gray-400 text-lg">Fundo de distribuição em circulação para o ciclo atual</p>
                 </div>
 
                 {/* Informações do Ciclo Atual - Agora dentro da mesma seção */}
-                {dadosCiclo && (
+                {ciclosInfo && (
                   <div className="bg-gradient-to-r from-sementes-primary/20 to-sementes-accent/20 rounded-2xl border border-sementes-primary/30 p-6">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
                       {/* Status do Ciclo */}
@@ -376,7 +364,10 @@ export default function CriadoresPage() {
                             <span className="text-gray-400 text-sm">Ciclo Atual</span>
                           </div>
                           <div className="text-4xl font-bold text-sementes-primary">
-                            {dadosCiclo.ciclo}
+                            #{ciclosInfo.numeroCiclo}
+                          </div>
+                          <div className="text-sm text-gray-400 mt-1">
+                            {ciclosInfo.diasRestantesCiclo} dias restantes
                           </div>
                         </div>
                         
@@ -386,7 +377,10 @@ export default function CriadoresPage() {
                             <span className="text-gray-400 text-sm">Season</span>
                           </div>
                           <div className="text-4xl font-bold text-sementes-accent">
-                            {dadosCiclo.season}
+                            S{ciclosInfo.numeroSeason}
+                          </div>
+                          <div className="text-sm text-gray-400 mt-1">
+                            {ciclosInfo.diasRestantesSeason} dias restantes
                           </div>
                         </div>
                       </div>
@@ -394,23 +388,23 @@ export default function CriadoresPage() {
                       {/* Status e Datas */}
                       <div className="flex flex-col items-center lg:items-end space-y-2">
                         <div className="flex items-center space-x-2">
-                          <span className={`w-3 h-3 rounded-full ${dadosCiclo.pausado ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                          <span className={`w-3 h-3 rounded-full ${ciclosInfo.pausado ? 'bg-red-500' : 'bg-green-500'}`}></span>
                           <span className="text-sm text-gray-300">
-                            {dadosCiclo.pausado ? 'Ciclo Pausado' : 'Ciclo Ativo'}
+                            {ciclosInfo.pausado ? 'Ciclo Pausado' : 'Ciclo Ativo'}
                           </span>
                         </div>
                         
                         <div className="text-center lg:text-right">
                           <p className="text-gray-400 text-xs">Início do Ciclo</p>
                           <p className="text-white text-sm">
-                            {new Date(dadosCiclo.dataInicioCiclo).toLocaleDateString('pt-BR')}
+                            {new Date(ciclosInfo.dataInicioCiclo).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
                         
                         <div className="text-center lg:text-right">
                           <p className="text-gray-400 text-xs">Início da Season</p>
                           <p className="text-white text-sm">
-                            {new Date(dadosCiclo.dataInicioSeason).toLocaleDateString('pt-BR')}
+                            {new Date(ciclosInfo.dataInicioSeason).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
                       </div>
@@ -443,7 +437,7 @@ export default function CriadoresPage() {
                 </div>
                 <p className="text-gray-400 text-sm font-medium mb-2">Total de Criadores</p>
                 <p className="text-3xl font-black text-white">
-                  {dadosCiclo ? dadosCiclo.estatisticas.totalCriadores : 0}
+                  {criadores.length}
                 </p>
                 <div className="mt-4 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
               </div>
@@ -496,10 +490,7 @@ export default function CriadoresPage() {
                 </div>
                 <p className="text-gray-400 text-sm font-medium mb-2">Total de Sementes</p>
                 <p className="text-3xl font-black text-white">
-                  {dadosCiclo ? 
-                    (dadosCiclo.estatisticas.totalSementes / 1000).toFixed(0) + 'k' : 
-                    (totalSementes / 1000).toFixed(0) + 'k'
-                  }
+                  {totalSementes ? (totalSementes / 1000).toFixed(0) + 'k' : '0k'}
                 </p>
                 <div className="mt-4 h-1 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-full"></div>
               </div>
