@@ -1,8 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   BuildingOfficeIcon,
   CurrencyDollarIcon,
@@ -19,20 +17,10 @@ import {
   ClockIcon,
   CheckCircleIcon,
   Cog6ToothIcon,
-  VideoCameraIcon,
-  ArrowLeftIcon,
-  ChartBarIcon,
-  EyeIcon,
-  StarIcon,
-  LinkIcon,
-  QrCodeIcon,
-  ClipboardDocumentIcon
+  VideoCameraIcon
 } from '@heroicons/react/24/outline'
 
-// Forçar renderização dinâmica para evitar erro de prerendering
-export const dynamic = 'force-dynamic'
-
-interface Transacao {
+type Transacao = {
   id: string
   valor: number
   codigoParceiro: string
@@ -41,7 +29,7 @@ interface Transacao {
   usuario?: { nome: string; email: string }
 }
 
-interface Estatisticas {
+type Estatisticas = {
   totalVendas: number
   totalComissoes: number
   codigosAtivos: number
@@ -50,14 +38,14 @@ interface Estatisticas {
   usuariosAtivos: number
 }
 
-interface Notificacao {
+type Notificacao = {
   id: string
   titulo: string
   mensagem: string
   data: string
 }
 
-interface Repasse {
+type Repasse = {
   id: string
   valorCompra: number
   valorRepasse: number
@@ -69,7 +57,7 @@ interface Repasse {
   tipo?: string
 }
 
-interface ConteudoParceiro {
+type ConteudoParceiro = {
   id: string
   titulo: string
   tipo: string
@@ -82,22 +70,7 @@ interface ConteudoParceiro {
   dislikes?: number
 }
 
-interface CodigoCashback {
-  id: string
-  codigo: string
-  desconto: number
-  maxUsos: number
-  usosAtuais: number
-  ativo: boolean
-  dataCriacao: string
-  dataExpiracao?: string
-}
-
-export default function PainelParceiroPage() {
-  const router = useRouter()
-  const [usuario, setUsuario] = useState<any>(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [loading, setLoading] = useState(true)
+export default function PainelParceiro() {
   const [transacoes, setTransacoes] = useState<Transacao[]>([])
   const [loadingTransacoes, setLoadingTransacoes] = useState(true)
   const [estatisticas, setEstatisticas] = useState<Estatisticas | null>(null)
@@ -106,768 +79,608 @@ export default function PainelParceiroPage() {
   const [loadingNotificacoes, setLoadingNotificacoes] = useState(true)
   const [repasses, setRepasses] = useState<Repasse[]>([])
   const [loadingRepasses, setLoadingRepasses] = useState(true)
+  const [parceiro, setParceiro] = useState<any>(null)
+  const [user, setUser] = useState<any>(null)
+  const [checkingAuth, setCheckingAuth] = useState(true)
+  const [authorized, setAuthorized] = useState(false)
   const [conteudos, setConteudos] = useState<ConteudoParceiro[]>([])
   const [loadingConteudos, setLoadingConteudos] = useState(true)
   const [showModalConteudo, setShowModalConteudo] = useState(false)
-  const [formConteudo, setFormConteudo] = useState({ 
+  const [formConteudo, setFormConteudo] = useState({
     titulo: '',
     tipo: '',
-    categoria: '', 
+    categoria: '',
     url: '',
     cidade: ''
   })
-  const [savingConteudo, setSavingConteudo] = useState(false)
   const [editandoConteudo, setEditandoConteudo] = useState<ConteudoParceiro | null>(null)
-  const [codigosCashback, setCodigosCashback] = useState<CodigoCashback[]>([])
-  const [loadingCodigos, setLoadingCodigos] = useState(true)
-  const [showModalCodigo, setShowModalCodigo] = useState(false)
-  const [formCodigo, setFormCodigo] = useState({
-    codigo: '',
-    desconto: 10,
-    maxUsos: 100,
-    dataExpiracao: ''
+  const [savingConteudo, setSavingConteudo] = useState(false)
+  const [showModalPIX, setShowModalPIX] = useState(false)
+  const [repasseSelecionado, setRepasseSelecionado] = useState<Repasse | null>(null)
+  const [showModalRedesSociais, setShowModalRedesSociais] = useState(false)
+  const [redesSociais, setRedesSociais] = useState({
+    instagram: '',
+    twitch: '',
+    youtube: '',
+    tiktok: '',
+    discord: '',
+    urlConnect: ''
   })
-  const [savingCodigo, setSavingCodigo] = useState(false)
-  const [editandoCodigo, setEditandoCodigo] = useState<CodigoCashback | null>(null)
+  const [savingRedesSociais, setSavingRedesSociais] = useState(false)
+  const [aprovarLoading, setAprovarLoading] = useState<string | null>(null)
+  const [rejeitarLoading, setRejeitarLoading] = useState<string | null>(null)
+  const [pagamentoPIX, setPagamentoPIX] = useState<any>(null)
+  const [verificandoPagamento, setVerificandoPagamento] = useState(false)
 
+  // Verificar autenticação
   useEffect(() => {
-    const verificarAutenticacao = () => {
-      const usuarioSalvo = localStorage.getItem('usuario-dados')
-      if (usuarioSalvo) {
-        try {
-          const dadosUsuario = JSON.parse(usuarioSalvo)
-          // Verificar se é um parceiro
-          if (dadosUsuario.nivel === 'parceiro') {
-            setUsuario(dadosUsuario)
-            setIsAuthenticated(true)
-            // Carregar dados após autenticação
-            carregarDados()
-          } else {
-            // Não é parceiro, redirecionar
-            window.location.href = '/perfil'
-          }
-        } catch (error) {
-          console.error('Erro ao ler dados do usuário:', error)
-          localStorage.removeItem('usuario-dados')
+    const checkAuth = async () => {
+      try {
+        const userData = localStorage.getItem('usuario-dados')
+        if (!userData) {
           window.location.href = '/login'
+          return
         }
-      } else {
+
+        const currentUser = JSON.parse(userData)
+        if (currentUser.nivel !== 'parceiro') {
+          alert('Acesso negado. Apenas parceiros podem acessar esta área.')
+          window.location.href = '/perfil'
+          return
+        }
+
+        setUser(currentUser)
+        setAuthorized(true)
+      } catch (error) {
+        console.error('Erro na verificação de autorização:', error)
         window.location.href = '/login'
+      } finally {
+        setCheckingAuth(false)
       }
-      setLoading(false)
     }
-    verificarAutenticacao()
+
+    checkAuth()
   }, [])
 
-  const carregarDados = async () => {
+  // Carregar dados
+  const fetchParceiro = useCallback(async () => {
     try {
-      // TODO: Implementar APIs reais
-      setEstatisticas({
-        totalVendas: 0,
-        totalComissoes: 0,
-        codigosAtivos: 0,
-        repassesRealizados: 0,
-        transacoesMes: 0,
-        usuariosAtivos: 0
-      })
-      setTransacoes([])
-      setRepasses([])
-      setConteudos([])
-      setCodigosCashback([])
-      setNotificacoes([])
+      const response = await fetch(`/api/parceiros/perfil?usuarioId=${user?.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setParceiro(data)
+      }
     } catch (error) {
-      console.error('Erro ao carregar dados:', error)
+      console.error('Erro ao carregar dados do parceiro:', error)
+    }
+  }, [user?.id])
+
+  const fetchTransacoes = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/parceiros/transacoes?usuarioId=${user?.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setTransacoes(data)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar transações:', error)
+    } finally {
+      setLoadingTransacoes(false)
+    }
+  }, [user?.id])
+
+  const fetchEstatisticas = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/parceiros/estatisticas?usuarioId=${user?.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setEstatisticas(data)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas:', error)
     } finally {
       setLoadingEstatisticas(false)
-      setLoadingTransacoes(false)
-      setLoadingRepasses(false)
-      setLoadingConteudos(false)
-      setLoadingCodigos(false)
+    }
+  }, [user?.id])
+
+  const fetchNotificacoes = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/notificacoes?usuarioId=${user?.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setNotificacoes(data.slice(0, 5))
+      }
+    } catch (error) {
+      console.error('Erro ao carregar notificações:', error)
+    } finally {
       setLoadingNotificacoes(false)
     }
-  }
+  }, [user?.id])
 
-  const handleSubmitConteudo = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSavingConteudo(true)
-    
+  const fetchRepasses = useCallback(async () => {
     try {
-      // TODO: Implementar API para salvar conteúdo
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      if (editandoConteudo) {
-        setConteudos(prev => prev.map(c => c.id === editandoConteudo.id ? { ...c, ...formConteudo } : c))
-      } else {
-        setConteudos(prev => [...prev, { 
-          id: Date.now().toString(), 
-          ...formConteudo, 
-          dataPublicacao: new Date().toISOString(),
-          visualizacoes: 0,
-          curtidas: 0,
-          dislikes: 0
-        }])
+      const response = await fetch(`/api/parceiros/repasses-pendentes?usuarioId=${user?.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setRepasses(data)
       }
-      
-      setFormConteudo({ titulo: '', tipo: '', categoria: '', url: '', cidade: '' })
-      setEditandoConteudo(null)
-      setShowModalConteudo(false)
     } catch (error) {
-      console.error('Erro ao salvar conteúdo:', error)
+      console.error('Erro ao carregar repasses:', error)
     } finally {
-      setSavingConteudo(false)
+      setLoadingRepasses(false)
     }
-  }
+  }, [user?.id])
 
-  const handleSubmitCodigo = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSavingCodigo(true)
-    
+  const fetchConteudos = useCallback(async () => {
     try {
-      // TODO: Implementar API para salvar código
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      if (editandoCodigo) {
-        setCodigosCashback(prev => prev.map(c => c.id === editandoCodigo.id ? { ...c, ...formCodigo } : c))
-      } else {
-        setCodigosCashback(prev => [...prev, { 
-          id: Date.now().toString(), 
-          ...formCodigo, 
-          usosAtuais: 0,
-          ativo: true,
-          dataCriacao: new Date().toISOString()
-        }])
+      const response = await fetch(`/api/parceiros/conteudos?parceiroId=${parceiro?.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setConteudos(data.conteudos || [])
+        }
       }
-      
-      setFormCodigo({ codigo: '', desconto: 10, maxUsos: 100, dataExpiracao: '' })
-      setEditandoCodigo(null)
-      setShowModalCodigo(false)
     } catch (error) {
-      console.error('Erro ao salvar código:', error)
+      console.error('Erro ao carregar conteúdos:', error)
     } finally {
-      setSavingCodigo(false)
+      setLoadingConteudos(false)
+    }
+  }, [parceiro?.id])
+
+  useEffect(() => {
+    if (authorized && user) {
+      fetchParceiro()
+      fetchTransacoes()
+      fetchEstatisticas()
+      fetchNotificacoes()
+      fetchRepasses()
+      fetchConteudos()
+    }
+  }, [authorized, user, parceiro?.id, fetchParceiro, fetchTransacoes, fetchEstatisticas, fetchNotificacoes, fetchRepasses, fetchConteudos])
+
+  const getProgressWidthClass = (value: number, max: number) => {
+    const percentage = (value / max) * 100
+    if (percentage >= 100) return 'w-full'
+    if (percentage >= 75) return 'w-3/4'
+    if (percentage >= 50) return 'w-1/2'
+    if (percentage >= 25) return 'w-1/4'
+    return 'w-full'
+  }
+
+  const formatarNumero = (numero: number) => {
+    if (numero >= 1000000) {
+      return (numero / 1000000).toFixed(1) + 'M'
+    } else if (numero >= 1000) {
+      return (numero / 1000).toFixed(1) + 'K'
+    }
+    return numero.toString()
+  }
+
+  // Função para mostrar toast notifications
+  const mostrarToast = (mensagem: string, tipo: 'success' | 'error' | 'info' = 'success') => {
+    const toast = document.createElement('div')
+    toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`
+    
+    let bgColor = 'bg-green-500'
+    let icon = '✅'
+    
+    if (tipo === 'error') {
+      bgColor = 'bg-red-500'
+      icon = '❌'
+    } else if (tipo === 'info') {
+      bgColor = 'bg-blue-500'
+      icon = 'ℹ️'
+    }
+    
+    toast.className += ` ${bgColor} text-white`
+    
+    toast.innerHTML = `
+      <div class="flex items-center space-x-2">
+        <span class="text-lg">${icon}</span>
+        <span class="font-medium">${mensagem}</span>
+      </div>
+    `
+    
+    document.body.appendChild(toast)
+    
+    setTimeout(() => {
+      toast.classList.remove('translate-x-full')
+    }, 100)
+    
+    setTimeout(() => {
+      toast.classList.add('translate-x-full')
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.parentElement.removeChild(toast)
+        }
+      }, 300)
+    }, 3000)
+  }
+
+  // Função para obter thumbnail das plataformas
+  function getThumbnail(url: string) {
+    if (!url) return null
+    
+    // YouTube
+    const yt = url.match(/(?:youtu.be\/|youtube.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/)
+    if (yt) {
+      return {
+        src: `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg`,
+        platform: 'YouTube',
+        icon: '🎥',
+        color: 'from-red-500 to-red-600'
+      }
+    }
+    
+    // Twitch
+    const tw = url.match(/twitch\.tv\/([^/?]+)/)
+    if (tw) {
+      return {
+        src: null,
+        platform: 'Twitch',
+        icon: '📺',
+        color: 'from-purple-600 to-pink-600'
+      }
+    }
+    
+    // Instagram
+    if (url.includes('instagram.com')) {
+      return {
+        src: null,
+        platform: 'Instagram',
+        icon: '📷',
+        color: 'from-pink-500 via-purple-500 to-orange-500'
+      }
+    }
+    
+    // TikTok
+    if (url.includes('tiktok.com')) {
+      return {
+        src: null,
+        platform: 'TikTok',
+        icon: '🎵',
+        color: 'from-gray-900 via-gray-800 to-gray-700'
+      }
+    }
+    
+    return {
+      src: null,
+      platform: 'Link',
+      icon: '🔗',
+      color: 'from-blue-500 to-blue-600'
     }
   }
 
-  const handleDeleteConteudo = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este conteúdo?')) {
-      setConteudos(prev => prev.filter(c => c.id !== id))
-    }
-  }
-
-  const handleDeleteCodigo = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este código?')) {
-      setCodigosCashback(prev => prev.filter(c => c.id !== id))
-    }
-  }
-
-  const handleToggleCodigoAtivo = async (id: string) => {
-    setCodigosCashback(prev => prev.map(c => 
-      c.id === id ? { ...c, ativo: !c.ativo } : c
-    ))
-  }
-
-  const handleToggleConteudoFixado = async (id: string) => {
-    setConteudos(prev => prev.map(c => 
-      c.id === id ? { ...c, fixado: !c.fixado } : c
-    ))
-  }
-
-  const gerarCodigoUnico = () => {
-    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    let codigo = ''
-    for (let i = 0; i < 8; i++) {
-      codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length))
-    }
-    setFormCodigo(prev => ({ ...prev, codigo }))
-  }
-
-  if (loading) {
+  // Loading
+  if (checkingAuth) {
     return (
-      <div className="min-h-screen bg-sss-dark flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sementes-primary mx-auto mb-4"></div>
-          <p className="text-white">Carregando painel parceiro...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="text-white text-lg font-medium">Verificando autorização...</div>
         </div>
       </div>
     )
   }
 
+  if (!authorized) {
+    return null
+  }
+
   return (
-    <div className="min-h-screen bg-sss-dark">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
-          >
-            <div className="flex items-center justify-center mb-4">
-              <button
-                onClick={() => router.push('/')}
-                className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors mr-4"
-              >
-                <ArrowLeftIcon className="w-5 h-5 text-white" />
-              </button>
-              <h1 className="text-4xl font-bold text-white">
-                <BuildingOfficeIcon className="w-8 h-8 inline mr-2 text-sementes-primary" />
-                Painel do Parceiro
-              </h1>
-            </div>
-            <p className="text-gray-300">
-              Gerencie suas promoções, acompanhe transações e controle seus códigos de cashback
-            </p>
-            <p className="text-sementes-accent font-semibold mt-2">
-              🏢 Parceiro Oficial • {estatisticas?.usuariosAtivos} usuários ativos
-            </p>
-          </motion.div>
-
-          {/* Estatísticas Rápidas */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8"
-          >
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">💰</div>
-              <p className="text-gray-400 text-sm">Total de Vendas</p>
-              <p className="text-white font-bold text-lg">R$ {estatisticas?.totalVendas?.toLocaleString('pt-BR')}</p>
-            </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">🏆</div>
-              <p className="text-gray-400 text-sm">Comissões</p>
-              <p className="text-white font-bold text-lg">R$ {estatisticas?.totalComissoes?.toLocaleString('pt-BR')}</p>
-            </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">🎫</div>
-              <p className="text-gray-400 text-sm">Códigos Ativos</p>
-              <p className="text-white font-bold text-lg">{estatisticas?.codigosAtivos}</p>
-            </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">📊</div>
-              <p className="text-gray-400 text-sm">Repasses</p>
-              <p className="text-white font-bold text-lg">{estatisticas?.repassesRealizados}</p>
-            </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">📈</div>
-              <p className="text-gray-400 text-sm">Transações/Mês</p>
-              <p className="text-white font-bold text-lg">{estatisticas?.transacoesMes}</p>
-            </div>
-            <div className="card p-4 text-center">
-              <div className="text-2xl mb-2">👥</div>
-              <p className="text-gray-400 text-sm">Usuários Ativos</p>
-              <p className="text-white font-bold text-lg">{estatisticas?.usuariosAtivos}</p>
-            </div>
-          </motion.div>
-
-          {/* Ações Rápidas */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="card mb-8"
-          >
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-white mb-4">
-                🚀 Ações Rápidas
-              </h3>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={() => setShowModalConteudo(true)}
-                  className="inline-flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
-                >
-                  <PlusIcon className="w-5 h-5 mr-2" />
-                  Adicionar Conteúdo
-                </button>
-                <button
-                  onClick={() => setShowModalCodigo(true)}
-                  className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-                >
-                  <QrCodeIcon className="w-5 h-5 mr-2" />
-                  Criar Código
-                </button>
-                <button
-                  onClick={() => router.push('/admin/fundo')}
-                  className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
-                >
-                  <CurrencyDollarIcon className="w-5 h-5 mr-2" />
-                  Ver Fundo de Sementes
-                </button>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Grid de Conteúdo */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Lado Esquerdo */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="space-y-6"
-            >
-              {/* Conteúdos */}
-              <div className="card">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-white">
-                    📺 Meus Conteúdos
-                  </h3>
-                  <button
-                    onClick={() => setShowModalConteudo(true)}
-                    className="p-2 bg-sementes-primary hover:bg-sementes-secondary rounded-lg transition-colors"
-                  >
-                    <PlusIcon className="w-5 h-5 text-white" />
-                  </button>
+    <div className="min-h-screen bg-gray-900">
+      {/* Header */}
+      <div className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+                  <BuildingOfficeIcon className="w-5 h-5 text-white" />
                 </div>
-
-                {conteudos.length === 0 ? (
-                  <div className="text-center py-8">
-                    <VideoCameraIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-semibold text-white mb-2">Nenhum conteúdo ainda</h4>
-                    <p className="text-gray-400">Comece adicionando suas promoções e conteúdos</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {conteudos.map((conteudo) => (
-                      <div key={conteudo.id} className="p-4 bg-gray-700/50 rounded-lg">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h4 className="text-white font-semibold">{conteudo.titulo}</h4>
-                            <p className="text-gray-400 text-sm">{conteudo.categoria} • {conteudo.tipo}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleToggleConteudoFixado(conteudo.id)}
-                              className={`p-1 rounded ${conteudo.fixado ? 'bg-yellow-500/20 text-yellow-300' : 'bg-gray-500/20 text-gray-300'}`}
-                              title={conteudo.fixado ? 'Desfixar' : 'Fixar'}
-                            >
-                              <StarIcon className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setEditandoConteudo(conteudo)
-                                setFormConteudo({
-                                  titulo: conteudo.titulo,
-                                  tipo: conteudo.tipo,
-                                  categoria: conteudo.categoria,
-                                  url: conteudo.url,
-                                  cidade: '' // Valor padrão para cidade
-                                })
-                                setShowModalConteudo(true)
-                              }}
-                              className="p-1 bg-blue-500/20 text-blue-300 rounded hover:bg-blue-500/30"
-                            >
-                              <PencilIcon className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteConteudo(conteudo.id)}
-                              className="p-1 bg-red-500/20 text-red-300 rounded hover:bg-red-500/30"
-                            >
-                              <TrashIcon className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between text-sm">
-                          <a
-                            href={conteudo.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sementes-primary hover:text-sementes-accent flex items-center space-x-1"
-                          >
-                            <LinkIcon className="w-4 h-4" />
-                            <span>Ver conteúdo</span>
-                          </a>
-                          <div className="flex items-center space-x-4 text-gray-400">
-                            <span className="flex items-center space-x-1">
-                              <EyeIcon className="w-4 h-4" />
-                              <span>{conteudo.visualizacoes}</span>
-                            </span>
-                            <span className="flex items-center space-x-1">
-                              <StarIcon className="w-4 h-4" />
-                              <span>{conteudo.curtidas}</span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <h1 className="text-xl font-bold text-white">Painel do Parceiro</h1>
               </div>
-
-              {/* Transações Recentes */}
-              <div className="card">
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  💰 Transações Recentes
-                </h3>
-                {transacoes.length === 0 ? (
-                  <p className="text-gray-400 text-center py-4">Nenhuma transação ainda</p>
-                ) : (
-                  <div className="space-y-3">
-                    {transacoes.slice(0, 5).map((transacao) => (
-                      <div key={transacao.id} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
-                        <div>
-                          <p className="text-white font-medium">{transacao.usuario?.nome}</p>
-                          <p className="text-gray-400 text-sm">Código: {transacao.codigoParceiro}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sementes-primary font-bold">R$ {transacao.valor.toFixed(2)}</p>
-                          <p className={`text-xs ${transacao.status === 'aprovada' ? 'text-green-400' : 'text-yellow-400'}`}>
-                            {transacao.status}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-
-            {/* Lado Direito */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="space-y-6"
-            >
-              {/* Códigos de Cashback */}
-              <div className="card">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-white">
-                    🎫 Códigos de Cashback
-                  </h3>
-                  <button
-                    onClick={() => setShowModalCodigo(true)}
-                    className="p-2 bg-sementes-primary hover:bg-sementes-secondary rounded-lg transition-colors"
-                  >
-                    <PlusIcon className="w-5 h-5 text-white" />
-                  </button>
-                </div>
-
-                {codigosCashback.length === 0 ? (
-                  <p className="text-gray-400 text-center py-4">Nenhum código criado ainda</p>
-                ) : (
-                  <div className="space-y-3">
-                    {codigosCashback.map((codigo) => (
-                      <div key={codigo.id} className="p-3 bg-gray-700/50 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <h4 className="text-white font-semibold">{codigo.codigo}</h4>
-                            <p className="text-gray-400 text-sm">{codigo.desconto}% de desconto</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleToggleCodigoAtivo(codigo.id)}
-                              className={`p-1 rounded text-xs ${
-                                codigo.ativo ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'
-                              }`}
-                            >
-                              {codigo.ativo ? 'Ativo' : 'Inativo'}
-                            </button>
-                            <button
-                              onClick={() => {
-                                setEditandoCodigo(codigo)
-                                setFormCodigo({
-                                  codigo: codigo.codigo,
-                                  desconto: codigo.desconto,
-                                  maxUsos: codigo.maxUsos,
-                                  dataExpiracao: codigo.dataExpiracao || ''
-                                })
-                                setShowModalCodigo(true)
-                              }}
-                              className="p-1 bg-blue-500/20 text-blue-300 rounded hover:bg-blue-500/30"
-                            >
-                              <PencilIcon className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteCodigo(codigo.id)}
-                              className="p-1 bg-red-500/20 text-red-300 rounded hover:bg-red-500/30"
-                            >
-                              <TrashIcon className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-300">
-                            Usos: {codigo.usosAtuais}/{codigo.maxUsos}
-                          </span>
-                          <span className="text-gray-400 text-xs">
-                            Criado em {new Date(codigo.dataCriacao).toLocaleDateString('pt-BR')}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Repasses Pendentes */}
-              <div className="card">
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  📊 Repasses Pendentes
-                </h3>
-                {repasses.length === 0 ? (
-                  <p className="text-gray-400 text-center py-4">Nenhum repasse pendente</p>
-                ) : (
-                  <div className="space-y-3">
-                    {repasses.slice(0, 3).map((repasse) => (
-                      <div key={repasse.id} className="p-3 bg-gray-700/50 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-white font-medium">{repasse.usuario?.nome}</span>
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            repasse.status === 'pendente' ? 'bg-yellow-500/20 text-yellow-300' :
-                            repasse.status === 'aprovado' ? 'bg-green-500/20 text-green-300' :
-                            'bg-red-500/20 text-red-300'
-                          }`}>
-                            {repasse.status}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-300">
-                            Compra: R$ {repasse.valorCompra.toFixed(2)}
-                          </span>
-                          <span className="text-sementes-primary font-bold">
-                            Repasse: R$ {repasse.valorRepasse.toFixed(2)}
-                          </span>
-                        </div>
-                        <p className="text-gray-400 text-xs mt-2">
-                          Data: {new Date(repasse.dataCompra).toLocaleDateString('pt-BR')}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Notificações */}
-              <div className="card">
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  🔔 Notificações
-                </h3>
-                {notificacoes.length === 0 ? (
-                  <p className="text-gray-400 text-center py-4">Nenhuma notificação</p>
-                ) : (
-                  <div className="space-y-3">
-                    {notificacoes.slice(0, 3).map((notificacao) => (
-                      <div key={notificacao.id} className="p-3 bg-gray-700/50 rounded-lg">
-                        <h4 className="text-white font-medium text-sm">{notificacao.titulo}</h4>
-                        <p className="text-gray-300 text-sm">{notificacao.mensagem}</p>
-                        <p className="text-gray-400 text-xs mt-2">
-                          {new Date(notificacao.data).toLocaleDateString('pt-BR')}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Modal de Conteúdo */}
-      {showModalConteudo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-gray-800 rounded-lg max-w-md w-full p-6"
-          >
-            <h3 className="text-xl font-bold text-white mb-4">
-              {editandoConteudo ? 'Editar Conteúdo' : 'Adicionar Conteúdo'}
-            </h3>
-            
-            <form onSubmit={handleSubmitConteudo} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Título</label>
-                <input
-                  type="text"
-                  value={formConteudo.titulo}
-                  onChange={(e) => setFormConteudo({ ...formConteudo, titulo: e.target.value })}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">URL</label>
-                <input
-                  type="url"
-                  value={formConteudo.url}
-                  onChange={(e) => setFormConteudo({ ...formConteudo, url: e.target.value })}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                  required
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Tipo</label>
-                  <select
-                    value={formConteudo.tipo}
-                    onChange={(e) => setFormConteudo({ ...formConteudo, tipo: e.target.value })}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                    required
-                  >
-                    <option value="">Selecione</option>
-                    <option value="promocao">Promoção</option>
-                    <option value="produto">Produto</option>
-                    <option value="servico">Serviço</option>
-                    <option value="evento">Evento</option>
-                  </select>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Estatísticas principais */}
+        <section className="mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 backdrop-blur-sm rounded-2xl p-6 border border-green-500/20 hover:border-green-500/40 transition-all duration-300 group">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center group-hover:bg-green-500/30 transition-all">
+                  <CurrencyDollarIcon className="w-6 h-6 text-green-400" />
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Categoria</label>
-                  <select
-                    value={formConteudo.categoria}
-                    onChange={(e) => setFormConteudo({ ...formConteudo, categoria: e.target.value })}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                    required
-                  >
-                    <option value="">Selecione</option>
-                    <option value="gaming">Gaming</option>
-                    <option value="tecnologia">Tecnologia</option>
-                    <option value="entretenimento">Entretenimento</option>
-                    <option value="educacao">Educação</option>
-                  </select>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-white">
+                    {!loadingEstatisticas ? `R$ ${estatisticas?.totalVendas.toFixed(2) || '0.00'}` : '--'}
+                  </div>
+                  <div className="text-sm text-green-300">Total de Repasses</div>
                 </div>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Cidade</label>
-                <input
-                  type="text"
-                  value={formConteudo.cidade}
-                  onChange={(e) => setFormConteudo({ ...formConteudo, cidade: e.target.value })}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                  placeholder="Ex: São Paulo"
-                />
+              <div className="h-1 bg-green-500/20 rounded-full overflow-hidden">
+                <div className={`h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full ${getProgressWidthClass(estatisticas?.totalVendas || 0, 10000)}`}></div>
               </div>
-              
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModalConteudo(false)
-                    setEditandoConteudo(null)
-                    setFormConteudo({ titulo: '', tipo: '', categoria: '', url: '', cidade: '' })
-                  }}
-                  className="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingConteudo}
-                  className="flex-1 bg-sementes-primary hover:bg-sementes-secondary disabled:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"
-                >
-                  {savingConteudo ? 'Salvando...' : (editandoConteudo ? 'Atualizar' : 'Adicionar')}
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
+            </div>
 
-      {/* Modal de Código */}
-      {showModalCodigo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-gray-800 rounded-lg max-w-md w-full p-6"
-          >
-            <h3 className="text-xl font-bold text-white mb-4">
-              {editandoCodigo ? 'Editar Código' : 'Criar Código de Cashback'}
-            </h3>
-            
-            <form onSubmit={handleSubmitCodigo} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Código</label>
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={formCodigo.codigo}
-                    onChange={(e) => setFormCodigo({ ...formCodigo, codigo: e.target.value.toUpperCase() })}
-                    className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                    placeholder="Ex: PARCEIRO10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={gerarCodigoUnico}
-                    className="px-3 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors"
-                  >
-                    🎲
-                  </button>
+            <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 group">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-all">
+                  <CreditCardIcon className="w-6 h-6 text-blue-400" />
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-white">
+                    {!loadingEstatisticas ? estatisticas?.codigosAtivos || 0 : '--'}
+                  </div>
+                  <div className="text-sm text-blue-300">Códigos Ativos</div>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Desconto (%)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="50"
-                    value={formCodigo.desconto}
-                    onChange={(e) => setFormCodigo({ ...formCodigo, desconto: parseInt(e.target.value) })}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                    required
-                  />
+              <div className="h-1 bg-blue-500/20 rounded-full overflow-hidden">
+                <div className={`h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full ${getProgressWidthClass(estatisticas?.codigosAtivos || 0, 100)}`}></div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 group">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center group-hover:bg-purple-500/30 transition-all">
+                  <CheckCircleIcon className="w-6 h-6 text-purple-400" />
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Máximo de Usos</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formCodigo.maxUsos}
-                    onChange={(e) => setFormCodigo({ ...formCodigo, maxUsos: parseInt(e.target.value) })}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                    required
-                  />
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-white">
+                    {!loadingEstatisticas ? estatisticas?.repassesRealizados || 0 : '--'}
+                  </div>
+                  <div className="text-sm text-purple-300">Repasses Realizados</div>
                 </div>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Data de Expiração (opcional)</label>
-                <input
-                  type="date"
-                  value={formCodigo.dataExpiracao}
-                  onChange={(e) => setFormCodigo({ ...formCodigo, dataExpiracao: e.target.value })}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
-                />
+              <div className="h-1 bg-purple-500/20 rounded-full overflow-hidden">
+                <div className={`h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full ${getProgressWidthClass(estatisticas?.repassesRealizados || 0, 50)}`}></div>
               </div>
-              
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModalCodigo(false)
-                    setEditandoCodigo(null)
-                    setFormCodigo({ codigo: '', desconto: 10, maxUsos: 100, dataExpiracao: '' })
-                  }}
-                  className="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingCodigo}
-                  className="flex-1 bg-sementes-primary hover:bg-sementes-secondary disabled:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"
-                >
-                  {savingCodigo ? 'Salvando...' : (editandoCodigo ? 'Atualizar' : 'Criar')}
-                </button>
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 group">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center group-hover:bg-yellow-500/30 transition-all">
+                  <UsersIcon className="w-6 h-6 text-yellow-400" />
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-white">
+                    {!loadingEstatisticas ? estatisticas?.usuariosAtivos || 0 : '--'}
+                  </div>
+                  <div className="text-sm text-yellow-300">Usuários com Repasse</div>
+                </div>
               </div>
-            </form>
-          </motion.div>
+              <div className="h-1 bg-yellow-500/20 rounded-full overflow-hidden">
+                <div className={`h-full bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full ${getProgressWidthClass(estatisticas?.usuariosAtivos || 0, 100)}`}></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Conteúdo principal */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Coluna esquerda - Repasses e Transações */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Repasses Pendentes */}
+            <section>
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 overflow-hidden">
+                <div className="p-6 border-b border-gray-700">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                      <CurrencyDollarIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white">Repasses Pendentes</h2>
+                      <p className="text-sm text-gray-400">Gerencie os repasses aguardando aprovação</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  {loadingRepasses ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                      <p className="text-gray-400">Carregando repasses...</p>
+                    </div>
+                  ) : repasses.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircleIcon className="w-8 h-8 text-gray-500" />
+                      </div>
+                      <p className="text-gray-400">Nenhum repasse pendente</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {repasses.map((repasse) => (
+                        <div key={repasse.id} className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <h3 className="text-white font-semibold">
+                                Repasse de R$ {repasse.valorRepasse.toFixed(2)}
+                              </h3>
+                              <p className="text-sm text-gray-400">
+                                Compra: R$ {repasse.valorCompra.toFixed(2)} • {repasse.usuario?.nome || 'Usuário'}
+                              </p>
+                            </div>
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              repasse.status === 'pendente' ? 'bg-yellow-500/20 text-yellow-400' :
+                              repasse.status === 'aprovado' ? 'bg-green-500/20 text-green-400' :
+                              'bg-red-500/20 text-red-400'
+                            }`}>
+                              {repasse.status}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-sm text-gray-400">
+                            <span>{new Date(repasse.dataCompra).toLocaleDateString('pt-BR')}</span>
+                            <div className="flex space-x-2">
+                              <button className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs transition-colors">
+                                Aprovar
+                              </button>
+                              <button className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs transition-colors">
+                                Rejeitar
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Transações Recentes */}
+            <section>
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 overflow-hidden">
+                <div className="p-6 border-b border-gray-700">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                      <ArrowTrendingUpIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white">Transações Recentes</h2>
+                      <p className="text-sm text-gray-400">Histórico de suas transações</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  {loadingTransacoes ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                      <p className="text-gray-400">Carregando transações...</p>
+                    </div>
+                  ) : transacoes.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <DocumentTextIcon className="w-8 h-8 text-gray-500" />
+                      </div>
+                      <p className="text-gray-400">Nenhuma transação encontrada</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {transacoes.slice(0, 5).map((transacao) => (
+                        <div key={transacao.id} className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg border border-gray-600">
+                          <div>
+                            <p className="text-white font-medium">R$ {transacao.valor.toFixed(2)}</p>
+                            <p className="text-sm text-gray-400">{transacao.usuario?.nome || 'Usuário'}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              transacao.status === 'aprovado' ? 'bg-green-500/20 text-green-400' :
+                              transacao.status === 'pendente' ? 'bg-yellow-500/20 text-yellow-400' :
+                              'bg-red-500/20 text-red-400'
+                            }`}>
+                              {transacao.status}
+                            </span>
+                            <p className="text-sm text-gray-400 mt-1">
+                              {new Date(transacao.data).toLocaleDateString('pt-BR')}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* Coluna direita - Notificações e Configurações */}
+          <div className="space-y-8">
+            {/* Notificações */}
+            <section>
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 overflow-hidden">
+                <div className="p-6 border-b border-gray-700">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
+                      <BellIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white">Notificações</h2>
+                      <p className="text-sm text-gray-400">Suas notificações recentes</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  {loadingNotificacoes ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                      <p className="text-gray-400">Carregando notificações...</p>
+                    </div>
+                  ) : notificacoes.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <BellIcon className="w-8 h-8 text-gray-500" />
+                      </div>
+                      <p className="text-gray-400">Nenhuma notificação</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {notificacoes.map((notificacao) => (
+                        <div key={notificacao.id} className="p-4 bg-gray-700/30 rounded-lg border border-gray-600">
+                          <h3 className="text-white font-medium text-sm mb-2">{notificacao.titulo}</h3>
+                          <p className="text-gray-400 text-sm mb-2">{notificacao.mensagem}</p>
+                          <p className="text-gray-500 text-xs">{new Date(notificacao.data).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Configurações */}
+            <section>
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700 overflow-hidden">
+                <div className="p-6 border-b border-gray-700">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                      <Cog6ToothIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white">Configurações</h2>
+                      <p className="text-sm text-gray-400">Gerencie suas informações</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <div className="space-y-4">
+                    <div className="bg-gray-700/30 rounded-lg p-4">
+                      <h3 className="text-white font-semibold mb-3">Informações da Cidade</h3>
+                      <div className="space-y-2">
+                        <div>
+                          <p className="text-sm text-gray-400">Nome da Cidade</p>
+                          <p className="text-white font-medium">{parceiro?.nomeCidade || 'Não definido'}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-400">URL do Connect</p>
+                          <p className="text-white font-medium">
+                            {parceiro?.urlConnect ? (
+                              <span className="text-blue-400">{parceiro.urlConnect}</span>
+                            ) : (
+                              'Não configurado'
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors">
+                      Editar Perfil
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
         </div>
-      )}
+      </main>
     </div>
   )
 }
