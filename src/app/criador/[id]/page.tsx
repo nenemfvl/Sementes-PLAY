@@ -292,8 +292,15 @@ export default function CriadorPage() {
                   <div className="flex-1">
                                          <div className="mb-6">
                        <h2 className="text-4xl font-bold text-white mb-2">{criador.nome}</h2>
-                       <div className="max-w-full overflow-hidden">
-                         <p className={`text-gray-300 text-lg break-words ${bioExpandida ? '' : 'line-clamp-3'}`}>
+                       <div className="w-full">
+                         <p 
+                           className={`text-gray-300 text-lg ${bioExpandida ? '' : 'line-clamp-3'}`}
+                           style={{
+                             wordBreak: 'break-all',
+                             overflowWrap: 'break-word',
+                             maxWidth: '100%'
+                           }}
+                         >
                            {criador.bio}
                          </p>
                          {criador.bio && criador.bio.length > 200 && (
