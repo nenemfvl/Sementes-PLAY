@@ -33,6 +33,7 @@ export default function ConteudoInteracoes({
   const [isDisliked, setIsDisliked] = useState(false)
   const [showDenunciaModal, setShowDenunciaModal] = useState(false)
   const [usuario, setUsuario] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     // Carregar dados do usuário
@@ -47,16 +48,50 @@ export default function ConteudoInteracoes({
     }
   }, [])
 
+  // Verificar estado inicial das interações do usuário
+  useEffect(() => {
+    if (usuario?.id) {
+      verificarInteracoesUsuario()
+    }
+  }, [usuario, conteudoId, conteudoParceiroId])
+
   // Registrar visualização quando o componente é montado
   useEffect(() => {
     if (usuario?.id) {
       registrarVisualizacao()
     }
-  }, [usuario, conteudoId])
+  }, [usuario, conteudoId, conteudoParceiroId])
+
+  const verificarInteracoesUsuario = async () => {
+    if (!usuario?.id) return
+    
+    try {
+      const idParaUsar = tipoConteudo === 'parceiro' ? (conteudoParceiroId || conteudoId) : conteudoId
+      
+      // Verificar curtida
+      const responseCurtida = await fetch(`/api/conteudos/${idParaUsar}/verificar-interacao?tipo=curtida&userId=${usuario.id}`)
+      if (responseCurtida.ok) {
+        const dataCurtida = await responseCurtida.json()
+        setIsCurtido(dataCurtida.interagiu)
+      }
+      
+      // Verificar dislike
+      const responseDislike = await fetch(`/api/conteudos/${idParaUsar}/verificar-interacao?tipo=dislike&userId=${usuario.id}`)
+      if (responseDislike.ok) {
+        const dataDislike = await responseDislike.json()
+        setIsDisliked(dataDislike.interagiu)
+      }
+    } catch (error) {
+      console.error('Erro ao verificar interações do usuário:', error)
+    }
+  }
 
   const registrarVisualizacao = async () => {
     try {
-      const response = await fetch(`/api/conteudos/${conteudoId}/visualizar`, {
+      // Usar o ID correto baseado no tipo de conteúdo
+      const idParaUsar = tipoConteudo === 'parceiro' ? (conteudoParceiroId || conteudoId) : conteudoId
+      
+      const response = await fetch(`/api/conteudos/${idParaUsar}/visualizar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -84,7 +119,10 @@ export default function ConteudoInteracoes({
     }
 
     try {
-      const response = await fetch(`/api/conteudos/${conteudoId}/curtir`, {
+      // Usar o ID correto baseado no tipo de conteúdo
+      const idParaUsar = tipoConteudo === 'parceiro' ? (conteudoParceiroId || conteudoId) : conteudoId
+      
+      const response = await fetch(`/api/conteudos/${idParaUsar}/curtir`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -113,7 +151,10 @@ export default function ConteudoInteracoes({
     }
 
     try {
-      const response = await fetch(`/api/conteudos/${conteudoId}/dislike`, {
+      // Usar o ID correto baseado no tipo de conteúdo
+      const idParaUsar = tipoConteudo === 'parceiro' ? (conteudoParceiroId || conteudoId) : conteudoId
+      
+      const response = await fetch(`/api/conteudos/${idParaUsar}/dislike`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -710,13 +710,34 @@ export default function CriadoresPage() {
                          curtidas={conteudo.curtidas}
                          dislikes={conteudo.dislikes || 0}
                          onVisualizacaoChange={(novasVisualizacoes: number) => {
-                           // Atualizar visualizações localmente se necessário
+                           // Atualizar visualizações localmente
+                           setConteudosParceiros(prev => 
+                             prev.map(c => 
+                               c.id === conteudo.id 
+                                 ? { ...c, visualizacoes: novasVisualizacoes }
+                                 : c
+                             )
+                           )
                          }}
                          onCurtidaChange={(novasCurtidas: number, curtido: boolean) => {
-                           // Atualizar curtidas localmente se necessário
+                           // Atualizar curtidas localmente
+                           setConteudosParceiros(prev => 
+                             prev.map(c => 
+                               c.id === conteudo.id 
+                                 ? { ...c, curtidas: novasCurtidas }
+                                 : c
+                             )
+                           )
                          }}
                          onDislikeChange={(novosDislikes: number, disliked: boolean) => {
-                           // Atualizar dislikes localmente se necessário
+                           // Atualizar dislikes localmente
+                           setConteudosParceiros(prev => 
+                             prev.map(c => 
+                               c.id === conteudo.id 
+                                 ? { ...c, dislikes: novosDislikes }
+                                 : c
+                             )
+                           )
                          }}
                        />
                      </div>
