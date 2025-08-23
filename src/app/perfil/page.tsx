@@ -25,6 +25,7 @@ export default function Perfil() {
   const [activeTab, setActiveTab] = useState('overview')
   const [uploading, setUploading] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [usuarioCompleto, setUsuarioCompleto] = useState<any>(null)
 
   // Função específica para Edge - sincronizar cookies e localStorage
   const sincronizarEdge = () => {
@@ -46,6 +47,7 @@ export default function Perfil() {
       if (isAuthenticated && usuario) {
         setAvatarUrl(usuario.avatarUrl || null)
         carregarEstatisticas(usuario.id)
+        carregarDadosCompletos(usuario.id)
         setLoading(false)
         
         // Sincronizar Edge se necessário
@@ -90,6 +92,22 @@ export default function Perfil() {
       console.error('Erro ao carregar estatísticas:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const carregarDadosCompletos = async (userId: string) => {
+    try {
+      // Buscar dados completos do usuário incluindo o campo criador
+      const response = await fetch(`/api/usuarios/${userId}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.usuario) {
+          // Atualizar o usuário com dados completos
+          setUsuarioCompleto(data.usuario)
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados completos:', error)
     }
   }
 
@@ -272,9 +290,9 @@ export default function Perfil() {
               <div className="flex-1">
                 <div className="flex items-center space-x-3 mb-2">
                   <h2 className="text-2xl font-bold text-white">{usuario.nome}</h2>
-                  {getNivelIcon(usuario.nivel)}
-                  <span className={`text-sm font-medium ${getNivelColor(usuario.nivel)}`}>
-                    Nível {usuario.nivel}
+                  {getNivelIcon((usuarioCompleto?.criador?.nivel || usuario.nivel))}
+                  <span className={`text-sm font-medium ${getNivelColor((usuarioCompleto?.criador?.nivel || usuario.nivel))}`}>
+                    Nível {usuarioCompleto?.criador?.nivel || usuario.nivel}
                   </span>
                 </div>
                 
