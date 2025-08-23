@@ -23,8 +23,7 @@ export async function GET(
             id: true,
             bio: true,
             categoria: true,
-            redesSociais: true,
-            dataAprovacao: true
+            redesSociais: true
           }
         },
         carteiraDigital: {
