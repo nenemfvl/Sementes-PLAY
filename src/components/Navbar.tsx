@@ -54,12 +54,38 @@ export default function Navbar() {
     }
     
     verificarAutenticacao()
-  }, [])
+    
+    // Verificar status periodicamente para detectar mudanças
+    const interval = setInterval(() => {
+      if (isAuthenticated && usuario) {
+        verificarStatusCandidatura(usuario.id)
+      }
+    }, 30000) // Verificar a cada 30 segundos
+    
+    return () => clearInterval(interval)
+  }, [isAuthenticated, usuario])
 
 
 
   const verificarStatusCandidatura = async (userId: string) => {
     try {
+      // Primeiro verificar se o usuário ainda tem nível de criador no banco
+      const userResponse = await fetch(`/api/usuarios/${userId}`)
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        if (userData.usuario && userData.usuario.criador) {
+          // Se tem criador, verificar se o nível é válido
+          const nivelCriador = userData.usuario.criador.nivel
+          const niveisValidos = ['criador-iniciante', 'criador-comum', 'criador-parceiro', 'criador-supremo']
+          
+          if (niveisValidos.includes(nivelCriador)) {
+            setStatusCandidatura('criador_aprovado')
+            return
+          }
+        }
+      }
+      
+      // Se não tem criador ou nível inválido, verificar candidatura
       const response = await fetch(`/api/candidaturas/criador/status?usuarioId=${userId}`)
       if (response.ok) {
         const data = await response.json()
