@@ -292,17 +292,19 @@ export default function CriadorPage() {
                   <div className="flex-1">
                                          <div className="mb-6">
                        <h2 className="text-4xl font-bold text-white mb-2">{criador.nome}</h2>
-                       <p className={`text-gray-300 text-lg max-w-4xl ${bioExpandida ? '' : 'line-clamp-3'}`}>
-                         {criador.bio}
-                       </p>
-                       {criador.bio && criador.bio.length > 200 && (
-                         <button
-                           onClick={() => setBioExpandida(!bioExpandida)}
-                           className="text-sementes-primary hover:text-sementes-accent text-sm font-medium mt-2 transition-colors"
-                         >
-                           {bioExpandida ? 'Ver menos' : 'Ver mais'}
-                         </button>
-                       )}
+                       <div className="max-w-full overflow-hidden">
+                         <p className={`text-gray-300 text-lg break-words ${bioExpandida ? '' : 'line-clamp-3'}`}>
+                           {criador.bio}
+                         </p>
+                         {criador.bio && criador.bio.length > 200 && (
+                           <button
+                             onClick={() => setBioExpandida(!bioExpandida)}
+                             className="text-sementes-primary hover:text-sementes-accent text-sm font-medium mt-2 transition-colors"
+                           >
+                             {bioExpandida ? 'Ver menos' : 'Ver mais'}
+                           </button>
+                         )}
+                       </div>
                      </div>
 
                     {/* Estatísticas */}
