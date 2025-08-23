@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       { error: 'Erro interno do servidor. Tente novamente.' },
       { status: 500 }
     )
-
+  }
 }
 
 // PUT - Atualizar status de candidatura (aprovar/rejeitar)

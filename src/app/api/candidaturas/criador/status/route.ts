@@ -85,5 +85,5 @@ export async function GET(request: NextRequest) {
       { error: 'Erro interno do servidor' },
       { status: 500 }
     )
-
+  }
 }
