@@ -226,6 +226,101 @@ export default function CriadoresPage() {
     }
   }
 
+  const renderRedesSociais = (redesSociais: any) => {
+    if (!redesSociais) return null
+    
+    const redesConfiguradas = []
+    
+    if (redesSociais.youtube) {
+      redesConfiguradas.push(
+        <a
+          key="youtube"
+          href={redesSociais.youtube}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-6 h-6 bg-red-600 rounded flex items-center justify-center text-white text-xs font-bold hover:bg-red-700 transition-colors"
+          title="YouTube"
+        >
+          YT
+        </a>
+      )
+    }
+    
+    if (redesSociais.twitch) {
+      redesConfiguradas.push(
+        <a
+          key="twitch"
+          href={redesSociais.twitch}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-6 h-6 bg-purple-600 rounded flex items-center justify-center text-white text-xs font-bold hover:bg-purple-700 transition-colors"
+          title="Twitch"
+        >
+          TW
+        </a>
+      )
+    }
+    
+    if (redesSociais.tiktok) {
+      redesConfiguradas.push(
+        <a
+          key="tiktok"
+          href={redesSociais.tiktok}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-6 h-6 bg-black rounded flex items-center justify-center text-white text-xs font-bold hover:bg-gray-800 transition-colors"
+          title="TikTok"
+        >
+          TT
+        </a>
+      )
+    }
+    
+    if (redesSociais.instagram) {
+      redesConfiguradas.push(
+        <a
+          key="instagram"
+          href={redesSociais.instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center text-white text-xs font-bold hover:from-purple-600 hover:to-pink-600 transition-colors"
+          title="Instagram"
+        >
+          IG
+        </a>
+      )
+    }
+    
+    if (redesSociais.discord) {
+      redesConfiguradas.push(
+        <a
+          key="discord"
+          href={redesSociais.discord}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white text-xs font-bold hover:bg-blue-700 transition-colors"
+          title="Discord"
+        >
+          DC
+        </a>
+        )
+    }
+    
+    if (redesConfiguradas.length === 0) {
+      return (
+        <span className="px-2 py-1 rounded-lg text-xs font-medium border border-gray-500/30 text-gray-400">
+          Sem redes sociais
+        </span>
+      )
+    }
+    
+    return (
+      <div className="flex items-center space-x-2">
+        {redesConfiguradas}
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-sss-dark flex items-center justify-center">
@@ -473,9 +568,7 @@ export default function CriadoresPage() {
                             <h3 className="text-lg font-bold text-white group-hover:text-sementes-primary transition-colors mb-1">
                               {criador.nome}
                             </h3>
-                            <span className="px-2 py-1 rounded-lg text-xs font-medium border border-sementes-primary/30 text-sementes-primary">
-                              {criador.categoria}
-                            </span>
+                            {renderRedesSociais(criador.redesSociais)}
                           </div>
                         </div>
                       </div>
