@@ -296,7 +296,7 @@ export default function PainelCriador() {
       } else {
         // Criar novo conteúdo
         console.log('Criando novo conteúdo com dados:', {
-          criadorId: usuario.id,
+          criadorId: usuario.criador?.id,
           titulo: form.titulo,
           tipo: form.tipo,
           categoria: form.categoria,
@@ -308,7 +308,7 @@ export default function PainelCriador() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            criadorId: usuario.id,
+            criadorId: usuario.criador?.id,
             titulo: form.titulo,
             descricao: form.titulo, // Usar título como descrição por enquanto
             tipo: form.tipo,
