@@ -119,6 +119,15 @@ export default function PainelCriador() {
   const [loadingEnquetes, setLoadingEnquetes] = useState(true)
   const [showEnqueteModal, setShowEnqueteModal] = useState(false)
   const [formEnquete, setFormEnquete] = useState({ pergunta: '', opcoes: ['', ''], dataFim: '' })
+  const [redesSociais, setRedesSociais] = useState({
+    youtube: '',
+    twitch: '',
+    tiktok: '',
+    instagram: '',
+    discord: ''
+  })
+  const [showRedesSociaisModal, setShowRedesSociaisModal] = useState(false)
+  const [salvandoRedes, setSalvandoRedes] = useState(false)
 
   useEffect(() => {
     const verificarAutenticacao = async () => {
@@ -172,6 +181,9 @@ export default function PainelCriador() {
     try {
       // Carregar conteúdos do criador
       await carregarConteudos()
+      
+      // Carregar redes sociais
+      await carregarRedesSociais()
       
       // TODO: Implementar outras APIs reais
       setEstatisticas({
@@ -409,6 +421,41 @@ export default function PainelCriador() {
     }
   }
 
+  const carregarRedesSociais = async () => {
+    try {
+      // TODO: Implementar API real para carregar redes sociais
+      // Por enquanto, usar dados mockados
+      setRedesSociais({
+        youtube: 'https://youtube.com/@meucanal',
+        twitch: 'https://twitch.tv/meucanal',
+        tiktok: 'https://tiktok.com/@meucanal',
+        instagram: 'https://instagram.com/meucanal',
+        discord: 'https://discord.gg/meuservidor'
+      })
+    } catch (error) {
+      console.error('Erro ao carregar redes sociais:', error)
+    }
+  }
+
+  const salvarRedesSociais = async () => {
+    setSalvandoRedes(true)
+    try {
+      // TODO: Implementar API real para salvar redes sociais
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Simular sucesso
+      setShowRedesSociaisModal(false)
+      
+      // Mostrar toast de sucesso
+      alert('Redes sociais salvas com sucesso!')
+    } catch (error) {
+      console.error('Erro ao salvar redes sociais:', error)
+      alert('Erro ao salvar redes sociais')
+    } finally {
+      setSalvandoRedes(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-sss-dark flex items-center justify-center">
@@ -500,6 +547,13 @@ export default function PainelCriador() {
                 >
                   <ChartBarIcon className="w-5 h-5 mr-2" />
                   Criar Enquete
+                </button>
+                <button
+                  onClick={() => setShowRedesSociaisModal(true)}
+                  className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
+                >
+                  <LinkIcon className="w-5 h-5 mr-2" />
+                  Redes Sociais
                 </button>
                 <button
                   onClick={() => setSuporteStatus('enviando')}
@@ -954,6 +1008,113 @@ export default function PainelCriador() {
                 </button>
               </div>
             </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Modal de Redes Sociais */}
+      {showRedesSociaisModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gray-800 rounded-lg max-w-2xl w-full p-6"
+          >
+            <h3 className="text-xl font-bold text-white mb-6">🔗 Configurar Redes Sociais</h3>
+            
+            <div className="space-y-4">
+              {/* YouTube */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                  <span className="w-6 h-6 bg-red-600 rounded mr-2 flex items-center justify-center text-white text-xs font-bold">YT</span>
+                  YouTube
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://youtube.com/@seucanal"
+                  value={redesSociais.youtube}
+                  onChange={(e) => setRedesSociais({ ...redesSociais, youtube: e.target.value })}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
+                />
+              </div>
+
+              {/* Twitch */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                  <span className="w-6 h-6 bg-purple-600 rounded mr-2 flex items-center justify-center text-white text-xs font-bold">TW</span>
+                  Twitch
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://twitch.tv/seucanal"
+                  value={redesSociais.twitch}
+                  onChange={(e) => setRedesSociais({ ...redesSociais, twitch: e.target.value })}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
+                />
+              </div>
+
+              {/* TikTok */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                  <span className="w-6 h-6 bg-black rounded mr-2 flex items-center justify-center text-white text-xs font-bold">TT</span>
+                  TikTok
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://tiktok.com/@seucanal"
+                  value={redesSociais.tiktok}
+                  onChange={(e) => setRedesSociais({ ...redesSociais, tiktok: e.target.value })}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
+                />
+              </div>
+
+              {/* Instagram */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                  <span className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded mr-2 flex items-center justify-center text-white text-xs font-bold">IG</span>
+                  Instagram
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://instagram.com/seucanal"
+                  value={redesSociais.instagram}
+                  onChange={(e) => setRedesSociais({ ...redesSociais, instagram: e.target.value })}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
+                />
+              </div>
+
+              {/* Discord */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                  <span className="w-6 h-6 bg-blue-600 rounded mr-2 flex items-center justify-center text-white text-xs font-bold">DC</span>
+                  Discord
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://discord.gg/seuserver"
+                  value={redesSociais.discord}
+                  onChange={(e) => setRedesSociais({ ...redesSociais, discord: e.target.value })}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-sementes-primary"
+                />
+              </div>
+              
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowRedesSociaisModal(false)}
+                  className="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={salvarRedesSociais}
+                  disabled={salvandoRedes}
+                  className="flex-1 bg-sementes-primary hover:bg-sementes-secondary disabled:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"
+                >
+                  {salvandoRedes ? 'Salvando...' : 'Salvar Redes Sociais'}
+                </button>
+              </div>
+            </div>
           </motion.div>
         </div>
       )}
