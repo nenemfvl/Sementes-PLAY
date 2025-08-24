@@ -4,7 +4,7 @@ Sistema de cashback e doações para o ecossistema FiveM. Conectamos jogadores, 
 
 > **Status**: Projeto configurado e pronto para deploy no Vercel e Railway!
 > 
-> **Nota**: Projeto revertido para commit ffcb62e - versão estável de produção.
+> **Nota**: Projeto revertido para commit 15cfb8d - versão estável de produção.
 
 ## 🚀 Funcionalidades
 
